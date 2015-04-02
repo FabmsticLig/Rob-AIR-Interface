@@ -7,12 +7,12 @@ Web Application for RobAir - Fablab
 TODO archi tu projet :
 
 This project contains a WebRTC connection:
-	* WebRTC video-chat : 
-		* the module signalingserver launches the communication between the two WebRTC clients (the robot and the suser)
-		* the module server enables the WebRTC communication
-	* The part to control the robot:
-		* direction to move the robot
-		* gets the signals from the robots
+* WebRTC video-chat : 
+    * the module signalingserver launches the communication between the two WebRTC clients (the robot and the suser)
+    * the module server enables the WebRTC communication
+* The part to control the robot:
+    * direction to move the robot
+    * gets the signals from the robots
 
 This project is based on the MVCB project (see below).
 
