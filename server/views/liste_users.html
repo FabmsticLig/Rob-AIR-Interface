@@ -1,0 +1,9 @@
+<h1>Liste des utilisateurs connectés</h1>
+
+<ul>
+<% for (var i in isConnected) { %>
+	<% if (isConnected[i]) { %>
+		<li><a href='/profil/<%= i %>'><%= i %></a></li>
+	<% } %>
+<% } %>
+</ul>
