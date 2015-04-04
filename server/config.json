@@ -1,7 +1,7 @@
 {
 	"mysql" : {
 		"user":"root",
-		"password":"soa@suse"	
+		"password":""	
 	},
 
 	"signal" : {
