@@ -30,6 +30,7 @@ var connection = mysql.createConnection({
     password: json.mysql.password
 });
 
+//map the EJS template engine to ".html" files
 app.engine('html', require('ejs').renderFile);
 
 connection.connect(function (err) {
@@ -94,10 +95,6 @@ var printPageWithLayout = function (req, res, contentFile, data) {
     // Ajout des données de session dans data
     data.session = req.session;
     console.log("New layout: " + contentFile);
-
-
-
-
 
     //print(userToRooms);
     //print(roomToUsers);
