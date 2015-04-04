@@ -118,20 +118,9 @@ console.log('XXXXXXXXXXXXX');
 console.log('user : ' + req.session.name);
 
 		var user = req.session.name;
-		var user_type;
-		var q = connection.query('SELECT user_type FROM users WHERE login= "' + 
-		                         user + '"');
-		q
-		    .on('error', function (err) {
-		        // TODO: afficher erreur
-console.log(err);
-		    })
-		    .on('result', function (row, index) {
-		        user_type = row.user_type;
-		    })
-		    .on('end', function () {
-console.log('onEND');
-console.log('user_type='+user_type);
+		var user_type = req.session.userType;
+		
+		console.log('user_type='+user_type);
 			var html_file;
 			if (user_type=='user'){
 console.log('user_type is USER');
@@ -145,7 +134,6 @@ console.log('user_type is ROBOT');
 		        	content: html
 		    	});
 
-		    });
 	    } else {
 console.log('XXXXXXXXXXXXX');
 console.log('XXXXXXXXXXXXX');
@@ -200,7 +188,14 @@ app.get('/room/:name', function (req, res) {
         var data = {
             room: roomName
         }
-        printPageWithLayout(req, res, 'room.html', data);
+		
+		//if it's the user --> go to room_user.htm (video chat + remote controls)
+		//else if robot --> go to room_robot.html (only the video chat) 
+		if (req.session.userType == 'user') {
+			printPageWithLayout(req, res, 'room_user.html', data);
+		} else {
+			printPageWithLayout(req, res, 'room_robot.html', data);
+		}
     } else {
         res.redirect('/login')
     }
@@ -374,7 +369,7 @@ app.post('/login/log', function (req, res) {
     var mail;
     var val;
 
-    var query = connection.query('SELECT COUNT(*) AS res from users WHERE login= "' +
+    var query = connection.query('SELECT user_type, COUNT(*) AS res from users WHERE login= "' +
         req.body.login + '" AND pw="' + req.body.password + '"');
 
     query.on('error', function (err) {
@@ -388,28 +383,11 @@ app.post('/login/log', function (req, res) {
             var sess = req.session;
             sess.isLogged = true;
             sess.name = login;
+			sess.userType = row.user_type;
             console.log("connexion correctly done for " + login);
             isConnected[login] = true;
-/*
-            var q = connection.query('SELECT * FROM users,fablab WHERE login= "' + 
-                                     login + '" AND fablab.nom = users.fablab');
-            q.on('error', function (err) {
-                console.log(err.stack);
-                throw err;
-            });
-            q.on('result', function (row, index) {
-                sess.mail = row.mail;
-                sess.fablab = row.fablab;
-                sess.adresse = row.adresse;
-                sess.ville = row.ville;
-                sess.cp = row.cp;
-                sess.lat = row.latitude;
-                sess.log = row.longitude;
-                console.log(row);
-                res.redirect('/');
-            });
-*/
-	    res.redirect('/');
+	    
+			res.redirect('/');
 
         } else {
             //res.render('login.html');
