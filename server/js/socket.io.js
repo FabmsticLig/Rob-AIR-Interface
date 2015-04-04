@@ -13,7 +13,6 @@ var io = ('undefined' === typeof module ? {} : module.exports);
 
   /**
    * IO namespace.
-   *
    * @namespace
    */
 
