@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="keywords" content="jQuery Gauge, Gauge, Radial Gauge, jqxGauge" />
+        <meta name="description" content="In the following demo you can see how you can cuztomize jqxGauge's ranges. You can set range's start and end width, start and end distance from the gauge's bundaries and custom style." />
+        <title id='Description'>jqxGauge displays an indicator within a range of values. Gauges
+            can be used in a table or matrix to show the relative value of a field in a range
+            of values in the data region, for example, as a KPI</title>
+        <link rel="stylesheet" href="css/jqx.base.css" type="text/css" />
+        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="js/jqxcore.js"></script>
+        <script type="text/javascript" src="js/jqxdraw.js"></script>
+        <script type="text/javascript" src="js/jqxgauge.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var labels = {visible: true, position: 'inside'};
+                $('#gaugeContainer').jqxGauge({
+                    ranges: [{startValue: 0, endValue: 220, style: {fill: '#e2e2e2', stroke: '#e2e2e2'}, startDistance: '50%', endDistance: '50%', endWidth: 13, startWidth: 13},
+                        ],
+                    startAngle : 0,
+                    endAngle : 180,
+                    value: 110,
+                    style: {stroke: '#ffffff', 'stroke-width': '1px', fill: '#ffffff'},
+                    animationDuration: 1500,
+                    colorScheme: 'scheme04',
+                    labels: labels,
+                    ticksMinor: {interval: 5, size: '5%'},
+                    ticksMajor: {interval: 10, size: '10%'}
+                });
+
+                $('#gaugeContainer').on('valueChanging', function (e) {
+                    $('#gaugeValue').text(Math.round(e.args.value) + ' kph');
+                });
+
+                
+                labels.visible = false;
+                $('#gaugeContainer').jqxGauge('labels', labels);
+                $('#gaugeContainer').jqxGauge('showRanges', false);
+                $('#gaugeContainer').jqxGauge('border', { visible: false });
+                //$('#gaugeContainer').jqxGauge('height', '200');
+                //$('#gaugeContainer').jqxGauge({ pointer: { pointerType: 'default', style: { fill: '#ff0000', stroke: '#ff0000' }, length: '70%', width: '2%', visible: true }});
+                $(document).keydown(function(e){
+                    if(e.keyCode == 39){
+                        $('#gaugeContainer').jqxGauge('value', $('#gaugeContainer').jqxGauge('value')+10);
+                    }
+                })
+            });
+        </script>
+    </head>
+    <body style="background:white;">
+        <div id="demoWidget" style="position: relative;">
+            <div style="float: left;" id="gaugeContainer"></div>
+        </div>
+    </body>
+</html>
