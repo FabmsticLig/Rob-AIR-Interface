@@ -30,7 +30,6 @@ window.onload=function(){
 		ros : ros,
 		name : 'turtle1/cmd_vel',
 		messageType : 'geometry_msgs/Twist'
-
 	});
 
 	/** Object storing references to the remote screen DOM elements */
@@ -81,11 +80,11 @@ window.onload=function(){
 		}else if (key == '37') {
 			// left arrow
 			console.log("left Arrow");
-			angular_val = 0.75;
+			angular_val = 1;
 		}else if (key == '39') {
 			// right arrow
 			console.log("right Arrow");
-			angular_val = -0.75;
+			angular_val = -1;
 		}else if (key == '83') {
 			// 's' key -> stop
 			console.log("'s' key (Stop)");
@@ -126,97 +125,79 @@ window.onload=function(){
 	this.remote.down.click(clickButton.bind(null, 40));
 	this.remote.stop.click(clickButton.bind(null, 83));
 
-	/*	document.onkeydown = function (e) {
-		e = e || window.event;
-		console.log("onKeyDown ---> keyCode = " + e.keyCode);
 
-		var keyCode = e.keyCode;
-		var html_img_id;
+	//==============================================
+	//=============XBOX PAD CONTROL=================
+	//==============================================
 
-		if (keyCode == '38' || keyCode == '40' || keyCode == '37'
-		|| keyCode == '39' || keyCode == '83'){
+	var start;
+	var rAF = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
+	window.requestAnimationFrame;
 
-		if (e.keyCode == '38') {
-		// up arrow
-		console.log("up Arrow");
-		angular_val = 0.0;
-		html_img_id = 'up';
+	var rAFStop = window.mozCancelRequestAnimationFrame ||	window.webkitCancelRequestAnimationFrame ||
+	window.cancelRequestAnimationFrame;
 
-		}else if (e.keyCode == '40') {
-		// down arrow
-		console.log("down Arrow");
-		angular_val = 3.0;
-		html_img_id = 'down';
+	window.addEventListener("gamepadconnected", function() {
+		var gp = navigator.getGamepads()[0];
+		console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
+		gameLoop();
+	});
 
-		}else if (e.keyCode == '37') {
-		// left arrow
-		console.log("left Arrow");
-		angular_val = 0.75;
-		html_img_id = 'left';
+	window.addEventListener("gamepaddisconnected", function() {
+		console.log("Waiting for gamepad.");
+		rAFStop(start);
+	});
 
-		}else if (e.keyCode == '39') {
-		// right arrow
-		console.log("right Arrow");
-		angular_val = -0.75;
-		html_img_id = 'right';
+	if(!('GamepadEvent' in window)) {
+		// No gamepad events available, poll instead.
+		var interval = setInterval(pollGamepads, 500);
+	}
 
-		}else if (e.keyCode == '83') {
-		// 's' key -> stop
-		console.log("'s' key (Stop)");
-		angular_val = 0.0;
-		html_img_id = 'stop';
+	function pollGamepads() {
+		var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+		for (var i = 0; i < gamepads.length; i++) {
+			var gp = gamepads[i];
+			if(gp) {
+				console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
+				gameLoop();
+				clearInterval(interval);
+			}
 		}
+	}
+
+
+	function gameLoop() {
+		var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+		if (!gamepads)
+			return;
+		var gp = gamepads[0];
+		var x = gp.axes[0];
+		var speed = gp.buttons[0].value;
+		var isPressed = gp.buttons[0].pressed;
+		if (!isPressed) { 
+			var start = rAF(gameLoop);
+			return;
+		}
+
+		var angular_val = -x;
+		
+
 		var msg = new ROSLIB.Message({
-		linear : {
-		x : 2.0,
-		y : 0.0,
-		z : 0.0
-		},
-		angular : {
-		x : 0.0,
-		y : 0.0,
-		z : angular_val
-		}
+			linear : {
+				x : speed,
+				y : 0.0,
+				z : 0.0
+			},
+			angular : {
+				x : 0.0,
+				y : 0.0,
+				z : angular_val
+			}
 		});
+
 		//Publish on Topic
 		topic_cmd.publish(msg);
-		console.log("published " + e.keyCode);
-		}
-		console.log("");
-		};*/
 
-
-
-
-		/*	webrtc.on('chat', function(message) {
-			console.log("MSG received!!!");
-			document.getElementById("title").innerHTML += message.data;
-
-			var linear_val = message.data;
-
-			var msg = new ROSLIB.Message({
-			//{"top": 0, "bottom": 1, "left": 2, "right": 3, "s": 4}
-			move : linear_val,
-			speed1 : 0,
-			turn : 0
-			});
-
-			//Publish on Topic
-			topic_cmd.publish(msg);
-			});*/
-
-
-
-} //end window.onload
-
-
-
-
-
-
-
-
-
-
-
-
+		var start = rAF(gameLoop);
+	};
+}
