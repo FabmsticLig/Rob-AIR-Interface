@@ -1,5 +1,3 @@
-var utils = require('./utils');
-
 /**
  * Gives access to buttons and other DOM elements it also
  * handle some events binding between buttons and calls. This class must be
@@ -10,13 +8,13 @@ function GUI() {
   var me = this;
   // store reference to buttons and stuff
   /** Object storing references to the connect formulary DOM elements*/
-  this.connect = {
+/*  this.connect = {
     btn: $('#connect-btn'),
     form: $('#connect-form'),
     ip: $('#connect-ip'),
     div: $('#connect'),
     remember: $('#connect-remember'),
-  };
+  };*/
 
   /** Object storing references to the remote screen DOM elements */
   this.remote = {
@@ -31,37 +29,48 @@ function GUI() {
     visible: false
   };
 
+  /**
+   * KeyCodes for better readability
+   */
+  this.keys = {
+    SPACE: 32,
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    S: 83
+  };
 }
 
 /**
  * Reset the connect formulary
  */
-GUI.prototype.resetConnectForm = function reset() {
+/*GUI.prototype.resetConnectForm = function reset() {
   this.connect.ip.prop('disabled', false);
   this.connect.remember.prop('disabled', false);
   this.connect.btn.button('reset');
-};
+};*/
 /**
  * Hides the connect formulary
  */
-GUI.prototype.hideConnectForm = function hide() {
+/*GUI.prototype.hideConnectForm = function hide() {
   this.connect.div.slideUp(500);
-};
+};*/
 
 /**
  * Shows the remote screen view
  */
-GUI.prototype.showRemote = function show() {
+/*GUI.prototype.showRemote = function show() {
   this.remote.div.slideDown(500);
   this.remote.visible = true;
-};
+};*/
 
 /**
  * Bind events for the connect formulary
  * @param {RosConnection} rc RosConnection instance
  * @param {Storage} sto Storage instance
  */
-GUI.prototype.bindConnect = function bindConnect(rc, sto) {
+/*GUI.prototype.bindConnect = function bindConnect(rc, sto) {
   // load form data if available
   sto.loadIP();
   var me = this;
@@ -82,7 +91,7 @@ GUI.prototype.bindConnect = function bindConnect(rc, sto) {
       });
     }
   });
-};
+};*/
 
 /**
  * Binds events for the remote screen
@@ -93,21 +102,21 @@ GUI.prototype.bindRemote = function bindRemote(rc, sto) {
   // Add keyboard events
   var me = this;
   var direction = {};
-  direction[utils.keys.UP] = 0;
-  direction[utils.keys.DOWN] = 1;
-  direction[utils.keys.LEFT] = 2;
-  direction[utils.keys.RIGHT] = 3;
-  direction[utils.keys.SPACE] = 4;
-  direction[utils.keys.S] = 4;
+  direction[keys.UP] = 0;
+  direction[keys.DOWN] = 1;
+  direction[keys.LEFT] = 2;
+  direction[keys.RIGHT] = 3;
+  direction[keys.SPACE] = 4;
+  direction[keys.S] = 4;
   direction[0] = 5;
 
   var but = {};
-  but[utils.keys.UP] = this.remote.up;
-  but[utils.keys.DOWN] = this.remote.down;
-  but[utils.keys.LEFT] = this.remote.left;
-  but[utils.keys.RIGHT] = this.remote.right;
-  but[utils.keys.SPACE] = this.remote.stop;
-  but[utils.keys.S] = this.remote.stop;
+  but[keys.UP] = this.remote.up;
+  but[keys.DOWN] = this.remote.down;
+  but[keys.LEFT] = this.remote.left;
+  but[keys.RIGHT] = this.remote.right;
+  but[keys.SPACE] = this.remote.stop;
+  but[keys.S] = this.remote.stop;
   but[0] = this.remote.move;
 
   // Give the key pressed. It must be in directions array
@@ -146,18 +155,18 @@ GUI.prototype.bindRemote = function bindRemote(rc, sto) {
   };
 
   // bind buttons clicks as well
-  this.remote.left.click(clickButton.bind(null, utils.keys.LEFT));
-  this.remote.right.click(clickButton.bind(null, utils.keys.RIGHT));
-  this.remote.up.click(clickButton.bind(null, utils.keys.UP));
-  this.remote.down.click(clickButton.bind(null, utils.keys.DOWN));
-  this.remote.stop.click(clickButton.bind(null, utils.keys.S));
+  this.remote.left.click(clickButton.bind(null, keys.LEFT));
+  this.remote.right.click(clickButton.bind(null, keys.RIGHT));
+  this.remote.up.click(clickButton.bind(null, keys.UP));
+  this.remote.down.click(clickButton.bind(null, keys.DOWN));
+  this.remote.stop.click(clickButton.bind(null, keys.S));
   
   // Control with mouse motion
-  var mouseMotionCtrl = function mouseMotionCtrl(event) {
+  /*var mouseMotionCtrl = function mouseMotionCtrl(event) {
     var x0 = event.x
-    var y0 = event.y
+    var y0 = event.y*/
 
-    document.onmousemove = function (event) {
+  /*  document.onmousemove = function (event) {
       onselectstart = 'return false';
       dx = (x0 - event.x);
       dy = (y0 - event.y);
@@ -194,7 +203,7 @@ GUI.prototype.bindRemote = function bindRemote(rc, sto) {
     e = e || window.event;
     mouseMotionCtrl(e);
     console.log('debig');
-  };
+  };*/
   /*
   //GAMEPAD
   var haveEvents = 'GamepadEvent' in window;
@@ -232,4 +241,3 @@ GUI.prototype.bindRemote = function bindRemote(rc, sto) {
 */
 };
 
-module.exports = GUI;
