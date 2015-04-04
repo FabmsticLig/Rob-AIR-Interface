@@ -1,7 +1,8 @@
 var fs = require('fs'),
     express = require('express'),
     https = require('https'),
-    http = require('http');
+    http = require('http'),
+    url = require ('url');
 var mysql = require('mysql');
 var cookieParser = require('cookie-parser'),
     session = require('express-session');
@@ -14,7 +15,7 @@ var options = {
     cert: hscert
 };
 
-var app = express();
+var app = new express();
 var port = '8087';
 
 var data = fs.readFileSync("config.json");
@@ -163,12 +164,6 @@ app.get('/', function (req, res) {
     
 });
 
-/**
- * Pour les erreurs 404
- */
-app.get('/404', function (req, res) {
-    printPageWithLayout(req, res, '404.html');
-});
 
 /**
  * Pour les rooms
@@ -411,6 +406,14 @@ app.post('/login/log', function (req, res) {
         }
 
     });
+});
+/**
+ * Pour les erreurs 404
+ */
+app.use(function(req, res, next){
+    res.setHeader('Content-Type', 'text/plain');
+    var page = url.parse(req.url).pathname;
+   res.send(404, 'Page introuvable!');
 });
 
 http.createServer(app).listen(port);
