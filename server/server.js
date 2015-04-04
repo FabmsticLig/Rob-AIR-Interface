@@ -130,8 +130,8 @@ console.log('user_type is ROBOT');
 			}
 
 			res.render(html_file, {
-		        	content: html
-		    	});
+				content: html
+		    });
 
 	    } else {
 console.log('XXXXXXXXXXXXX');
@@ -140,7 +140,7 @@ console.log('NOT CONNECTED');
 console.log('XXXXXXXXXXXXX');
 console.log('XXXXXXXXXXXXX');
 		    res.render('layout.html', {
-		    	content: html
+		    	content: html,
 		    });
 	    };
 	    // Second rendu END
