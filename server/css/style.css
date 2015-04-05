@@ -43,7 +43,8 @@ img {
 }
 
 .container-fluid{
-    background-color: #c1e2b3;
+    /*background-color: #c1e2b3;*/
+    background-color: #B0C4DE;
 }
 
 /*.row {
@@ -64,7 +65,8 @@ img {
 }
 
 .col-sm-12 {
-    background-color: lightgreen;
+    /*background-color: lightgreen;*/
+    background-color: #008080;
 }
 
 #divBB{
