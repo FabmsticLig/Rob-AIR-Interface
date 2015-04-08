@@ -1,0 +1,197 @@
+#Tableau_01 {
+        position:absolute;
+	left:0px;
+	top:0px;
+	width:991px;
+	height:1027px;
+        padding : 0px;
+}
+
+#Interface-01 {
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:340px;
+	height:442px;
+}
+
+#Interface-02 {
+	position:absolute;
+	left:340px;
+	top:0px;
+	width:367px;
+	height:205px;
+}
+
+#Interface-03 {
+	position:absolute;
+	left:707px;
+	top:0px;
+	width:284px;
+	height:120px;
+}
+
+#Interface-04 {
+	position:absolute;
+	left:707px;
+	top:120px;
+	width:284px;
+	height:200px;
+}
+
+#BoutonHaut {
+	position:absolute;
+	left:340px;
+	top:205px;
+	width:291px;
+	height:303px;
+}
+
+#Interface-06 {
+	position:absolute;
+	left:631px;
+	top:205px;
+	width:76px;
+	height:115px;
+}
+
+#Interface-07 {
+	position:absolute;
+	left:631px;
+	top:320px;
+	width:360px;
+	height:122px;
+}
+
+#Interface-08 {
+	position:absolute;
+	left:0px;
+	top:442px;
+	width:41px;
+	height:585px;
+}
+
+#BoutonGauche {
+	position:absolute;
+	left:41px;
+	top:442px;
+	width:299px;
+	height:330px;
+}
+
+#BoutonDroit {
+	position:absolute;
+	left:631px;
+	top:442px;
+	width:301px;
+	height:330px;
+}
+
+#Interface-11 {
+	position:absolute;
+	left:932px;
+	top:442px;
+	width:59px;
+	height:330px;
+}
+
+#Interface-12 {
+	position:absolute;
+	left:340px;
+	top:508px;
+	width:291px;
+	height:108px;
+}
+
+#Interface-13 {
+	position:absolute;
+	left:340px;
+	top:616px;
+	width:291px;
+	height:115px;
+}
+
+#BoutonBas {
+	position:absolute;
+	left:340px;
+	top:731px;
+	width:291px;
+	height:286px;
+}
+
+#TeteRobot {
+	position:absolute;
+	left:41px;
+	top:772px;
+	width:299px;
+	height:255px;
+}
+
+#CorpsRobot {
+	position:absolute;
+	left:631px;
+	top:772px;
+	width:301px;
+	height:183px;
+}
+
+#Interface-17 {
+	position:absolute;
+	left:932px;
+	top:772px;
+	width:59px;
+	height:183px;
+}
+
+#Interface-18 {
+	position:absolute;
+	left:631px;
+	top:955px;
+	width:360px;
+	height:62px;
+}
+
+#Interface-19 {
+	position:absolute;
+	left:340px;
+	top:1017px;
+	width:37px;
+	height:1px;
+}
+
+#Interface-20 {
+	position:absolute;
+	left:377px;
+	top:1017px;
+	width:254px;
+	height:10px;
+}
+
+#Interface-21 {
+	position:absolute;
+	left:631px;
+	top:1017px;
+	width:360px;
+	height:10px;
+}
+
+#Interface-22 {
+	position:absolute;
+	left:340px;
+	top:1018px;
+	width:3px;
+	height:9px;
+}
+
+#Interface-23 {
+	position:absolute;
+	left:343px;
+	top:1018px;
+	width:34px;
+	height:9px;
+}
+
+#Interface-01, #Interface-02, #Interface-03, #Interface-04, #BoutonHaut, #Interface-06, #Interface-07, #Interface-08, #BoutonGauche, #BoutonDroit, #Interface-11, #Interface-12, #Interface-13, #BoutonBas, #TeteRobot, #CorpsRobot,#Interface-17, #Interface-18, #Interface-19, #Interface-20,#Interface-21, #Interface-22, #Interface-23{
+        padding : 0px;
+        max-width: 100%;
+}
