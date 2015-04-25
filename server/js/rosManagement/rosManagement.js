@@ -1,8 +1,8 @@
 window.onload=function(){
 
-
-	// Connecting to ROS
-	// -----------------
+	//==========================
+	//==== Connecting to ROS====
+	//==========================
 	var ros = new ROSLIB.Ros({
 		url : 'ws://localhost:9090'
 		//url : 'ws://130.190.30.104:9090'
@@ -21,12 +21,42 @@ window.onload=function(){
 		console.log('Connected to websocket server.');
 	});    
 
-	//Motor drive
+	//========================================
+	//============Publisher===================
+	//========================================
+
+	//Topics
+
+	//Gaze_direction
+	var topic_end_line_obstacles = new ROSLIB.Topic({
+		ros : ros,
+		name : '/gaze_direction_topic',
+		messageType : 'robair_simulation/gaze_direction'
+	});
+
+	//Command_motor
 	var topic_cmd = new ROSLIB.Topic({
 		ros : ros,
 		name : '/cmd',
 		messageType : 'command_motor'
 	});
+
+	//Angle_position
+	var topic_cmd = new ROSLIB.Topic({
+		ros : ros,
+		name : '/angle_position_topic',
+		messageType : 'angle_position'
+	});
+
+	//Publications
+	
+	//Gaze_direction
+	//TODO
+
+	//Angle_position
+	//TODO	
+
+	//Command_motor
 
 	/** Object storing references to the remote screen DOM elements */
 	this.remote = {
@@ -48,8 +78,7 @@ window.onload=function(){
 	but[39] = this.remote.right;
 	but[83] = this.remote.stop;
 	var lastPressed = this.remote.stop; // only one action at a time
-	var clickButton = function clickButton(key) {
-		var speed1, speed2;
+	var clickButton = function clickButton(key) { var speed1, speed2;
 		console.log("onKeyDown ---> keyCode = " + key);
 		if (lastPressed) {
 			lastPressed.removeClass('btn-primary');
@@ -198,7 +227,7 @@ window.onload=function(){
 	};
 
 	//==================================
-	//===========Subscribe==============
+	//===========Subscriber==============
 	//==================================
 
 	//Topic for collision
@@ -211,4 +240,62 @@ window.onload=function(){
 	topic_collision.subscribe(function(message) {
 		console.log('Received message on ' + topic_collision.name);// + ': ' + message.data);
 	});
+
+
+	//Topic for panic event
+	var topic_panic_event = new ROSLIB.Topic({
+		ros : ros,
+		name : '/panic_event_topic',
+		messageType : 'robair_simulation/panic_event'
+	});
+
+	topic_panic_event.subscribe(function(message) {
+		console.log('Received message on' + topic_panic_event.name);
+	});
+
+	//Topic for proximity obstacles
+	var topic_proximity_obstacles = new ROSLIB.Topic({
+		ros : ros,
+		name : '/proximity_obstacles_topic',
+		messageType : 'robair_simulation/proximity_obstacles'
+	});
+
+	topic_proximity_obstacles.subscribe(function(message) {
+		console.log('Received message on' + topic_proximity_obstacles.name);
+	});
+
+	//Topic for end_line_obstacles
+	var topic_end_line_obstacles = new ROSLIB.Topic({
+		ros : ros,
+		name : '/end_line_obstacles_topic',
+		messageType : 'robair_simulation/end_line_obstacles'
+	});
+
+	topic_end_line_obstacles.subscribe(function(message) {
+		console.log('Received message on' + topic_end_line_obstacles.name);
+	});
+	
+	//Topic for bandwidth_quality	
+	var topic_bandwidth_quality = new ROSLIB.Topic({
+		ros : ros,
+		name : '/bandwidth_quality_topic',
+		messageType : 'bandwidth_quality'
+	});
+
+	topic_bandwidth.subscribe(function(message) {
+		console.log('Received message on' + topic_bandwidth_quality.name);
+	});
+
+	//Topic for battery_level
+	var topic_battery_level = new ROSLIB.Topic({
+		ros : ros,
+		name : '/battery_level_topic',
+		messageType : 'battery_level'
+	});
+
+	topic_battery_level.subscribe(function(message) {
+		console.log('Received message on' + topic_battery_level.name);
+	});
+	
+
 }
