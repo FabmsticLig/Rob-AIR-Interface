@@ -4,9 +4,8 @@ window.onload=function(){
 	// Connecting to ROS
 	// -----------------
 	var ros = new ROSLIB.Ros({
-		//url : 'ws://localhost:9090'
-		url : 'ws://192.168.0.12:9090'
-		//url : 'ws://192.168.1.3:9090'
+		url : 'ws://localhost:9090'
+		//url : 'ws://130.190.30.104:9090'
 	});
 
 
@@ -22,14 +21,11 @@ window.onload=function(){
 		console.log('Connected to websocket server.');
 	});    
 
-
-
-
+	//Motor drive
 	var topic_cmd = new ROSLIB.Topic({
-		//Test with turtlesim
 		ros : ros,
-		name : 'turtle1/cmd_vel',
-		messageType : 'geometry_msgs/Twist'
+		name : '/cmd',
+		messageType : 'command_motor'
 	});
 
 	/** Object storing references to the remote screen DOM elements */
@@ -53,6 +49,7 @@ window.onload=function(){
 	but[83] = this.remote.stop;
 	var lastPressed = this.remote.stop; // only one action at a time
 	var clickButton = function clickButton(key) {
+		var speed1, speed2;
 		console.log("onKeyDown ---> keyCode = " + key);
 		if (lastPressed) {
 			lastPressed.removeClass('btn-primary');
@@ -72,35 +69,33 @@ window.onload=function(){
 		if (key == '38') {
 			// up arrow
 			console.log("up Arrow");
-			angular_val = 0.0;
+			speed1 = 255;
+			speed2 = 255;
 		}else if (key== '40') {
 			// down arrow
 			console.log("down Arrow");
-			angular_val = 3.0;
+			speed1 = 0;
+			speed2 = 0;
 		}else if (key == '37') {
 			// left arrow
 			console.log("left Arrow");
-			angular_val = 1;
+			speed1 = 255;
+			speed2 = 128;
 		}else if (key == '39') {
 			// right arrow
 			console.log("right Arrow");
-			angular_val = -1;
+			speed1 = 128;
+			speed2 = 255;
 		}else if (key == '83') {
 			// 's' key -> stop
 			console.log("'s' key (Stop)");
-			angular_val = 0.0;
+			speed1 = 128;
+			speed2 = 128;
 		}
 		var msg = new ROSLIB.Message({
-			linear : {
-				x : 2.0,
-				y : 0.0,
-				z : 0.0
-			},
-			angular : {
-				x : 0.0,
-				y : 0.0,
-				z : angular_val
-			}
+			speed1 : speed1,
+			speed2 : speed2,
+			mode : 0			
 		});
 		//Publish on Topic
 		topic_cmd.publish(msg);
@@ -127,9 +122,10 @@ window.onload=function(){
 
 
 	//==============================================
-	//=============XBOX PAD CONTROL=================
+	//=============GAMEPAD CONTROL=================
 	//==============================================
 
+	//Tested with a xbox pad
 	var start;
 	var rAF = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
 	window.requestAnimationFrame;
@@ -180,7 +176,7 @@ window.onload=function(){
 		}
 
 		var angular_val = -x;
-		
+
 
 		var msg = new ROSLIB.Message({
 			linear : {
@@ -200,4 +196,19 @@ window.onload=function(){
 
 		var start = rAF(gameLoop);
 	};
+
+	//==================================
+	//===========Subscribe==============
+	//==================================
+
+	//Topic for collision
+	var topic_collision = new ROSLIB.Topic({
+		ros : ros,
+		name : '/collision_topic',
+		messageType : 'robair_simulation/collision_event'
+	});
+
+	topic_collision.subscribe(function(message) {
+		console.log('Received message on ' + topic_collision.name);// + ': ' + message.data);
+	});
 }
