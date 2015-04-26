@@ -2,226 +2,223 @@
 <script type="text/javascript" src="../js/display.js"></script>
 <script src="../js/fnResize.js" type="text/javascript"></script>
 <script>
-    window.onunload = window.onbeforeunload = (function () {
-        console.log("leaving a room");
-        $.ajax({
-            url: '/leaving_room/' + $('#roomName').val(),
-            type: 'GET',
-            data: $('#roomName').val(),
-            success: function (response) {
-                console.log(response.status);
-            },
-            error: function (res, statut, error) {
-                console.log("Error when unloading page");
-            }
-        });
-        return "Voulez-vous quitter la room " + $('#roomName').val();
-    });
-    $(function () {
-        $(".div_resizabled").resizable();
-        init_size();
-    });
+	window.onunload = window.onbeforeunload = (function () {
+		console.log("leaving a room");
+		$.ajax({
+			url: '/leaving_room/' + $('#roomName').val(),
+			type: 'GET',
+			data: $('#roomName').val(),
+			success: function (response) {
+				console.log(response.status);
+			},
+			error: function (res, statut, error) {
+				console.log("Error when unloading page");
+			}
+		});
+		return "Voulez-vous quitter la room " + $('#roomName').val();
+	});
+	$(function () {
+		$(".div_resizabled").resizable();
+		init_size();
+	});
 </script>
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-8">
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3>Vue Web Cam</h3>
-                    <div id="miniature" class="row miniature">
-                        <video id="localVideo" class="miniature-video">
-                            your browser does not support the HTML 5 video tag
-                        </video>
-                        <!-- contains the video of the remote fablabs -->
+	<div class="row">
+		<div class="col-sm-8">
+			<div class="row">
+				<div class="col-sm-6">
+					<h3>Vue Web Cam</h3>
+					<div id="miniature" class="row miniature">
+						<video id="localVideo" class="miniature-video">
+						your browser does not support the HTML 5 video tag
+						</video>
+						<!-- contains the video of the remote fablabs -->
 						<!--<span id="remotes"></span>-->
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <h3>Cam Assistance</h3>
-                    <div id="div_cam2" class="div_resizabled">
-                        <img src="img/esacalier.JPG" alt=""/>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <h3>Cam principale</h3>
-                    <div id="div_cam3" class="div_resizabled">
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<h3>Cam Assistance</h3>
+					<div id="div_cam2" class="div_resizabled">
+						<img src="img/esacalier.JPG" alt=""/>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12">
+					<h3>Cam principale</h3>
+					<div id="div_cam3" class="div_resizabled">
 						<!--						<img id="camP" src="img/visio.jpg" alt=""/>-->
-                        <!-- contains the video of the remote fablabs -->
+						<!-- contains the video of the remote fablabs -->
 						<span id="remotes"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="row">
-                <div id="indication_board" class="col-sm-12">
-                    <h3>Info Board et Batterie Board</h3>
-		    <div id="battery"><div id="battery-level"></div></div>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
-                </div>
-            </div>
-            <div class="row">
-                <div id="divBB" class="col-sm-12">
-                    <h3>BandWith Board</h3>
-                    <p>ERROR SYSTEM</p>
-                    <a href="index.html"> Connection </a>
-                </div>
-            </div>
-            <div class="row">
-                <div id="remote" class="col-sm-12">
-                    <h3>Touch Pad</h3>
-<!--                    <div id="robotDrive">
-                        <div id="remote" class="inner" style="display: inline">
-                            <p class="visible-xs-block col-xs-12"></p>
-                            <div id="remote-controls" class="col-xs-12 col-sm-12 col-md-3 col-lg-2">-->
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
-                                            <span class="glyphicon glyphicon-arrow-up"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-4">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <button type="button" id="remote-left" class="remote-direction btn btn-block btn-default btn-lg">
-                                            <span class="glyphicon glyphicon-arrow-left"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
-                                            <span class="glyphicon glyphicon-pause"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button type="button" id="remote-right" class="remote-direction btn btn-block btn-default btn-lg">
-                                            <span class="glyphicon glyphicon-arrow-right"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
-                                            <span class="glyphicon glyphicon-arrow-down"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-4">
-                                    </div>
-                                </div>
-<!--                            </div>
-                        </div>
-                    </div>-->
-                </div>
-            </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="row">
+				<div class="col-sm-12">
+					<h3>Info Board et Batterie Board</h3>
+					<div id="battery"><div id="battery-level"></div></div>
+					<div id="indication_board"> 
+						<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div id="divBB" class="col-sm-12">
+					<h4>BandWith Board</h4>
+					<p> <span id="brandwith_quality"></span></p>
+				</div>
+			</div>
+			<div class="row">
+				<div id="remote" class="col-sm-12">
+					<h3>Touch Pad</h3>
+					<!--                    <div id="robotDrive">
+						<div id="remote" class="inner" style="display: inline">
+							<p class="visible-xs-block col-xs-12"></p>
+							<div id="remote-controls" class="col-xs-12 col-sm-12 col-md-3 col-lg-2">-->
+								<div class="row">
+									<div class="col-sm-4">
+									</div>
+									<div class="col-sm-4">
+										<button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
+											<span class="glyphicon glyphicon-arrow-up"></span>
+										</button>
+									</div>
+									<div class="col-sm-4">
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-4">
+										<button type="button" id="remote-left" class="remote-direction btn btn-block btn-default btn-lg">
+											<span class="glyphicon glyphicon-arrow-left"></span>
+										</button>
+									</div>
+									<div class="col-sm-4">
+										<button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
+											<span class="glyphicon glyphicon-pause"></span>
+										</button>
+									</div>
+									<div class="col-sm-4">
+										<button type="button" id="remote-right" class="remote-direction btn btn-block btn-default btn-lg">
+											<span class="glyphicon glyphicon-arrow-right"></span>
+										</button>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-4">
+									</div>
+									<div class="col-sm-4">
+										<button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
+											<span class="glyphicon glyphicon-arrow-down"></span>
+										</button>
+									</div>
+									<div class="col-sm-4">
+									</div>
+								</div>
+								<!--                            </div>
+						</div>
+					</div>-->
+				</div>
+			</div>
 
-        </div>
-    </div>
-
-    <script src="../js/rosManagement/rosManagement.js"></script>
-    <!-- <script src="../js/videoManagement.js"></script> -->
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="../lib/js/jquery-1.11.2.min.js"></script>
-    <script src="../lib/js/bootstrap.min.js"></script>
-    <script src="../lib/js/jquery.bootstrap-growl.min.js"></script>
+		</div>
+	</div>
 
 
-    <!-- Bootstrap core CSS -->
-    <link href="../css/bootstrap.min.css" rel="stylesheet">
+	<script src="../js/rosManagement/rosManagement.js"></script>
+	<script src="../js/videoManagement.js"></script>
 
-    <!-- Custom styles for this template -->
-    <link href="../css/cover.css" rel="stylesheet">
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="../lib/js/jquery-1.11.2.min.js"></script>
+	<script src="../lib/js/bootstrap.min.js"></script>
+	<script src="../lib/js/jquery.bootstrap-growl.min.js"></script>
+
+	<!-- Bootstrap core CSS -->
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- Custom styles for this template -->
+	<link href="../css/cover.css" rel="stylesheet">
 
 
-    <link href="../css/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
-    <link href="../css/jquery-ui.theme.min.css" rel="stylesheet" type="text/css"/>
+	<link href="../css/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+	<link href="../css/jquery-ui.theme.min.css" rel="stylesheet" type="text/css"/>
 
-    <script type="text/javascript" src="../lib/js/eventemitter2.min.js"></script>
-    <script type="text/javascript" src="../lib/js/roslib.min.js"></script>
+	<script type="text/javascript" src="../lib/js/eventemitter2.min.js"></script>
+	<script type="text/javascript" src="../lib/js/roslib.min.js"></script>
 
 
 
+	<!--<div class="container">
 
-    <!--<div class="container">
-    
-        <h1 id="title">Join a room</h1>
-        <form id="joinRoom" class="form-inline">
-            <div class="form-group" style="margin-bottom:10px;">
-                <input id="sessionInput" class="form-control"/>
-                <button type="submit" type="button" class="btn btn-default">Join it!</button>
-            </div>
-        </form>
-    
-        <div class="row">
-            <div style="height:400px;" id="principal">
-            </div>
-        </div>
-        <div id="miniature" class="row miniature">
-            <video id="localVideo" class="miniature-video">
-                your browser does not support the HTML 5 video tag
-            </video>
-             contains the video of the remote fablabs 
-            <span id="remotes"></span>
-        </div>
-        <div id="robotDrive">
-            <div id="remote" class="inner" style="display: inline">
-                <p class="visible-xs-block col-xs-12"></p>
-                <div id="remote-controls" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-                    <div class="row">
-                        <p class="col-xs-12 hidden-xs" style="min-height: 5em"></p>
-                        <div class="col-xs-4">
-                        </div>
-                        <div class="col-xs-4">
-                            <button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
-                                <span class="glyphicon glyphicon-arrow-up"></span>
-                            </button>
-                        </div>
-                        <div class="col-xs-4">
-                        </div>
-                    </div>
-                    <p class="col-xs-12"></p>
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <button type="button" id="remote-left" class="remote-direction btn btn-block btn-default btn-lg">
-                                <span class="glyphicon glyphicon-arrow-left"></span>
-                            </button>
-                        </div>
-                        <div class="col-xs-4">
-                            <button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
-                                <span class="glyphicon glyphicon-pause"></span>
-                            </button>
-                        </div>
-                        <div class="col-xs-4">
-                            <button type="button" id="remote-right" class="remote-direction btn btn-block btn-default btn-lg">
-                                <span class="glyphicon glyphicon-arrow-right"></span>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="col-xs-12"></p>
-                    <div class="row">
-                        <div class="col-xs-4">
-                        </div>
-                        <div class="col-xs-4">
-                            <button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
-                                <span class="glyphicon glyphicon-arrow-down"></span>
-                            </button>
-                        </div>
-                        <div class="col-xs-4">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>-->
+		<h1 id="title">Join a room</h1>
+		<form id="joinRoom" class="form-inline">
+			<div class="form-group" style="margin-bottom:10px;">
+				<input id="sessionInput" class="form-control"/>
+				<button type="submit" type="button" class="btn btn-default">Join it!</button>
+			</div>
+		</form>
+
+		<div class="row">
+			<div style="height:400px;" id="principal">
+			</div>
+		</div>
+		<div id="miniature" class="row miniature">
+			<video id="localVideo" class="miniature-video">
+			your browser does not support the HTML 5 video tag
+			</video>
+			contains the video of the remote fablabs 
+			<span id="remotes"></span>
+		</div>
+		<div id="robotDrive">
+			<div id="remote" class="inner" style="display: inline">
+				<p class="visible-xs-block col-xs-12"></p>
+				<div id="remote-controls" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+					<div class="row">
+						<p class="col-xs-12 hidden-xs" style="min-height: 5em"></p>
+						<div class="col-xs-4">
+						</div>
+						<div class="col-xs-4">
+							<button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
+								<span class="glyphicon glyphicon-arrow-up"></span>
+							</button>
+						</div>
+						<div class="col-xs-4">
+						</div>
+					</div>
+					<p class="col-xs-12"></p>
+					<div class="row">
+						<div class="col-xs-4">
+							<button type="button" id="remote-left" class="remote-direction btn btn-block btn-default btn-lg">
+								<span class="glyphicon glyphicon-arrow-left"></span>
+							</button>
+						</div>
+						<div class="col-xs-4">
+							<button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
+								<span class="glyphicon glyphicon-pause"></span>
+							</button>
+						</div>
+						<div class="col-xs-4">
+							<button type="button" id="remote-right" class="remote-direction btn btn-block btn-default btn-lg">
+								<span class="glyphicon glyphicon-arrow-right"></span>
+							</button>
+						</div>
+					</div>
+					<p class="col-xs-12"></p>
+					<div class="row">
+						<div class="col-xs-4">
+						</div>
+						<div class="col-xs-4">
+							<button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
+								<span class="glyphicon glyphicon-arrow-down"></span>
+							</button>
+						</div>
+						<div class="col-xs-4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>-->

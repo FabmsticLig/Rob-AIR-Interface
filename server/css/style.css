@@ -112,3 +112,10 @@ img {
 #battery-level.low {
 	background-color: #FF3333;
 }
+
+#indication_board {
+	height: 50pt;
+	overflow-y:auto; 
+}
+
+

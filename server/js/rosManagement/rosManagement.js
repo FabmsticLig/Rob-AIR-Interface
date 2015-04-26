@@ -238,82 +238,105 @@ window.onload=function(){
 	});
 
 	topic_collision.subscribe(function(message) {
-		console.log('Received message on ' + topic_collision.name);// + ': ' + message.data);
+		console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
+		//get indication_board div and append the message only if there is a collision
+		if(message.collision) {
+			$('#indication_board').append("<p> Collision détectée </p>");
+		}
+
 	});
 
 
 	//Topic for panic event
-	/*var topic_panic_event = new ROSLIB.Topic({
+	var topic_panic_event = new ROSLIB.Topic({
 		ros : ros,
 		name : '/panic_event_topic',
 		messageType : 'robair_simulation/panic_event'
-		});
+	});
 
-		topic_panic_event.subscribe(function(message) {
+	topic_panic_event.subscribe(function(message) {
 		console.log('Received message on' + topic_panic_event.name);
-		});
+		if(message.panic_event) {
+			$('#indication_board').append("<p> \"Panic button\" activé </p>");
+		}
+	});
 
-		//Topic for proximity obstacles
-		var topic_proximity_obstacles = new ROSLIB.Topic({
+	//Topic for proximity obstacles
+	var topic_proximity_obstacles = new ROSLIB.Topic({
 		ros : ros,
 		name : '/proximity_obstacles_topic',
 		messageType : 'robair_simulation/proximity_obstacles'
-		});
+	});
 
-		topic_proximity_obstacles.subscribe(function(message) {
+	topic_proximity_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topic_proximity_obstacles.name);
-		});
+		for (var iter = 0; i < 8; iter++){
+			//TODO à quels palliers y a-t-il un pb?
+			//TODO changer le 100
+			if(message.proximity_obstacles[iter] > 100){
+				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.proximity_obstacles[iter] + "</p>");
+			}
+		}
+	});
 
-		//Topic for end_line_obstacles
-		var topic_end_line_obstacles = new ROSLIB.Topic({
+	//Topic for end_line_obstacles
+	var topic_end_line_obstacles = new ROSLIB.Topic({
 		ros : ros,
 		name : '/end_line_obstacles_topic',
 		messageType : 'robair_simulation/end_line_obstacles'
-		});
+	});
 
-		topic_end_line_obstacles.subscribe(function(message) {
-		console.log('Received message on' + topic_end_line_obstacles.name);
-		});
+	topic_end_line_obstacles.subscribe(function(message) {
+		console.log('Received message on' + topIic_end_line_obstacles.name);
+		//on parcourt les 8 capteurs
+		for (var iter = 0; i < 8; iter++){
+			if(message.end_line_obstacles[iter]){
+				$('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter +"</p>");
+			}
+		}
+	});
 
-		//Topic for bandwidth_quality	
-		var topic_bandwidth_quality = new ROSLIB.Topic({
+	//Topic for bandwidth_quality	
+	var topic_bandwidth_quality = new ROSLIB.Topic({
 		ros : ros,
 		name : '/bandwidth_quality_topic',
 		messageType : 'bandwidth_quality'
-		});
+	});
 
-		topic_bandwidth_quality.subscribe(function(message) {
+	topic_bandwidth_quality.subscribe(function(message) {
 		console.log('Received message on' + topic_bandwidth_quality.name);
-		});*/
+		$('#brandwith_quality').text(message.brandwith_quality);
 
-		//Topic for battery_level
-		var topic_battery_level = new ROSLIB.Topic({
-			ros : ros,
-			name : '/battery_level_topic',
-			messageType : 'robair_simulation/battery_level'
-		});
+	});
 
-		topic_battery_level.subscribe(function(message) {
-			console.log('Received message on' + topic_battery_level.name);
-			console.log('Battery value' + message.battery_level);
+	//Topic for battery_level
+	var topic_battery_level = new ROSLIB.Topic({
+		ros : ros,
+		name : '/battery_level_topic',
+		messageType : 'robair_simulation/battery_level'
+	});
 
-			//Update the battery view in room_user.html
-			var battery = $('battery');
-			var level = parseInt(message.battery_level)/255 * 100;
-			var batteryLevel = $('#battery-level');
-			batteryLevel.css('width', level + '%');
-			if (level > 50) {  
-				batteryLevel.addClass('high'); 
-				batteryLevel.removeClass('medium');  
-				batteryLevel.removeClass('low'); 
-			} else if (level >= 25 ) {  
-				batteryLevel.addClass('medium');  
-				batteryLevel.removeClass('high');  
-				batteryLevel.removeClass('low');
-			} else {  
-				batteryLevel.addClass('low');
-				batteryLevel.removeClass('high');  
-				batteryLevel.removeClass('medium');  
-			}
-		});
+	topic_battery_level.subscribe(function(message) {
+		console.log('Received message on' + topic_battery_level.name);
+		console.log('Battery value' + message.battery_level);
+
+		//Update the battery view in room_user.html
+		var battery = $('battery');
+		var level = parseInt(message.battery_level)/255 * 100;
+		var batteryLevel = $('#battery-level');
+		batteryLevel.css('width', level + '%');
+		if (level > 50) {  
+			batteryLevel.addClass('high'); 
+			batteryLevel.removeClass('medium');  
+			batteryLevel.removeClass('low'); 
+		} else if (level >= 25 ) {  
+			batteryLevel.addClass('medium');  
+			batteryLevel.removeClass('high');  
+			batteryLevel.removeClass('low');
+		} else {  
+			batteryLevel.addClass('low');
+			batteryLevel.removeClass('high');  
+			batteryLevel.removeClass('medium');  
+		}
+	});
 }
