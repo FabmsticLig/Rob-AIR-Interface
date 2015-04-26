@@ -49,7 +49,7 @@ window.onload=function(){
 	});
 
 	//Publications
-	
+
 	//Gaze_direction
 	//TODO
 
@@ -131,7 +131,7 @@ window.onload=function(){
 		console.log("published " + key);
 	};
 	// bind keyboard
-	document.onkeydown = function keyDown(e) {
+	document.addEventListener('keydown', function(e){
 		e = e || window.event;
 
 		var keyCode = e.keyCode;
@@ -140,7 +140,7 @@ window.onload=function(){
 			e.preventDefault();
 			clickButton(e.keyCode);
 		}
-	};
+	}, false);
 
 	// bind buttons clicks as well
 	this.remote.left.click(clickButton.bind(null, 37));
@@ -293,7 +293,7 @@ window.onload=function(){
 
 	topic_end_line_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topIic_end_line_obstacles.name);
-		//on parctourt les 8 capteurs
+		//on parcourt les 8 capteurs
 		for (var iter = 0; i < 8; iter++){
 			if(message.end_line_obstacles[iter]){
 				$('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter +"</p>");
@@ -302,7 +302,7 @@ window.onload=function(){
 			}
 		}
 	});
-	
+
 	//Topic for bandwidth_quality	
 	var topic_bandwidth_quality = new ROSLIB.Topic({
 		ros : ros,
@@ -320,12 +320,30 @@ window.onload=function(){
 	var topic_battery_level = new ROSLIB.Topic({
 		ros : ros,
 		name : '/battery_level_topic',
-		messageType : 'battery_level'
+		messageType : 'robair_simulation/battery_level'
 	});
 
 	topic_battery_level.subscribe(function(message) {
 		console.log('Received message on' + topic_battery_level.name);
-	});
-	
+		console.log('Battery value' + message.battery_level);
 
+		//Update the battery view in room_user.html
+		var battery = $('battery');
+		var level = parseInt(message.battery_level)/255 * 100;
+		var batteryLevel = $('#battery-level');
+		batteryLevel.css('width', level + '%');
+		if (level > 50) {  
+			batteryLevel.addClass('high'); 
+			batteryLevel.removeClass('medium');  
+			batteryLevel.removeClass('low'); 
+		} else if (level >= 25 ) {  
+			batteryLevel.addClass('medium');  
+			batteryLevel.removeClass('high');  
+			batteryLevel.removeClass('low');
+		} else {  
+			batteryLevel.addClass('low');
+			batteryLevel.removeClass('high');  
+			batteryLevel.removeClass('medium');  
+		}
+	});
 }
