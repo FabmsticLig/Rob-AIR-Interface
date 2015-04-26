@@ -243,7 +243,8 @@ window.onload=function(){
 		if(message.collision) {
 			$('#indication_board').append("<p> Collision détectée </p>");
 		}
-
+		//scroll le div à la fin 
+		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 	});
 
 
@@ -258,6 +259,8 @@ window.onload=function(){
 		console.log('Received message on' + topic_panic_event.name);
 		if(message.panic_event) {
 			$('#indication_board').append("<p> \"Panic button\" activé </p>");
+		//scroll le div à la fin 
+		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 		}
 	});
 
@@ -275,6 +278,8 @@ window.onload=function(){
 			//TODO changer le 100
 			if(message.proximity_obstacles[iter] > 100){
 				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.proximity_obstacles[iter] + "</p>");
+			//scroll le div à la fin 
+			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 			}
 		}
 	});
@@ -292,6 +297,8 @@ window.onload=function(){
 		for (var iter = 0; i < 8; iter++){
 			if(message.end_line_obstacles[iter]){
 				$('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter +"</p>");
+				//scroll le div à la fin 
+				$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 			}
 		}
 	});
