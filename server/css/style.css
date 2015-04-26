@@ -1,83 +1,114 @@
 #remote .btn-block {
-  padding: 10px 10px;
+	padding: 10px 10px;
 }
 
 #remote-img {
-  margin: auto;
+	margin: auto;
 }
 
 html {
-    height: 100%;
-    width: 100%;
+	height: 100%;
+	width: 100%;
 }
 
 body {
-    background-color: aliceblue;
-    height: 100%;
-    width : 100%;
+	background-color: aliceblue;
+	height: 100%;
+	width : 100%;
 }
 
 div{
-    padding : 5px;
-    //border:1px solid black;
+	padding : 5px;
+	//border:1px solid black;
 }
 
 a:focus {
-    outline:0;
+	outline:0;
 }
 
 .container {
-    position:absolute;
-    left: 20px;
-    top: 20px;
-    width: 90%;
+	position:absolute;
+	left: 20px;
+	top: 20px;
+	width: 90%;
 }
 
 h3 {
-    margin: 5px;
+	margin: 5px;
 }
 
 img {
-    height: 100%;
-    width: 100%;
+	height: 100%;
+	width: 100%;
 }
 
-.container-fluid{
-    /*background-color: #c1e2b3;*/
-    background-color: #B0C4DE;
+.container-fluid {
+	/*background-color: #c1e2b3;*/
+	background-color: #B0C4DE;
 }
-
-/*.row {
-    background-color: #eea236;
-}*/
 
 .col-sm-4 {
-    background-color: darkgrey;
+	background-color: darkgrey;
 }
 
 .col-sm-6 {
-    background-color: wheat;
+	background-color: wheat;
 }
 
 
 .col-sm-8 {
-    background-color: #66afe9;
+	background-color: #66afe9;
 }
 
 .col-sm-12 {
-    /*background-color: lightgreen;*/
-    background-color: #008080;
+	/*background-color: lightgreen;*/
+	background-color: #008080;
 }
 
 #divBB{
-    color : white;
-    text-align: center;
+	color : white;
+	text-align: center;
 }
 
 #remote .btn-block {
-  padding: 10px 10px;
+	padding: 10px 10px;
 }
 
 #remote-img {
-  margin: auto;
+	margin: auto;
+}
+
+/*Battery{}*/
+#battery:after {
+	background-color: #fff;
+	border: 2px solid #000;
+	content: "";
+	display: block;
+	height: 16px;
+	position: absolute;
+	right: -6px;
+	top: 6px;
+	width: 6px;
+}
+#battery {
+	background-color: #fff;
+	border: 2px solid #000;
+	height: 32px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	width: 100px;
+}
+#battery-level {
+	background-color: #666;
+	height: 100%;
+}
+#battery-level.high {
+	background-color: #66CD00;
+}
+#battery-level.medium {
+	background-color: #FCD116;
+}
+#battery-level.low {
+	background-color: #FF3333;
 }

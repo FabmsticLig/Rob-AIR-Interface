@@ -49,7 +49,7 @@ window.onload=function(){
 	});
 
 	//Publications
-	
+
 	//Gaze_direction
 	//TODO
 
@@ -131,7 +131,7 @@ window.onload=function(){
 		console.log("published " + key);
 	};
 	// bind keyboard
-	document.onkeydown = function keyDown(e) {
+	document.addEventListener('keydown', function(e){
 		e = e || window.event;
 
 		var keyCode = e.keyCode;
@@ -140,7 +140,7 @@ window.onload=function(){
 			e.preventDefault();
 			clickButton(e.keyCode);
 		}
-	};
+	}, false);
 
 	// bind buttons clicks as well
 	this.remote.left.click(clickButton.bind(null, 37));
@@ -243,59 +243,77 @@ window.onload=function(){
 
 
 	//Topic for panic event
-	var topic_panic_event = new ROSLIB.Topic({
+	/*var topic_panic_event = new ROSLIB.Topic({
 		ros : ros,
 		name : '/panic_event_topic',
 		messageType : 'robair_simulation/panic_event'
-	});
+		});
 
-	topic_panic_event.subscribe(function(message) {
+		topic_panic_event.subscribe(function(message) {
 		console.log('Received message on' + topic_panic_event.name);
-	});
+		});
 
-	//Topic for proximity obstacles
-	var topic_proximity_obstacles = new ROSLIB.Topic({
+		//Topic for proximity obstacles
+		var topic_proximity_obstacles = new ROSLIB.Topic({
 		ros : ros,
 		name : '/proximity_obstacles_topic',
 		messageType : 'robair_simulation/proximity_obstacles'
-	});
+		});
 
-	topic_proximity_obstacles.subscribe(function(message) {
+		topic_proximity_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topic_proximity_obstacles.name);
-	});
+		});
 
-	//Topic for end_line_obstacles
-	var topic_end_line_obstacles = new ROSLIB.Topic({
+		//Topic for end_line_obstacles
+		var topic_end_line_obstacles = new ROSLIB.Topic({
 		ros : ros,
 		name : '/end_line_obstacles_topic',
 		messageType : 'robair_simulation/end_line_obstacles'
-	});
+		});
 
-	topic_end_line_obstacles.subscribe(function(message) {
+		topic_end_line_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topic_end_line_obstacles.name);
-	});
-	
-	//Topic for bandwidth_quality	
-	var topic_bandwidth_quality = new ROSLIB.Topic({
+		});
+
+		//Topic for bandwidth_quality	
+		var topic_bandwidth_quality = new ROSLIB.Topic({
 		ros : ros,
 		name : '/bandwidth_quality_topic',
 		messageType : 'bandwidth_quality'
-	});
+		});
 
-	topic_bandwidth.subscribe(function(message) {
+		topic_bandwidth_quality.subscribe(function(message) {
 		console.log('Received message on' + topic_bandwidth_quality.name);
-	});
+		});*/
 
-	//Topic for battery_level
-	var topic_battery_level = new ROSLIB.Topic({
-		ros : ros,
-		name : '/battery_level_topic',
-		messageType : 'battery_level'
-	});
+		//Topic for battery_level
+		var topic_battery_level = new ROSLIB.Topic({
+			ros : ros,
+			name : '/battery_level_topic',
+			messageType : 'robair_simulation/battery_level'
+		});
 
-	topic_battery_level.subscribe(function(message) {
-		console.log('Received message on' + topic_battery_level.name);
-	});
-	
+		topic_battery_level.subscribe(function(message) {
+			console.log('Received message on' + topic_battery_level.name);
+			console.log('Battery value' + message.battery_level);
 
+			//Update the battery view in room_user.html
+			var battery = $('battery');
+			var level = parseInt(message.battery_level)/255 * 100;
+			var batteryLevel = $('#battery-level');
+			batteryLevel.css('width', level + '%');
+			if (level > 50) {  
+				batteryLevel.addClass('high'); 
+				batteryLevel.removeClass('medium');  
+				batteryLevel.removeClass('low'); 
+			} else if (level >= 25 ) {  
+				batteryLevel.addClass('medium');  
+				batteryLevel.removeClass('high');  
+				batteryLevel.removeClass('low');
+			} else {  
+				batteryLevel.addClass('low');
+				batteryLevel.removeClass('high');  
+				batteryLevel.removeClass('medium');  
+			}
+		});
 }
