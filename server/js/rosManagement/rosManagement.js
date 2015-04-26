@@ -239,6 +239,11 @@ window.onload=function(){
 
 	topic_collision.subscribe(function(message) {
 		console.log('Received message on ' + topic_collision.name);// + ': ' + message.data);
+		//get indication_board div and append the message only if there is a collision
+		if(message.collision_event) {
+			$('#indication_board').append("<p> Collision détectée </p>");
+		}
+
 	});
 
 
@@ -251,6 +256,9 @@ window.onload=function(){
 
 	topic_panic_event.subscribe(function(message) {
 		console.log('Received message on' + topic_panic_event.name);
+		if(message.panic_event) {
+			$('#indication_board').append("<p> \"Panic button\" activé </p>");
+		}
 	});
 
 	//Topic for proximity obstacles
@@ -262,6 +270,13 @@ window.onload=function(){
 
 	topic_proximity_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topic_proximity_obstacles.name);
+		for (var iter = 0; i < 8; iter++){
+			//TODO à quels palliers y a-t-il un pb?
+			//TODO changer le 100
+			if(message.proximity_obstacles[iter] > 100){
+				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.proximity_obstacles[iter] + "</p>");
+			}
+		}
 	});
 
 	//Topic for end_line_obstacles
@@ -272,7 +287,13 @@ window.onload=function(){
 	});
 
 	topic_end_line_obstacles.subscribe(function(message) {
-		console.log('Received message on' + topic_end_line_obstacles.name);
+		console.log('Received message on' + topIic_end_line_obstacles.name);
+		//on parctourt les 8 capteurs
+		for (var iter = 0; i < 8; iter++){
+			if(message.end_line_obstacles[iter]){
+				$('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter +"</p>");
+			}
+		}
 	});
 	
 	//Topic for bandwidth_quality	
@@ -284,6 +305,8 @@ window.onload=function(){
 
 	topic_bandwidth.subscribe(function(message) {
 		console.log('Received message on' + topic_bandwidth_quality.name);
+		$('#brandwith_quality').text(message.brandwith_quality);
+
 	});
 
 	//Topic for battery_level
