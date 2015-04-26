@@ -81,3 +81,10 @@ img {
 #remote-img {
   margin: auto;
 }
+
+#indication_board {
+	height: 50pt;
+	overflow-y:auto; 
+}
+
+

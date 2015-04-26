@@ -238,9 +238,9 @@ window.onload=function(){
 	});
 
 	topic_collision.subscribe(function(message) {
-		console.log('Received message on ' + topic_collision.name);// + ': ' + message.data);
+		console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
 		//get indication_board div and append the message only if there is a collision
-		if(message.collision_event) {
+		if(message.collision) {
 			$('#indication_board').append("<p> Collision détectée </p>");
 		}
 
@@ -303,7 +303,7 @@ window.onload=function(){
 		messageType : 'bandwidth_quality'
 	});
 
-	topic_bandwidth.subscribe(function(message) {
+	topic_bandwidth_quality.subscribe(function(message) {
 		console.log('Received message on' + topic_bandwidth_quality.name);
 		$('#brandwith_quality').text(message.brandwith_quality);
 
