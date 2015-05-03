@@ -160,35 +160,6 @@
 	<script type="text/javascript" src="../lib/js/eventemitter2.min.js"></script>
 	<script type="text/javascript" src="../lib/js/roslib.min.js"></script>
 
-	<!-- Script pour faire clignoter le coeur du HUG -->
-	<script type="text/javascript">
-		var clignotement = function(){
-			if ( $("#hug").css('color') == 'rgb(255, 0, 0)') {
-				console.log($("#hug").css('color'));
-				
-				$("#hug").css('color','rgb(0,0,0)');
-				
-				console.log("red -> black");
-				console.log($("#hug").css('color'));
-		    }
-			else{
-				console.log($("#hug").css('color'));
-				
-				$("#hug").css('color','rgb(255,0,0)');
-				
-				console.log("black -> red");
-				console.log($("#hug").css('color'));
-			}
-		};
-		
-		/*clignotement();
-		setTimeout(clignotement,1000);
-		setTimeout(clignotement,1000);
-		setTimeout(clignotement,1000);*/
-		// clignotement tous les 0.8 secondes
-		periode = setInterval(clignotement, 1000); 
-		//setTimeout(function(){clearInterval(periode)},4000);
-	</script>
 
 	<!--<div class="container">
 

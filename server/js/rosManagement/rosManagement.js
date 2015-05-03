@@ -255,12 +255,32 @@ window.onload=function(){
 		messageType : 'std_msgs/Bool'
 	});
 	
+
+		var clignotement = function(){
+			if ( $("#hug").css('color') == 'rgb(255, 0, 0)') {
+				console.log($("#hug").css('color'));
+				
+				$("#hug").css('color','rgb(0,0,0)');
+				
+				console.log("red -> black");
+				console.log($("#hug").css('color'));
+		    }
+			else{
+				console.log($("#hug").css('color'));
+				
+				$("#hug").css('color','rgb(255,0,0)');
+				
+				console.log("black -> red");
+				console.log($("#hug").css('color'));
+			}
+		};
+		
+
 	topic_hug_event.subscribe(function(message) {
 		//console.log('Received message on' + topic_panic_event.name);
 		if(message.data) {
-			$('#indication_board').append("<p> ****** HUG ****** </p>");
-			//scroll le div à la fin 
-			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+			periode = setInterval(clignotement, 1000);
+			setTimeout(function(){clearInterval(periode)},4000);
 		}
 	});
 
