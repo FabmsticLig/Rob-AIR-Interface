@@ -18,7 +18,7 @@
 		return "Voulez-vous quitter la room " + $('#roomName').val();
 	});
 	$(function () {
-		$(".div_resizabled").resizable();
+		//$(".div_resizabled").resizable();
 		init_size();
 	});
 </script>
@@ -49,7 +49,7 @@
 					<h3>Cam principale</h3>
 					<div id="div_cam3" class="div_resizabled">
 						<!--						<img id="camP" src="img/visio.jpg" alt=""/>-->
-						t!-- contains the video of the remote fablabs -->
+						<!-- contains the video of the remote fablabs -->
 						<span id="remotes"></span>
 					</div>
 				</div>
@@ -59,10 +59,11 @@
 			<div class="row">
 				<div class="col-sm-12">
 					<h3>Info Board et Batterie Board</h3>
-					<div id="hug" class="alert alert-danger" role="alert">
-						  <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Hug
+					<div class="row">
+						<span id="hug" class="glyphicon glyphicon-heart col-sm-2"></span>
+
+						<div id="battery"><div id="battery-level"></div></div>
 					</div>
-					<div id="battery"><div id="battery-level"></div></div>
 					<div id="indication_board"> 
 						<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
 					</div>
@@ -148,14 +149,6 @@
 
 	<!-- Bootstrap core CSS -->
 	<link href="../css/bootstrap.min.css" rel="stylesheet">
-	<style type="type/css "> 
-		 @font-face {   font-family: 'Glyphicons Halflings';   
-	     src: url('../lib/fonts/glyphicons-halflings-regular.eot');   
-	     src: url('../lib/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), 
-		 url('../lib/fonts/glyphicons-halflings-regular.woff') format('woff'),  
-	     url('../lib/fonts/glyphicons-halflings-regular.ttf') format('truetype'), 
-	     url('../lib/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg'); } 
-	</style>
 
 <!-- Cusom style for this template -->
 	<link href="../css/cover.css" rel="stylesheet">
@@ -167,7 +160,35 @@
 	<script type="text/javascript" src="../lib/js/eventemitter2.min.js"></script>
 	<script type="text/javascript" src="../lib/js/roslib.min.js"></script>
 
-
+	<!-- Script pour faire clignoter le coeur du HUG -->
+	<script type="text/javascript">
+		var clignotement = function(){
+			if ( $("#hug").css('color') == 'rgb(255, 0, 0)') {
+				console.log($("#hug").css('color'));
+				
+				$("#hug").css('color','rgb(0,0,0)');
+				
+				console.log("red -> black");
+				console.log($("#hug").css('color'));
+		    }
+			else{
+				console.log($("#hug").css('color'));
+				
+				$("#hug").css('color','rgb(255,0,0)');
+				
+				console.log("black -> red");
+				console.log($("#hug").css('color'));
+			}
+		};
+		
+		/*clignotement();
+		setTimeout(clignotement,1000);
+		setTimeout(clignotement,1000);
+		setTimeout(clignotement,1000);*/
+		// clignotement tous les 0.8 secondes
+		periode = setInterval(clignotement, 1000); 
+		//setTimeout(function(){clearInterval(periode)},4000);
+	</script>
 
 	<!--<div class="container">
 
