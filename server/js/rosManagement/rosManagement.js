@@ -4,8 +4,8 @@ window.onload=function(){
 	//==== Connecting to ROS====
 	//==========================
 	var ros = new ROSLIB.Ros({
-		url : 'ws://localhost:9090'
-		//url : 'ws://130.190.30.104:9090'
+		//url : 'ws://localhost:9090'
+		url : 'ws://192.168.1.2:9090'
 	});
 
 
@@ -30,22 +30,22 @@ window.onload=function(){
 	//Gaze_direction
 	var topic_end_line_obstacles = new ROSLIB.Topic({
 		ros : ros,
-		name : '/gaze_direction_topic',
-		messageType : 'robair_simulation/gaze_direction'
+		name : '/gaze_direction',
+		messageType : 'std_msgs/Byte'
 	});
 
 	//Command_motor
 	var topic_cmd = new ROSLIB.Topic({
 		ros : ros,
-		name : '/cmd',
-		messageType : 'command_motor'
+		name : '/command_motor',
+		messageType : 'MotorCmd'
 	});
 
 	//Angle_position
-	var topic_cmd = new ROSLIB.Topic({
+	var topic_angle_position = new ROSLIB.Topic({
 		ros : ros,
-		name : '/angle_position_topic',
-		messageType : 'angle_position'
+		name : '/angle_position',
+		messageType : 'std_msgs/Byte'
 	});
 
 	//Publications
@@ -123,8 +123,8 @@ window.onload=function(){
 		}
 		var msg = new ROSLIB.Message({
 			speed1 : speed1,
-			speed2 : speed2,
-			mode : 0			
+			speed2 : speed2
+			//mode : 1			
 		});
 		//Publish on Topic
 		topic_cmd.publish(msg);
@@ -233,14 +233,14 @@ window.onload=function(){
 	//Topic for collision
 	var topic_collision = new ROSLIB.Topic({
 		ros : ros,
-		name : '/collision_topic',
-		messageType : 'robair_simulation/collision_event'
+		name : '/collision_event',
+		messageType : 'std_msgs/Bool'
 	});
 
 	topic_collision.subscribe(function(message) {
 		console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
 		//get indication_board div and append the message only if there is a collision
-		if(message.collision) {
+		if(message.data) {
 			$('#indication_board').append("<p> Collision détectée </p>");
 		}
 		//scroll le div à la fin 
@@ -248,36 +248,54 @@ window.onload=function(){
 	});
 
 
+	//Topic for hug event
+	var topic_hug_event = new ROSLIB.Topic({
+		ros : ros,
+		name : '/social_touch_event',
+		messageType : 'std_msgs/Bool'
+	});
+	
+	topic_hug_event.subscribe(function(message) {
+		//console.log('Received message on' + topic_panic_event.name);
+		if(message.data) {
+			$('#indication_board').append("<p> ****** HUG ****** </p>");
+			//scroll le div à la fin 
+			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+		}
+	});
+
 	//Topic for panic event
 	var topic_panic_event = new ROSLIB.Topic({
 		ros : ros,
-		name : '/panic_event_topic',
-		messageType : 'robair_simulation/panic_event'
+		name : '/panic_event',
+		messageType : 'std_msgs/Bool'
 	});
 
 	topic_panic_event.subscribe(function(message) {
-		console.log('Received message on' + topic_panic_event.name);
-		if(message.panic_event) {
+		//console.log('Received message on' + topic_panic_event.name);
+		if(message.data) {
 			$('#indication_board').append("<p> \"Panic button\" activé </p>");
-		//scroll le div à la fin 
-		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+			//scroll le div à la fin 
+			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+		}
+		else {
+			$('#indication_board').append("Nothing");
 		}
 	});
 
 	//Topic for proximity obstacles
 	var topic_proximity_obstacles = new ROSLIB.Topic({
 		ros : ros,
-		name : '/proximity_obstacles_topic',
-		messageType : 'robair_simulation/proximity_obstacles'
+		name : '/proximity_obstacles',
+		messageType : 'std_msgs/Int32MultiArray'
 	});
 
 	topic_proximity_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topic_proximity_obstacles.name);
 		for (var iter = 0; i < 8; iter++){
-			//TODO à quels palliers y a-t-il un pb?
-			//TODO changer le 100
-			if(message.proximity_obstacles[iter] > 100){
-				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.proximity_obstacles[iter] + "</p>");
+			//TODO  palliers  pb à partir de 20 cm
+			if(message.data[iter] < 10){
+				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.data[iter] + "</p>");
 			//scroll le div à la fin 
 			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 			}
@@ -287,15 +305,15 @@ window.onload=function(){
 	//Topic for end_line_obstacles
 	var topic_end_line_obstacles = new ROSLIB.Topic({
 		ros : ros,
-		name : '/end_line_obstacles_topic',
-		messageType : 'robair_simulation/end_line_obstacles'
+		name : '/end_line_obstacles',
+		messageType : 'std_msgs/Int8MultiArray'
 	});
 
 	topic_end_line_obstacles.subscribe(function(message) {
 		console.log('Received message on' + topIic_end_line_obstacles.name);
 		//on parcourt les 8 capteurs
 		for (var iter = 0; i < 8; iter++){
-			if(message.end_line_obstacles[iter]){
+			if(message.data[iter]){
 				$('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter +"</p>");
 				//scroll le div à la fin 
 				$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
@@ -306,21 +324,21 @@ window.onload=function(){
 	//Topic for bandwidth_quality	
 	var topic_bandwidth_quality = new ROSLIB.Topic({
 		ros : ros,
-		name : '/bandwidth_quality_topic',
-		messageType : 'bandwidth_quality'
+		name : '/bandwidth_quality',
+		messageType : 'std_msgs/Byte'
 	});
 
 	topic_bandwidth_quality.subscribe(function(message) {
 		console.log('Received message on' + topic_bandwidth_quality.name);
-		$('#brandwith_quality').text(message.brandwith_quality);
+		$('#brandwith_quality').text(message.data);
 
 	});
 
 	//Topic for battery_level
 	var topic_battery_level = new ROSLIB.Topic({
 		ros : ros,
-		name : '/battery_level_topic',
-		messageType : 'robair_simulation/battery_level'
+		name : '/battery_level',
+		messageType : 'std_msgs/Byte'
 	});
 
 	topic_battery_level.subscribe(function(message) {
@@ -329,7 +347,7 @@ window.onload=function(){
 
 		//Update the battery view in room_user.html
 		var battery = $('battery');
-		var level = parseInt(message.battery_level)/255 * 100;
+		var level = parseInt(message.data)/255 * 100;
 		var batteryLevel = $('#battery-level');
 		batteryLevel.css('width', level + '%');
 		if (level > 50) {  
