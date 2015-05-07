@@ -37,7 +37,7 @@ window.onload=function(){
 	//Command_motor
 	var topic_cmd = new ROSLIB.Topic({
 		ros : ros,
-		name : '/command_motor',
+		name : '/cmdmotors',
 		messageType : 'MotorCmd'
 	});
 
@@ -148,7 +148,59 @@ window.onload=function(){
 	this.remote.up.click(clickButton.bind(null, 38));
 	this.remote.down.click(clickButton.bind(null, 40));
 	this.remote.stop.click(clickButton.bind(null, 83));
+	
+	
+// Control with mouse motion
+/*  var mouseMotionCtrl = function mouseMotionCtrl(event) {
+    var x0 = event.x
+    var y0 = event.y
 
+    document.onmousemove = function (event) {
+      onselectstart = 'return false';
+      dx = (x0 - event.x);
+      dy = (y0 - event.y);
+      // distance when speed max is reached 
+      normX = 200;
+      rx1 = (dx + (normX/2))/normX;
+      rx2 = 1 - rx1;
+
+      normY = 200;
+      dy = (y0-event.y)*normY/255;
+      v = dy+128;
+
+      //process speed with ponderation
+      speed1 = 2 * v * rx1;
+      speed2 = 2 * v * rx2;
+      console.log("Debug C dx:" + dx + " dy:" + dy + " rx1:" + rx1 + " rx2:" + rx2 + " speed1:" + speed1 + " speed2:"+speed2);
+      if(speed1 > 255) { speed1 = 255;}
+      if(speed1 < 0) {speed1 = 0;}
+      if(speed2 > 255) {speed2 = 255;}
+      if(speed2 < 0) {speed2 = 0;}
+		var msg = new ROSLIB.Message({
+			speed1 : speed1,
+			speed2 : speed2
+			//mode : 1			
+		});
+		//Publish on Topic
+		topic_cmd.publish(msg);
+		console.log("published ");
+      //rc.moveRobot(5,Math.round(speed1),Math.round(speed2));
+    }
+    this.onmouseup = function () {
+      document.onmousemove = null;
+      //rc.moveRobot(4,0,0);
+    }
+  }
+  // bind mouse
+  document.onmousedown = function(e) {
+    console.log("debug B");
+    if (!me.remote.visible) {
+      return;
+    }
+    e = e || window.event;
+    mouseMotionCtrl(e);
+    console.log('debig');
+  };*/
 
 	//==============================================
 	//=============GAMEPAD CONTROL=================

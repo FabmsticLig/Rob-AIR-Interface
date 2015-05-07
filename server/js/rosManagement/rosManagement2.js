@@ -49,10 +49,10 @@ window.onload=function(){
     });
 
     //allow movement (if collision,panic_button,...)
-    boolean move_up    = true;
-    boolean move_down  = true;
-    boolean turn_left  = true;
-    boolean turn_right = true;
+    var move_up    = true;
+    var move_down  = true;
+    var turn_left  = true;
+    var turn_right = true;
     //limit of speed in case proximity max=4 min=1
     var speed_limit   = 4;
     //Publications
@@ -117,7 +117,7 @@ window.onload=function(){
 						      console.log("left Arrow");
 						      speed1 = 32*speed_limit;
 						      speed2 = 128;
-						  }else if (key == '39' turn_right) {
+						  }else if (key == '39' && turn_right) {
 						      // right arrow
 						      console.log("right Arrow");
 						      speed1 = 128;
@@ -196,7 +196,7 @@ window.onload=function(){
 	    if(gp) {
 		console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
 		gameLoop();
-		clearInterval(interval);
+		//clearInterval(interval);
 	    }
 	}
     }
@@ -288,7 +288,7 @@ window.onload=function(){
 	    //display error
 	    $('#indication_board').append("<p> Collision détectée </p>");
 	    periode = setInterval(clignotement, 100);
-	    function(){clearInterval(periode)};
+	    function(){clearInterval(periode);}
 	    $("#up_possibility").css('color','rgb(255,0,0)');
 	    $("#down_possibility").css('color','rgb(255,0,0)');
 	    $("#left_possibility").css('color','rgb(255,0,0)');
@@ -620,7 +620,7 @@ window.onload=function(){
 		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 
 		periode = setInterval(clignotement, 100);
-		function(){clearInterval(periode)};   
+		//function(){clearInterval(periode)};   
 		switch (iter) {
 		case 0 :
 		    $("#circle_alert").css('background','rgb(255,0,0)');
