@@ -130,6 +130,27 @@ img {
 }
 
 #up_possibility {
+	color : rgb(0,0,0);
+	/*font-size : 30px;*/
+}
+
+#down_possibility {
+	color : rgb(0,0,0);
+	/*font-size : 30px;*/
+}
+
+#left_possibility {
+	color : rgb(0,0,0);
+	/*font-size : 30px;*/
+}
+
+#right_possibility {
+	color : rgb(0,0,0);
+	/*font-size : 30px;*/
+}
+
+
+/*#up_possibility {
         margin-left:auto;
 	margin-right:auto;
 	color : rgb(0,0,0);
@@ -155,7 +176,7 @@ img {
         margin-left:-16;
 	color : rgb(0,0,0);
 	font-size : 30px;
-}
+}*/
 
 
 #proximity{
