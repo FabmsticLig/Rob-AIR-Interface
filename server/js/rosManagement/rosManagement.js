@@ -52,7 +52,39 @@ window.onload=function(){
 
 	//Gaze_direction
 	//TODO
+    var gazeValue = 0;
 
+        var setGazeDirection = function(key){
+
+            if(key ==='Q' || key  ==='q')
+            {
+                    if(gazeValue !== -127){
+                        gazeValue --;
+                        console.log("Turn sight to Left");
+                    }
+                    else{
+                        console.log("Max left position reached");
+                    }
+
+            }
+            else
+            {
+                    if(gazeValue !== 127){
+                         gazeValue ++; 
+                         console.log("Turn sight to Right");
+                    }
+                    else{
+                        console.log("Max right position reached");
+                    }
+
+            }
+            console.log(gazeValue);
+            var gaze = new ROSLIB.message( {
+            data : gazeValue
+        });
+
+};
+    
 	//Angle_position
 	//TODO	
 
@@ -140,6 +172,10 @@ window.onload=function(){
 			e.preventDefault();
 			clickButton(e.keyCode);
 		}
+        if( keyCode == 'Q' || keyCode == 'q' 
+            || keyCode == 'd' || keyCode =='D'){
+            setGazeDirection(keyCode);
+        }
 	}, false);
 
 	// bind buttons clicks as well
