@@ -411,14 +411,174 @@ window.onload=function(){
 
     topic_proximity_obstacles.subscribe(function(message) {
 	console.log('Received message on' + topic_proximity_obstacles.name);
-
+	
+	$("#proximity").css('color','rgb(102,102,102)');
+	$("#proximity_level1").css('color','rgb(102,102,102)');
+	$("#proximity1").css('color','rgb(102,102,102)');
+	$("#proximity1_level1").css('color','rgb(102,102,102)');
+	$("#proximity2").css('color','rgb(102,102,102)');
+	$("#proximity2_level1").css('color','rgb(102,102,102)');
+	$("#proximity3").css('color','rgb(102,102,102)');
+	$("#proximity3_level1").css('color','rgb(102,102,102)');
+	$("#proximity4").css('color','rgb(102,102,102)');
+	$("#proximity4_level1").css('color','rgb(102,102,102)');
+	$("#proximity5").css('color','rgb(102,102,102)');
+	$("#proximity5_level1").css('color','rgb(102,102,102)');
+	$("#proximity6").css('color','rgb(102,102,102)');
+	$("#proximity6_level1").css('color','rgb(102,102,102)');
+	$("#proximity7").css('color','rgb(102,102,102)');
+	$("#proximity7_level1").css('color','rgb(102,102,102)');
+	boolean find = false;
 	for (var iter = 0; i < 8; iter++){
-	    //TODO  palliers  pb à partir de 20 cm
+
+	    if(message.data[iter] < 40){
+		switch (iter) {
+		case 0 :
+		    $("#proximity").css('color','rgb(0,85,0)');
+		    break;
+		case 1 :
+		    $("#proximity1").css('color','rgb(0,85,0)');
+		    break;
+		case 2 :
+		    $("#proximity2").css('color','rgb(0,85,0)');
+		    break;
+		case 3 :
+		    $("#proximity3").css('color','rgb(0,85,0)');
+		    break;
+		case 4 :
+		    $("#proximity4").css('color','rgb(0,85,0)');
+		    break;
+		case 5 :
+		    $("#proximity5").css('color','rgb(0,85,0)');
+		    break;
+		case 6 :
+		    $("#proximity6").css('color','rgb(0,85,0)');
+		    break;    
+		default :
+		    $("#proximity7").css('color','rgb(0,85,0)');
+		    break;
+		}
+	    }
+	    if(message.data[iter] < 30){
+		switch (iter) {
+		case 0 :
+		    $("#proximity").css('color','rgb(204,78,0)');
+		    $("#proximity_level1").css('color','rgb(0,85,0)');
+		    break;
+		case 1 :
+		    $("#proximity1").css('color','rgb(204,78,0)');
+		    $("#proximity1_level1").css('color','rgb(0,85,0)');
+		    break;
+		case 2 :
+		    $("#proximity2").css('color','rgb(204,78,0)');
+		    $("#proximity2_level1").css('color','rgb(0,85,0)');
+		    break;
+		case 3 :
+		    $("#proximity3").css('color','rgb(204,78,0)');
+		    $("#proximity3_level1").css('color','rgb(0,85,0)');
+		    break;
+		case 4 :
+		    $("#proximity4").css('color','rgb(204,78,0)');
+		    $("#proximity4_level1").css('color','rgb(0,85,0)');
+		    break;
+		case 5 :
+		    $("#proximity5").css('color','rgb(204,78,0)');
+		    $("#proximity5_level1").css('color','rgb(0,85,0)');
+		    break;
+		case 6 :
+		    $("#proximity6").css('color','rgb(204,78,0)');
+		    $("#proximity6_level1").css('color','rgb(0,85,0)');
+		    break;    
+		default :
+		    $("#proximity7").css('color','rgb(204,78,0)');
+		    $("#proximity7_level1").css('color','rgb(0,85,0)');
+		    break;
+		}
+		find = true;
+		speed_limit = 3;
+	    }
+	    if(message.data[iter] < 20){
+		switch (iter) {
+		case 0 :
+		    $("#proximity").css('color','rgb(255,0,0)');
+		    $("#proximity_level1").css('color','rgb(204,78,0)');
+		    break;
+		case 1 :
+		    $("#proximity1").css('color','rgb(255,0,0)');
+		    $("#proximity1_level1").css('color','rgb(204,78,0)');
+		    break;
+		case 2 :
+		    $("#proximity2").css('color','rgb(255,0,0)');
+		    $("#proximity2_level1").css('color','rgb(204,78,0)');
+		    break;
+		case 3 :
+		    $("#proximity3").css('color','rgb(255,0,0)');
+		    $("#proximity3_level1").css('color','rgb(204,78,0)');
+		    break;
+		case 4 :
+		    $("#proximity4").css('color','rgb(255,0,0)');
+		    $("#proximity4_level1").css('color','rgb(204,78,0)');
+		    break;
+		case 5 :
+		    $("#proximity5").css('color','rgb(255,0,0)');
+		    $("#proximity5_level1").css('color','rgb(204,78,0)');
+		    break;
+		case 6 :
+		    $("#proximity6").css('color','rgb(255,0,0)');
+		    $("#proximity6_level1").css('color','rgb(204,78,0)');
+		    break;    
+		default :
+		    $("#proximity7").css('color','rgb(255,0,0)');
+		    $("#proximity7_level1").css('color','rgb(204,78,0)');
+		    break;
+		}	
+		find = true;
+		speed_limit = 2;
+	    }
 	    if(message.data[iter] < 10){
+		switch (iter) {
+		case 0 :
+		    $("#proximity").css('color','rgb(255,0,0)');
+		    $("#proximity_level1").css('color','rgb(255,0,0)');
+		    break;
+		case 1 :
+		    $("#proximity1").css('color','rgb(255,0,0)');
+		    $("#proximity1_level1").css('color','rgb(255,0,0)');
+		    break;
+		case 2 :
+		    $("#proximity2").css('color','rgb(255,0,0)');
+		    $("#proximity2_level1").css('color','rgb(255,0,0)');
+		    break;
+		case 3 :
+		    $("#proximity3").css('color','rgb(255,0,0)');
+		    $("#proximity3_level1").css('color','rgb(255,0,0)');
+		    break;
+		case 4 :
+		    $("#proximity4").css('color','rgb(255,0,0)');
+		    $("#proximity4_level1").css('color','rgb(255,0,0)');
+		    break;
+		case 5 :
+		    $("#proximity5").css('color','rgb(255,0,0)');
+		    $("#proximity5_level1").css('color','rgb(255,0,0)');
+		    break;
+		case 6 :
+		    $("#proximity6").css('color','rgb(255,0,0)');
+		    $("#proximity6_level1").css('color','rgb(255,0,0)');
+		    break;    
+		default :
+		    $("#proximity7").css('color','rgb(255,0,0)');
+		    $("#proximity7_level1").css('color','rgb(255,0,0)');
+		    break;
+		}
+		find = true;
+		speed_limit = 1;
 		$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.data[iter] + "</p>");
 		//scroll le div à la fin 
 		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 	    }
+	}
+	if (!find) {
+	    speed_limit = 4;
 	}
     });
 
@@ -460,15 +620,7 @@ window.onload=function(){
 		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 
 		periode = setInterval(clignotement, 100);
-		function(){clearInterval(periode)};
-		move_up    = false;
-		move_down  = false;
-		turn_left  = false;
-                turn_right = false;
-		$("#up_possibility").css('color','rgb(255,0,0)');
-		$("#down_possibility").css('color','rgb(255,0,0)');
-		$("#left_possibility").css('color','rgb(255,0,0)');
-		$("#right_possibility").css('color','rgb(255,0,0)');   
+		function(){clearInterval(periode)};   
 		switch (iter) {
 		case 0 :
 		    $("#circle_alert").css('background','rgb(255,0,0)');
@@ -529,18 +681,19 @@ window.onload=function(){
 
 		}
 		break;
-		
 	    }
-	    if (!find) {
-		move_up    = true;
-		move_down  = true;
-		turn_left  = true;
-                turn_right = true;
-		$("#up_possibility").css('color','rgb(0,0,0)');
-		$("#down_possibility").css('color','rgb(0,0,0)');
-		$("#left_possibility").css('color','rgb(0,0,0)');
-		$("#right_possibility").css('color','rgb(0,0,0)');
-		$("#circle").css('background','rgb(0,0,0)');
+		
+	}
+	if (!find) {
+	    move_up    = true;
+	    move_down  = true;
+	    turn_left  = true;
+            turn_right = true;
+	    $("#up_possibility").css('color','rgb(0,0,0)');
+	    $("#down_possibility").css('color','rgb(0,0,0)');
+	    $("#left_possibility").css('color','rgb(0,0,0)');
+	    $("#right_possibility").css('color','rgb(0,0,0)');
+	    $("#circle").css('background','rgb(0,0,0)');
 	}
     });
 
