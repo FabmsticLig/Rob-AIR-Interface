@@ -28,7 +28,7 @@ window.onload=function(){
 	//Topics
 
 	//Gaze_direction
-	var topic_end_line_obstacles = new ROSLIB.Topic({
+	var topic_gaze_direction = new ROSLIB.Topic({
 		ros : ros,
 		name : '/gaze_direction',
 		messageType : 'std_msgs/Byte'
@@ -37,7 +37,7 @@ window.onload=function(){
 	//Command_motor
 	var topic_cmd = new ROSLIB.Topic({
 		ros : ros,
-		name : '/command_motor',
+		name : '/cmdmotors',
 		messageType : 'MotorCmd'
 	});
 
@@ -51,7 +51,43 @@ window.onload=function(){
 	//Publications
 
 	//Gaze_direction
-	//TODO
+	var gazeValue = 127;
+
+	var setGazeDirection = function(key){
+
+		//Key code
+		//q 81
+		//d 68
+		if(key ==='81')
+		{
+			if(gazeValue !== 0){
+				gazeValue --;
+				console.log("Turn sight to Left");
+			}
+			else{
+				console.log("Max left position reached");
+			}
+
+		}
+		else
+		{
+			if(gazeValue !== 255){
+				gazeValue ++; 
+				console.log("Turn sight to Right");
+			}
+			else{
+				console.log("Max right position reached");
+			}
+
+		}
+		console.log(gazeValue);
+		var gaze = new ROSLIB.Message( {
+			data : gazeValue
+		});
+		topic_gaze_direction.publish(gaze);
+		console.log("gaze direction published " + key);
+
+	};
 
 	//Angle_position
 	//TODO	
@@ -140,6 +176,12 @@ window.onload=function(){
 			e.preventDefault();
 			clickButton(e.keyCode);
 		}
+
+		if( keyCode == '81' || keyCode == '68'){
+			e.preventDefault();
+			setGazeDirection(keyCode);
+		}
+
 	}, false);
 
 	// bind buttons clicks as well
@@ -149,6 +191,58 @@ window.onload=function(){
 	this.remote.down.click(clickButton.bind(null, 40));
 	this.remote.stop.click(clickButton.bind(null, 83));
 
+
+	// Control with mouse motion
+	var mouseMotionCtrl = function mouseMotionCtrl(event) {
+		var x0 = event.x
+		var y0 = event.y
+
+		document.onmousemove = function (event) {
+			onselectstart = 'return false';
+			dx = (x0 - event.x);
+			dy = (y0 - event.y);
+			// distance when speed max is reached 
+			normX = 200;
+			rx1 = (dx + (normX/2))/normX;
+			rx2 = 1 - rx1;
+
+			normY = 200;
+			dy = (y0-event.y)*normY/255;
+			v = dy+128;
+
+			//process speed with ponderation
+			speed1 = 2 * v * rx1;
+			speed2 = 2 * v * rx2;
+			console.log("Debug C dx:" + dx + " dy:" + dy + " rx1:" + rx1 + " rx2:" + rx2 + " speed1:" + speed1 + " speed2:"+speed2);
+			if(speed1 > 255) { speed1 = 255;}
+			if(speed1 < 0) {speed1 = 0;}
+			if(speed2 > 255) {speed2 = 255;}
+			if(speed2 < 0) {speed2 = 0;}
+			var msg = new ROSLIB.Message({
+				speed1 : Math.round(speed1-128),
+				speed2 : Math.round(speed2)
+				//mode : 1			
+			});
+			//Publish on Topic
+			topic_cmd.publish(msg);
+			console.log("published ");
+			//rc.moveRobot(5,Math.round(speed1),Math.round(speed2));
+		}
+		this.onmouseup = function () {
+			document.onmousemove = null;
+			//rc.moveRobot(4,0,0);
+		}
+	}
+	// bind mouse
+	document.onmousedown = function(e) {
+		console.log("debug B");
+		//if (!me.remote.visible) {
+			//return;
+			//}
+			e = e || window.event;
+			mouseMotionCtrl(e);
+			//console.log('debig');
+	};
 
 	//==============================================
 	//=============GAMEPAD CONTROL=================
@@ -254,27 +348,27 @@ window.onload=function(){
 		name : '/social_touch_event',
 		messageType : 'std_msgs/Bool'
 	});
-	
 
-		var clignotement = function(){
-			if ( $("#hug").css('color') == 'rgb(255, 0, 0)') {
-				console.log($("#hug").css('color'));
-				
-				$("#hug").css('color','rgb(0,0,0)');
-				
-				console.log("red -> black");
-				console.log($("#hug").css('color'));
-		    }
-			else{
-				console.log($("#hug").css('color'));
-				
-				$("#hug").css('color','rgb(255,0,0)');
-				
-				console.log("black -> red");
-				console.log($("#hug").css('color'));
-			}
-		};
-		
+
+	var clignotement = function(){
+		if ( $("#hug").css('color') == 'rgb(255, 0, 0)') {
+			console.log($("#hug").css('color'));
+
+			$("#hug").css('color','rgb(0,0,0)');
+
+			console.log("red -> black");
+			console.log($("#hug").css('color'));
+		}
+		else{
+			console.log($("#hug").css('color'));
+
+			$("#hug").css('color','rgb(255,0,0)');
+
+			console.log("black -> red");
+			console.log($("#hug").css('color'));
+		}
+	};
+
 
 	topic_hug_event.subscribe(function(message) {
 		//console.log('Received message on' + topic_panic_event.name);
@@ -316,8 +410,8 @@ window.onload=function(){
 			//TODO  palliers  pb à partir de 20 cm
 			if(message.data[iter] < 10){
 				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.data[iter] + "</p>");
-			//scroll le div à la fin 
-			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+				//scroll le div à la fin 
+				$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
 			}
 		}
 	});
