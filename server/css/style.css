@@ -120,17 +120,13 @@ img {
     overflow-y:auto; 
 }
 
-#indication_robair {
-    /*        margin-left:auto;
-            margin-right:auto;*/
-    height: 150px;
-}
-
 #hug {
     color : rgb(0,0,0);
-    font-size : 30px;
+    margin: auto;
+    font-size : 40px;
 }
 
+/*User movement possibility*/
 #up_possibility {
     color : rgb(0,0,0);
 }
@@ -147,6 +143,7 @@ img {
     color : rgb(0,0,0);
 }
 
+/*Obstacle proximity detection*/
 #proximity{
     position:relative;
     width:1px;
@@ -154,8 +151,8 @@ img {
     border:1px solid #666;
     border-color:transparent transparent transparent #666;
     border-width:7px;
-    margin-top:-65px;
-    margin-left:-28px;
+    margin-top:-75px; 
+    margin-left:8px;  
     transform: rotate(30deg);
 
 }
@@ -179,8 +176,8 @@ img {
     border:1px solid #666;
     border-color:transparent transparent transparent #666;
     border-width:7px;
-    margin-top:-65px;
-    margin-left:0px;
+    margin-top:-68px;
+    margin-left:36px;
     transform: rotate(65deg);
 }
 
@@ -204,7 +201,7 @@ img {
     border-color:transparent transparent transparent #666;
     border-width:7px;
     margin-top:-40px;
-    margin-left:35px;
+    margin-left:71px;
     transform: rotate(115deg);
 }
 
@@ -229,7 +226,7 @@ img {
     border-color:transparent transparent transparent #666;
     border-width:7px;
     margin-top:-15px;
-    margin-left:62px;
+    margin-left:98px;
     transform: rotate(155deg);
 }
 
@@ -254,7 +251,7 @@ img {
     border-color:transparent transparent transparent #666;
     border-width:7px;
     margin-top:-5px;
-    margin-left:62px;
+    margin-left:97px;
     transform: rotate(-155deg);
 }
 
@@ -279,7 +276,7 @@ img {
     border-color:transparent transparent transparent #666;
     border-width:7px;
     margin-top:-12px;
-    margin-left:39px;
+    margin-left:75px;
     transform: rotate(-115deg);
 
 }
@@ -306,7 +303,7 @@ img {
     border-color:transparent transparent transparent #666;
     border-width:7px;
     margin-top:-38px;
-    margin-left:0px;
+    margin-left:36px;
     transform: rotate(-65deg);
 
 }
@@ -332,7 +329,7 @@ img {
     border-color:transparent transparent transparent #666;
     border-width:7px;
     margin-top:-70px;
-    margin-left:-27px;
+    margin-left:9px;
     transform: rotate(-28deg);
 
 }
@@ -355,29 +352,33 @@ img {
     width:78px;
     height:78px;
     border-radius:50%;
-    margin-top:20px;
-    margin-left:40px;
-    /*       margin-right:auto;*/
+    margin-top:13px;
+    margin-left:26px;
     color:#050;
     border: 4px solid #050;
     background:#fff;
     z-index:1;
 }
 
-#circle_alert{
+/*disable actually*/
+#endline_alert{
     position:relative;
-    width:10px;
-    height:10px;
+    width:0px;
+    height:1px;
     border-radius:50%;
     top:24px;
     left:-3px;
+    /*must be set to #050 to be show*/
     color:transparent;
+    /*must be set to #050 to be show*/
     border: 2px solid transparent;
-    background:#fff;
+    /*must be set to #fff to be show*/
+    background:transparent;
     z-index:2;
 }
 
-#circle_alert1{
+/*disable actually*/
+#endline_alert1{
     position:relative;
     width:10px;
     height:10px;
@@ -386,11 +387,12 @@ img {
     top:10px;
     left:50px;
     border: 2px solid transparent;
-    background:#fff;
+    background:transparent;
     z-index:3;
 }
 
-#circle_alert2{
+/*disable actually*/
+#endline_alert2{
     position:relative;
     width:10px;
     height:10px;
@@ -399,11 +401,12 @@ img {
     left:24px;
     color:transparent;
     border: 2px solid transparent;
-    background:#fff;
+    background:transparent;
     z-index:4;
 }
 
-#circle_alert3{
+/*disable actually*/
+#endline_alert3{
     position:relative;
     width:10px;
     height:10px;
@@ -412,6 +415,46 @@ img {
     left:24px;
     color:transparent;
     border: 2px solid transparent;
-    background:#fff;
+    background:transparent;
     z-index:5;
+}
+
+/*Used to chose pannel control ie: touch pad or screen pad*/
+ul#tabs { 
+    list-style-type: none; 
+    margin: 30px 0 0 0; 
+    padding: 0 0 0.3em 0; 
+}
+
+ul#tabs li { 
+    display: inline; 
+}
+
+ul#tabs li a { 
+    color: #42454a; background-color: #dedbde; 
+    border: 1px solid #c9c3ba; 
+    border-bottom: none; 
+    padding: 0.3em; 
+    text-decoration: none;
+}
+
+ul#tabs li a:hover { 
+    background-color: #f1f0ee;
+}
+
+ul#tabs li a.selected { 
+    color: #000; background-color: 
+        #f1f0ee; font-weight: bold; 
+    padding: 0.7em 0.3em 0.38em 0.3em;
+}
+
+div.tabContent { 
+    border: 1px solid #c9c3ba;
+    padding: 0.5em; 
+    background-color: #f1f0ee;
+}
+
+div.tabContent.hide { 
+    display: none;
+
 }
