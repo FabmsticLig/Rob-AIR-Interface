@@ -53,6 +53,17 @@ window.onload = function () {
     //limit of speed in case proximity max=127 min=0
     var speed_limit = speed_max;
 
+    //Default keyboard control
+    var key_stop = 83; //'s' 
+    var key_forward = 38; // arrow up
+    var key_backward = 40; // arrow down
+    var key_turn_left = 37; // arrow left
+    var key_turn_right = 39; // arrow right
+    var key_gaze_left = 81; //'q'
+    var key_gaze_right = 68; //'d'
+    var key_head_left = 65; //'a'
+    var key_head_right = 69; //'e'
+
     //initial Gaze_direction [0,255]
     var gazeValue = 127;
 
@@ -118,7 +129,7 @@ window.onload = function () {
         //Key code
         //q 81
         //d 68
-        if (key === 81)
+        if (key === key_gaze_left)
         {
             if (gazeValue !== 0) {
                 gazeValue--;
@@ -128,7 +139,7 @@ window.onload = function () {
                 console.log("Max left position reached");
             }
 
-        } else if (key === 68) {
+        } else if (key === key_gaze_right) {
             if (gazeValue !== 255) {
                 gazeValue++;
                 console.log("Turn sight to Right");
@@ -147,6 +158,65 @@ window.onload = function () {
 
     };
 
+    //gaze direction with mouse clic on video
+    //x and y are calculate but only x is used
+    var screenGazeDirection = function (event) {
+        var x0;
+        var y0;
+        if (event.x !== undefined && event.y !== undefined)
+        {
+            x0 = event.x;
+            y0 = event.y;
+        }
+        else // Firefox method to get the position
+        {
+            x0 = event.clientX + document.body.scrollLeft +
+                    document.documentElement.scrollLeft;
+            y0 = event.clientY + document.body.scrollTop +
+                    document.documentElement.scrollTop;
+        }
+
+        // distance of the window 
+        var window_elem = $("#div_cam3").position();
+        var normX = $("#div_cam3").css('width');
+        var normY = $("#div_cam3").css('height');
+        //erase 'px' from norm and window_elem;
+        normX = normX.substring(normX.length - 2, 0);
+        normY = normY.substring(normY.length - 2, 0);
+
+        var dx = (window_elem.left + normX / 2) - (x0 - window_elem.left);
+        var rx = -dx * 127 / (normX / 2) + 128;
+
+        var dy = (window_elem.top + normY / 2) - (y0 - window_elem.top);
+        var ry = -dy * 127 / (normY / 2);
+        
+        if (rx > 255) {
+            rx = 255;
+        }
+        if (rx < 0) {
+            rx = 0;
+        }
+        if (ry > 255) {
+            ry = 255;
+        }
+        if (ry < 0) {
+            ry = 0;
+        }
+        //gazeValueY not yet implemented
+        gazeValue =Math.round(rx);
+        var gaze = new ROSLIB.Message({
+            data: gazeValue
+        });
+        topic_gaze_direction.publish(gaze);
+        console.log("gaze direction published " + gazeValue);
+        
+    };
+    var mouse_event_gaze = document.getElementById('div_cam3');
+    mouse_event_gaze.onclick = function (e) {
+        e = e || window.event;
+        screenGazeDirection(e);
+    };
+
     //-------------------------------------------------------------------------
     //Angle_position
     var setHeadDirection = function (key) {
@@ -155,7 +225,7 @@ window.onload = function () {
         //a 65
         //e 69
         elem = document.getElementById('triangle-up');
-        if (key === 65)
+        if (key === key_head_left)
         {
             if (headDirection !== 0) {
                 headDirection--;
@@ -166,7 +236,7 @@ window.onload = function () {
                 $('#indication_board').append("<p> Limite de rotation de la tête à gauche atteinte </p>");
             }
 
-        } else if (key === 69) {
+        } else if (key === key_head_right) {
             if (headDirection !== 255) {
                 headDirection++;
                 console.log("Turn head to Right");
@@ -182,7 +252,7 @@ window.onload = function () {
             data: headDirection
         });
         topic_angle_position.publish(head);
-        console.log("head direction published " + head);
+        console.log("head direction published " + headDirection);
     };
 
     //-------------------------------------------------------------------------
@@ -203,13 +273,13 @@ window.onload = function () {
     };
 
     var but = {};
-    but[38] = this.remote.up;
-    but[40] = this.remote.down;
-    but[37] = this.remote.left;
-    but[39] = this.remote.right;
-    but[83] = this.remote.stop;
-    but[65] = this.remote.head_l;
-    but[69] = this.remote.head_r;
+    but[key_forward] = this.remote.up;
+    but[key_backward] = this.remote.down;
+    but[key_turn_left] = this.remote.left;
+    but[key_turn_right] = this.remote.right;
+    but[key_stop] = this.remote.stop;
+    but[key_head_left] = this.remote.head_l;
+    but[key_head_right] = this.remote.head_r;
     var lastPressed = this.remote.stop; // only one action at a time
 
     //-------------------------------------------------------------------------
@@ -233,32 +303,32 @@ window.onload = function () {
             lastPressed.removeClass('btn-warning');
         }
         // Head movement
-        if (key === 65 || key === 69) {
+        if (key === key_head_left || key === key_head_right) {
             console.log("Head Movement");
             setHeadDirection(key);
         } else {
             //Robot movement
-            if (key === 38 && move_up) {
+            if (key === key_forward && move_up) {
                 // up arrow
                 console.log("up Arrow");
                 speed1 = speed_limit;
                 speed2 = speed_limit;
-            } else if (key === 40 && move_down) {
+            } else if (key === key_backward && move_down) {
                 // down arrow
                 console.log("down Arrow");
                 speed1 = -speed_limit;
                 speed2 = -speed_limit;
-            } else if (key === 37 && turn_left) {
+            } else if (key === key_turn_left && turn_left) {
                 // left arrow
                 console.log("left Arrow");
                 speed1 = speed_limit;
                 speed2 = speed_stop;
-            } else if (key === 39 && turn_right) {
+            } else if (key === key_turn_right && turn_right) {
                 // right arrow
                 console.log("right Arrow");
                 speed1 = speed_stop;
                 speed2 = speed_limit;
-            } else if (key === 83
+            } else if (key === key_stop
                     || !move_up
                     || !move_up
                     || !turn_left
@@ -290,29 +360,30 @@ window.onload = function () {
 
         var keyCode = e.keyCode;
         //Robot movement
-        if (keyCode === 38 || keyCode === 40 || keyCode === 37
-                || keyCode === 39 || keyCode === 83) {
+        if (keyCode === key_forward || keyCode === key_backward
+                || keyCode === key_turn_left
+                || keyCode === key_turn_right || keyCode === key_stop) {
             e.preventDefault();
             clickButton(e.keyCode);
             //Gaze direction    
-        } else if (keyCode === 81 || keyCode === 68) {
+        } else if (keyCode === key_gaze_left || keyCode === key_gaze_right) {
             e.preventDefault();
             setGazeDirection(e.keyCode);
             //Head movement
-        } else if (keyCode === 65 || keyCode === 69) {
+        } else if (keyCode === key_head_left || keyCode === key_head_right) {
             e.preventDefault();
             setHeadDirection(e.keyCode);
         }
     }, false);
 
     // bind buttons clicks as well
-    this.remote.left.click(clickButton.bind(null, 37));
-    this.remote.right.click(clickButton.bind(null, 39));
-    this.remote.up.click(clickButton.bind(null, 38));
-    this.remote.down.click(clickButton.bind(null, 40));
-    this.remote.stop.click(clickButton.bind(null, 83));
-    this.remote.head_l.click(clickButton.bind(null, 65));
-    this.remote.head_r.click(clickButton.bind(null, 69));
+    this.remote.left.click(clickButton.bind(null, key_turn_left));
+    this.remote.right.click(clickButton.bind(null, key_turn_right));
+    this.remote.up.click(clickButton.bind(null, key_forward));
+    this.remote.down.click(clickButton.bind(null, key_backward));
+    this.remote.stop.click(clickButton.bind(null, key_stop));
+    this.remote.head_l.click(clickButton.bind(null, key_head_left));
+    this.remote.head_r.click(clickButton.bind(null, key_head_right));
 
     //-------------------------------------------------------------------------
     // Control with mouse motion
@@ -349,23 +420,23 @@ window.onload = function () {
                 dy = event.clientY + document.body.scrollTop +
                         document.documentElement.scrollTop;
             }
-            
+
             // distance of the window 
             var normX = $("#remote-controls-mouse").css('width');
             var normY = $("#remote-controls-mouse").css('height');
             //erase 'px' from norm
-            normX = normX.substring(normX.length-2,0);
-            normY = normY.substring(normY.length-2,0);
+            normX = normX.substring(normX.length - 2, 0);
+            normY = normY.substring(normY.length - 2, 0);
             
             //TODO : calibrate and vérify calcul
-            var rx1 = (x0 - dx)/(normX)*speed_limit;
-            var rx2 = (y0 - dy)/(normY)*speed_limit;
+            var rx1 = (x0 - dx) / (normX) * speed_limit;
+            var rx2 = (y0 - dy) / (normY) * speed_limit;
 
             //process speed with ponderation
-            
-            var speed1 = rx1*4;
-            var speed2 = rx2*4;
-            
+
+            var speed1 = rx1 * 4;
+            var speed2 = rx2 * 4;
+
             if (speed1 > speed_limit) {
                 speed1 = speed_limit;
             }
@@ -384,7 +455,7 @@ window.onload = function () {
             });
             //Publish on Topic
             topic_cmd.publish(msg);
-            console.log("published "+ speed1 +" " +speed2);
+            console.log("published " + speed1 + " " + speed2);
         };
         mouse_event.onmousemove = function () {
             document.onmousemove = null;
@@ -576,7 +647,6 @@ window.onload = function () {
 
 
     topic_hug_event.subscribe(function (message) {
-        //console.log('Received message on' + topic_panic_event.name);
         if (message.data) {
             periode = setInterval(clignotement, 1000);
             setTimeout(function () {
