@@ -173,7 +173,7 @@ window.onload = function () {
             }
             else {
                 console.log("Max right position reached");
-                $('#indication_board').append("<p> Limite de rotation de la tête à gauche atteinte </p>");
+                $('#indication_board').append("<p> Limite de rotation de la tête à droite atteinte </p>");
             }
 
         }
