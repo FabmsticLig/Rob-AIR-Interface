@@ -49,7 +49,7 @@
                 <div class="col-sm-12">
                     <h3>Cam principale</h3>
                     <div id="div_cam3" class="div_resizabled">
-                        <!--						<img id="camP" src="img/visio.jpg" alt=""/>-->
+                        <img id="camP" src="img/visio.jpg" alt=""/>
                         <!-- contains the video of the remote fablabs -->
                         <span id="remotes"></span>
                     </div>
@@ -59,7 +59,11 @@
         <div class="col-sm-4">
             <div class="row">
                 <div class="row">
-                    <p> <span id="brandwith_quality"></span></p>
+                    <div id="brandwith_quality_critical"></div>
+                    <div id="brandwith_quality_low"></div>
+                    <div id="brandwith_quality_medium"></div>
+                    <div id="brandwith_quality_high"></div>
+                    <!--<p> <span id="brandwith_quality"></span></p>-->
                     <div id="battery"><div id="battery-level"></div></div>
                 </div>
                 <div class="row">
@@ -90,8 +94,15 @@
                         <span id="left_possibility" class="glyphicon glyphicon-arrow-left"></span><br><br>
                         <span id="right_possibility" class="glyphicon glyphicon-arrow-right"></span><br>
                     </div>
-                    <div class="col-sm-4" style="margin-top: auto">
-                        <span id="hug" class="glyphicon glyphicon-heart col-sm-2"></span>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <span id="hug" class="glyphicon glyphicon-heart" style="margin-top: auto"></span><br>
+                        </div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <div id="triangle-up"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -105,13 +116,30 @@
 
                 <div class="row">
                     <div class="col-sm-4">
+                        <button type="button" id="remote-left-head" class="remote-direction btn btn-block btn-default btn-lg">
+                            <span class="glyphicon glyphicon-hand-left"></span>
+                        </button>
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
+                            <span class="glyphicon glyphicon-pause"></span>
+                        </button>                      
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="button" id="remote-right-head" class="remote-direction btn btn-block btn-default btn-lg">
+                            <span class="glyphicon glyphicon-hand-right"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">                     
                     </div>
                     <div class="col-sm-4">
                         <button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
                             <span class="glyphicon glyphicon-arrow-up"></span>
                         </button>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4">                    
                     </div>
                 </div>
                 <div class="row">
@@ -121,8 +149,8 @@
                         </button>
                     </div>
                     <div class="col-sm-4">
-                        <button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
-                            <span class="glyphicon glyphicon-pause"></span>
+                        <button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
+                            <span class="glyphicon glyphicon-arrow-down"></span>
                         </button>
                     </div>
                     <div class="col-sm-4">
@@ -130,17 +158,7 @@
                             <span class="glyphicon glyphicon-arrow-right"></span>
                         </button>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                    </div>
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </button>
-                    </div>
-                    <div class="col-sm-4">
-                    </div>
+
                 </div>
 
             </div>
@@ -148,17 +166,14 @@
 
         </div>
         <div class="tabContent" id="remote-controls-mouse">             
-            <div class="row">
-                <div class="col-sm-4" style="background-color:#FFCC00; height:200px;">
-
-                </div>
+            <div class="row">            
+                <div class="col-sm-4" style="background-color:#FFCC00; height:200px;"></div>
             </div>
+
         </div>
 
-    </div>
+    </div>   
 </div>
-
-
 <script src="../js/rosManagement/rosManagement2.js"></script>
 <script src="../js/videoManagement.js"></script>
 
@@ -181,5 +196,3 @@
 
 <script type="text/javascript" src="../lib/js/eventemitter2.min.js"></script>
 <script type="text/javascript" src="../lib/js/roslib.min.js"></script>
-
-</body>
