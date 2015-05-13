@@ -14,7 +14,7 @@ var webrtc = new SimpleWebRTC({
     autoRequestMedia: true,
     debug: true,
     detectSpeakingEvents: true,
-    autoAdjustMic: false
+    autoAdjustMic: false,
     media :{
         audio:true,
         video:{

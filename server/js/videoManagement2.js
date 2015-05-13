@@ -14,7 +14,7 @@ var webrtc = new SimpleWebRTC({
 	autoRequestMedia: true,
 	debug: true,
 	detectSpeakingEvents: true,
-	autoAdjustMic: false
+	autoAdjustMic: false,
     media :{
         audio:true,
         video:{
@@ -61,7 +61,7 @@ webrtc.on('videoAdded', function(video,peer) {
                     
                     div_accelerometer.appendChild(inside_accelerometer);
                     
-                    container.appendChild(div_accelerometer);
+                    remotes.appendChild(div_accelerometer);
                     
                     
 //                    <div id="demoWidget" style="position: relative;">
