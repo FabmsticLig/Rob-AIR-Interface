@@ -6,6 +6,15 @@
     margin: auto;
 }
 
+.accelerometer {
+    position: absolute;
+    left: 10%;
+    width: 80%;
+    bottom: 5px;
+    height: 5px;
+    display: none;
+}
+
 /* Video principale de video-conf */
 .videoContainer {
     /*	position: relative;
@@ -15,11 +24,11 @@
     margin-right: auto;
     width: 100%;
 }
-.videoContainer video {
+/*.videoContainer video {
     position: absolute;
     width: 100%;
     height: 100%;
-}
+}*/
 /* Video "assistance" */
 .videoContainerAssistance {
     /*    position: relative;
@@ -29,11 +38,11 @@
     margin-right: auto;
     width: 100%;
 }
-.videoContainerAssistance video {
+/*.videoContainerAssistance video {
     position: absolute;
     width: 100%;
     height: 100%;
-}
+}*/
 /*Miniature de la vidéo locale */
 .miniature-video {
     width: 100px;
