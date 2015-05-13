@@ -20,9 +20,9 @@
     /*	position: relative;
             width: 400px;
             height: 400px;*/
-    margin-left: auto;
+/*    margin-left: auto;
     margin-right: auto;
-    width: 100%;
+    width: 100%;*/
 }
 .videoContainer video {
     /*position: absolute;*/
@@ -34,9 +34,9 @@
     /*    position: relative;
         width: 200px;
         height: 150px;*/
-    margin-left: auto;
+/*    margin-left: auto;
     margin-right: auto;
-    width: 100%;
+    width: 100%;*/
 }
 .videoContainerAssistance video {
     /*position: absolute;*/
