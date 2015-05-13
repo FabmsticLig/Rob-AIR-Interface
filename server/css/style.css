@@ -24,11 +24,11 @@
     margin-right: auto;
     width: 100%;
 }
-/*.videoContainer video {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}*/
+.videoContainer video {
+    /*position: absolute;*/
+    width: 50%;
+    height: 50%;
+}
 /* Video "assistance" */
 .videoContainerAssistance {
     /*    position: relative;
@@ -38,11 +38,11 @@
     margin-right: auto;
     width: 100%;
 }
-/*.videoContainerAssistance video {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}*/
+.videoContainerAssistance video {
+    /*position: absolute;*/
+    width: 50%;
+    height: 50%;
+}
 /*Miniature de la vidéo locale */
 .miniature-video {
     width: 100px;
