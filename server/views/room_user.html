@@ -3,171 +3,170 @@
 <script type="text/javascript" src="../js/control.js"></script>
 <script src="../js/fnResize.js" type="text/javascript"></script>
 <script>
-    window.onunload = window.onbeforeunload = (function () {
-        console.log("leaving a room");
-        $.ajax({
-            url: '/leaving_room/' + $('#roomName').val(),
-            type: 'GET',
-            data: $('#roomName').val(),
-            success: function (response) {
-                console.log(response.status);
-            },
-            error: function (res, statut, error) {
-                console.log("Error when unloading page");
-            }
-        });
-        return "Voulez-vous quitter la room " + $('#roomName').val();
-    });
-    $(function () {
-        //$(".div_resizabled").resizable();
-        init_size();
-    });
+window.onunload = window.onbeforeunload = (function () {
+		console.log("leaving a room");
+		$.ajax({
+			url: '/leaving_room/' + $('#roomName').val(),
+			type: 'GET',
+			data: $('#roomName').val(),
+			success: function (response) {
+				console.log(response.status);
+			},
+			error: function (res, statut, error) {
+				console.log("Error when unloading page");
+			}
+		});
+		return "Voulez-vous quitter la room " + $('#roomName').val();
+		});
+		$(function () {
+			//$(".div_resizabled").resizable();
+			init_size();
+		});
 </script>
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-8">
-            <div class="row">
-                <div class="col-sm-8">
-                    <h3>Cam principale</h3>
-                    <div id="div_cam3" class="div_resizabled">
-                        <span id="remotes"></span>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <h3>Cam Assistance</h3>
-                    <div id="div_cam2" class="div_resizabled">
-                        <!-- contains the assistance video of the remote robot-->
-                        <span id="remote_assistance"></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-sm-12">
-                    <h3>Vue Web Cam</h3>
-                    <div id="miniature" class="row miniature">
-                        <video id="localVideo" class="miniature-video">
-                            your browser does not support the HTML 5 video tag
-                        </video>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-        <div class="col-sm-4">
-            <div class="row">
-                <div class="row">
-                    <div id="brandwith_quality_critical"></div>
-                    <div id="brandwith_quality_low"></div>
-                    <div id="brandwith_quality_medium"></div>
-                    <div id="brandwith_quality_high"></div>
-                    <!--<p> <span id="brandwith_quality"></span></p>-->
-                    <div id="battery"><div id="battery-level"></div></div>
-                </div>
-                <div class="row">
-                    <div id="indication_board"></div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-5">
-                        <div id="circle"></div>
-                        <div id="proximity"><div id="proximity_level2"></div></div>
-                        <div id="proximity1"><div id="proximity1_level2"></div></div>
-                        <div id="proximity2"><div id="proximity2_level2"></div></div>
-                        <div id="proximity3"><div id="proximity3_level2"></div></div>
-                        <div id="proximity4"><div id="proximity4_level2"></div></div>
-                        <div id="proximity5"><div id="proximity5_level2"></div></div>
-                        <div id="proximity6"><div id="proximity6_level2"></div></div>
-                        <div id="proximity7"><div id="proximity7_level2"></div></div>
+	<div class="row">
+		<div class="col-sm-8">
+			<div class="row">
+				<div class="col-sm-8">
+					<h3>Cam principale</h3>
+					<div id="div_cam3" class="div_resizabled">
+						<span id="remotes"></span>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<h3>Cam Assistance</h3>
+					<div id="div_cam2" class="div_resizabled">
+						<!-- contains the assistance video of the remote robot-->
+						<span id="remote_assistance"></span>
+					</div>
+				</div>
+			</div>
 
-                    </div>
-                    <div class="col-sm-2" style="margin-top: auto">
-                        <span id="up_possibility" class="glyphicon glyphicon-arrow-up"></span><br><br>
-                        <span id="down_possibility" class="glyphicon glyphicon-arrow-down"></span><br><br>
-                        <span id="left_possibility" class="glyphicon glyphicon-arrow-left"></span><br><br>
-                        <span id="right_possibility" class="glyphicon glyphicon-arrow-right"></span><br>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <span id="hug" class="glyphicon glyphicon-heart" style="margin-top: auto"></span><br>
-                        </div>
-                        <div class="col-sm-4"></div>
-                        <div class="col-sm-4"></div>
-                        <div class="col-sm-4">
-                            <div id="triangle-up"></div>
-                        </div>
-                    </div>
-                </div>
+			<div class="row">
+				<div class="col-sm-12">
+					<h3>Vue Web Cam</h3>
+					<div id="miniature" class="row miniature">
+						<video id="localVideo" class="miniature-video">
+							your browser does not support the HTML 5 video tag
+						</video>
+					</div>
+				</div>
+			</div>
 
-            </div>
+		</div>
+		<div class="col-sm-4">
+			<div class="row">
+				<div class="row">
+					<div id="brandwith_quality_critical"></div>
+					<div id="brandwith_quality_low"></div>
+					<div id="brandwith_quality_medium"></div>
+					<div id="brandwith_quality_high"></div>
+					<!--<p> <span id="brandwith_quality"></span></p>-->
+					<div id="battery"><div id="battery-level"></div></div>
+				</div>
+				<div class="row">
+					<div id="indication_board"></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-5">
+						<div id="circle"></div>
+						<div id="proximity"><div id="proximity_level2"></div></div>
+						<div id="proximity1"><div id="proximity1_level2"></div></div>
+						<div id="proximity2"><div id="proximity2_level2"></div></div>
+						<div id="proximity3"><div id="proximity3_level2"></div></div>
+						<div id="proximity4"><div id="proximity4_level2"></div></div>
+						<div id="proximity5"><div id="proximity5_level2"></div></div>
+						<div id="proximity6"><div id="proximity6_level2"></div></div>
+						<div id="proximity7"><div id="proximity7_level2"></div></div>
 
-            <ul id="tabs">
-                <li><a href="#remote">Screen Pad</a></li>
-                <li><a href="#remote-controls-mouse">Touch Pad</a></li>
-            </ul>
-            <div class="tabContent" id="remote">
+					</div>
+					<div class="col-sm-2" style="margin-top: auto">
+						<span id="up_possibility" class="glyphicon glyphicon-arrow-up"></span><br><br>
+						<span id="down_possibility" class="glyphicon glyphicon-arrow-down"></span><br><br>
+						<span id="left_possibility" class="glyphicon glyphicon-arrow-left"></span><br><br>
+						<span id="right_possibility" class="glyphicon glyphicon-arrow-right"></span><br>
+					</div>
+					<div class="row">
+						<div class="col-sm-4">
+							<span id="hug" class="glyphicon glyphicon-heart" style="margin-top: auto"></span><br>
+						</div>
+						<div class="col-sm-4"></div>
+						<div class="col-sm-4"></div>
+						<div class="col-sm-4">
+							<div id="triangle-up"></div>
+						</div>
+					</div>
+				</div>
 
-                <div class="row">
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-left-head" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-hand-left"></span>
-                        </button>
-                    </div>
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
-                            <span class="glyphicon glyphicon-pause"></span>
-                        </button>                      
-                    </div>
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-right-head" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-hand-right"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">                     
-                    </div>
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </button>
-                    </div>
-                    <div class="col-sm-4">                    
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-left" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-arrow-left"></span>
-                        </button>
-                    </div>
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </button>
-                    </div>
-                    <div class="col-sm-4">
-                        <button type="button" id="remote-right" class="remote-direction btn btn-block btn-default btn-lg">
-                            <span class="glyphicon glyphicon-arrow-right"></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="tabContent" id="remote-controls-mouse">             
-            <div class="row">            
-                <div class="col-sm-4" style="background-color:#FFCC00; height:200px;"></div>
-            </div>
+			</div>
 
-        </div>
+			<ul id="tabs">
+				<li><a href="#remote">Screen Pad</a></li>
+				<li><a href="#remote-controls-mouse">Touch Pad</a></li>
+			</ul>
+			<div class="tabContent" id="remote">
 
-    </div>   
+				<div class="row">
+					<div class="col-sm-4">
+						<button type="button" id="remote-left-head" class="remote-direction btn btn-block btn-default btn-lg">
+							<span class="glyphicon glyphicon-hand-left"></span>
+						</button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" id="remote-stop" class="remote-direction btn btn-block btn-primary btn-lg">
+							<span class="glyphicon glyphicon-pause"></span>
+						</button>                      
+					</div>
+					<div class="col-sm-4">
+						<button type="button" id="remote-right-head" class="remote-direction btn btn-block btn-default btn-lg">
+							<span class="glyphicon glyphicon-hand-right"></span>
+						</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4">                     
+					</div>
+					<div class="col-sm-4">
+						<button type="button" id="remote-up" class="remote-direction btn btn-block btn-default btn-lg">
+							<span class="glyphicon glyphicon-arrow-up"></span>
+						</button>
+					</div>
+					<div class="col-sm-4">                    
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<button type="button" id="remote-left" class="remote-direction btn btn-block btn-default btn-lg">
+							<span class="glyphicon glyphicon-arrow-left"></span>
+						</button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" id="remote-down" class="remote-direction btn btn-block btn-default btn-lg">
+							<span class="glyphicon glyphicon-arrow-down"></span>
+						</button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" id="remote-right" class="remote-direction btn btn-block btn-default btn-lg">
+							<span class="glyphicon glyphicon-arrow-right"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="tabContent" id="remote-controls-mouse">             
+				<div class="row">            
+					<div style="background-color:#FFCC00; height:200px;"></div>
+				</div>
+			</div>
+		</div>
+
+	</div>   
 </div>
 <script src="../js/rosManagement/rosManagement2.js"></script>
 <script src="../js/videoManagement2.js"></script>
 
 <!-- Bootstrap core JavaScript
-     ================================================== -->
+	 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script type="text/javascript" src="../lib/js/jquery-1.11.2.min.js"></script>
 <script src="../lib/js/bootstrap.min.js"></script>

@@ -57,6 +57,11 @@ webrtc.on('videoAdded', function(video,peer) {
 webrtc.on('videoRemoved', function(video, peer) {
 	//console.log('video removed', peer);
 	if (peer) {
+		var remotes = document.getElementById('remotes');
+		var el = document.getElementById('container_' + webrtc.getDomId(peer));
+		if (remotes && el) {
+			remotes.removeChild(el);
+		}
 		nbPeers = nbPeers - 1;
 	}
 });
