@@ -13,7 +13,7 @@ function SimpleWebRTC(opts) {
     var options = opts || {};
     var config = this.config = {
             //url: 'http://localhost:8088',
-	url: 'http://129.88.2.145:8088',
+			url: 'http://192.168.1.15:8088',
             socketio: {/* 'force new connection':true*/},
             debug: false,
             localVideoEl: '',
@@ -5466,7 +5466,7 @@ Peer.prototype._observeDataChannel = function (channel) {
 
 // Fetch or create a data channel by the given name
 Peer.prototype.getDataChannel = function (name, opts) {
-    if (!webrtc.dataChannel) return this.emit('error', new Error('createDataChannel not supported'));
+    //if (!webrtc.dataChannel) return this.emit('error', new Error('createDataChannel not supported'));
     var channel = this.channels[name];
     opts || (opts = {});
     if (channel) return channel;

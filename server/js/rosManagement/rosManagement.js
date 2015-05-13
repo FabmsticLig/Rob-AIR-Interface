@@ -1,12 +1,11 @@
 window.onload=function(){
 
-
-	// Connecting to ROS
-	// -----------------
+	//==========================
+	//==== Connecting to ROS====
+	//==========================
 	var ros = new ROSLIB.Ros({
 		//url : 'ws://localhost:9090'
-		url : 'ws://192.168.0.12:9090'
-		//url : 'ws://192.168.1.3:9090'
+		url : 'ws://192.168.1.2:9090'
 	});
 
 
@@ -22,15 +21,78 @@ window.onload=function(){
 		console.log('Connected to websocket server.');
 	});    
 
+	//========================================
+	//============Publisher===================
+	//========================================
 
+	//Topics
 
-
-	var topic_cmd = new ROSLIB.Topic({
-		//Test with turtlesim
+	//Gaze_direction
+	var topic_gaze_direction = new ROSLIB.Topic({
 		ros : ros,
-		name : 'turtle1/cmd_vel',
-		messageType : 'geometry_msgs/Twist'
+		name : '/gaze_direction',
+		messageType : 'std_msgs/Byte'
 	});
+
+	//Command_motor
+	var topic_cmd = new ROSLIB.Topic({
+		ros : ros,
+		name : '/cmdmotors',
+		messageType : 'MotorCmd'
+	});
+
+	//Angle_position
+	var topic_angle_position = new ROSLIB.Topic({
+		ros : ros,
+		name : '/angle_position',
+		messageType : 'std_msgs/Byte'
+	});
+
+	//Publications
+
+	//Gaze_direction
+	var gazeValue = 127;
+
+	var setGazeDirection = function(key){
+
+		//Key code
+		//q 81
+		//d 68
+		if(key ==='81')
+		{
+			if(gazeValue !== 0){
+				gazeValue --;
+				console.log("Turn sight to Left");
+			}
+			else{
+				console.log("Max left position reached");
+			}
+
+		}
+		else
+		{
+			if(gazeValue !== 255){
+				gazeValue ++; 
+				console.log("Turn sight to Right");
+			}
+			else{
+				console.log("Max right position reached");
+			}
+
+		}
+		console.log(gazeValue);
+		var gaze = new ROSLIB.Message( {
+			data : gazeValue
+		});
+		topic_gaze_direction.publish(gaze);
+		console.log("gaze direction published " + key);
+
+	};
+
+	//Angle_position
+	//TODO	
+
+	//Command_motor
 
 	/** Object storing references to the remote screen DOM elements */
 	this.remote = {
@@ -52,7 +114,7 @@ window.onload=function(){
 	but[39] = this.remote.right;
 	but[83] = this.remote.stop;
 	var lastPressed = this.remote.stop; // only one action at a time
-	var clickButton = function clickButton(key) {
+	var clickButton = function clickButton(key) { var speed1, speed2;
 		console.log("onKeyDown ---> keyCode = " + key);
 		if (lastPressed) {
 			lastPressed.removeClass('btn-primary');
@@ -72,42 +134,40 @@ window.onload=function(){
 		if (key == '38') {
 			// up arrow
 			console.log("up Arrow");
-			angular_val = 0.0;
+			speed1 = 255;
+			speed2 = 255;
 		}else if (key== '40') {
 			// down arrow
 			console.log("down Arrow");
-			angular_val = 3.0;
+			speed1 = 0;
+			speed2 = 0;
 		}else if (key == '37') {
 			// left arrow
 			console.log("left Arrow");
-			angular_val = 1;
+			speed1 = 255;
+			speed2 = 128;
 		}else if (key == '39') {
 			// right arrow
 			console.log("right Arrow");
-			angular_val = -1;
+			speed1 = 128;
+			speed2 = 255;
 		}else if (key == '83') {
 			// 's' key -> stop
 			console.log("'s' key (Stop)");
-			angular_val = 0.0;
+			speed1 = 128;
+			speed2 = 128;
 		}
 		var msg = new ROSLIB.Message({
-			linear : {
-				x : 2.0,
-				y : 0.0,
-				z : 0.0
-			},
-			angular : {
-				x : 0.0,
-				y : 0.0,
-				z : angular_val
-			}
+			speed1 : speed1,
+			speed2 : speed2
+			//mode : 1			
 		});
 		//Publish on Topic
 		topic_cmd.publish(msg);
 		console.log("published " + key);
 	};
 	// bind keyboard
-	document.onkeydown = function keyDown(e) {
+	document.addEventListener('keydown', function(e){
 		e = e || window.event;
 
 		var keyCode = e.keyCode;
@@ -116,7 +176,13 @@ window.onload=function(){
 			e.preventDefault();
 			clickButton(e.keyCode);
 		}
-	};
+
+		if( keyCode == '81' || keyCode == '68'){
+			e.preventDefault();
+			setGazeDirection(keyCode);
+		}
+
+	}, false);
 
 	// bind buttons clicks as well
 	this.remote.left.click(clickButton.bind(null, 37));
@@ -126,10 +192,63 @@ window.onload=function(){
 	this.remote.stop.click(clickButton.bind(null, 83));
 
 
+	// Control with mouse motion
+	var mouseMotionCtrl = function mouseMotionCtrl(event) {
+		var x0 = event.x
+		var y0 = event.y
+
+		document.onmousemove = function (event) {
+			onselectstart = 'return false';
+			dx = (x0 - event.x);
+			dy = (y0 - event.y);
+			// distance when speed max is reached 
+			normX = 200;
+			rx1 = (dx + (normX/2))/normX;
+			rx2 = 1 - rx1;
+
+			normY = 200;
+			dy = (y0-event.y)*normY/255;
+			v = dy+128;
+
+			//process speed with ponderation
+			speed1 = 2 * v * rx1;
+			speed2 = 2 * v * rx2;
+			console.log("Debug C dx:" + dx + " dy:" + dy + " rx1:" + rx1 + " rx2:" + rx2 + " speed1:" + speed1 + " speed2:"+speed2);
+			if(speed1 > 255) { speed1 = 255;}
+			if(speed1 < 0) {speed1 = 0;}
+			if(speed2 > 255) {speed2 = 255;}
+			if(speed2 < 0) {speed2 = 0;}
+			var msg = new ROSLIB.Message({
+				speed1 : Math.round(speed1-128),
+				speed2 : Math.round(speed2)
+				//mode : 1			
+			});
+			//Publish on Topic
+			topic_cmd.publish(msg);
+			console.log("published ");
+			//rc.moveRobot(5,Math.round(speed1),Math.round(speed2));
+		}
+		this.onmouseup = function () {
+			document.onmousemove = null;
+			//rc.moveRobot(4,0,0);
+		}
+	}
+	// bind mouse
+	document.onmousedown = function(e) {
+		console.log("debug B");
+		//if (!me.remote.visible) {
+			//return;
+			//}
+			e = e || window.event;
+			mouseMotionCtrl(e);
+			//console.log('debig');
+	};
+
 	//==============================================
-	//=============XBOX PAD CONTROL=================
+	//=============GAMEPAD CONTROL=================
 	//==============================================
 
+	//Tested with a xbox pad
 	var start;
 	var rAF = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
 	window.requestAnimationFrame;
@@ -180,7 +299,7 @@ window.onload=function(){
 		}
 
 		var angular_val = -x;
-		
+
 
 		var msg = new ROSLIB.Message({
 			linear : {
@@ -200,4 +319,163 @@ window.onload=function(){
 
 		var start = rAF(gameLoop);
 	};
+
+	//==================================
+	//===========Subscriber==============
+	//==================================
+
+	//Topic for collision
+	var topic_collision = new ROSLIB.Topic({
+		ros : ros,
+		name : '/collision_event',
+		messageType : 'std_msgs/Bool'
+	});
+
+	topic_collision.subscribe(function(message) {
+		console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
+		//get indication_board div and append the message only if there is a collision
+		if(message.data) {
+			$('#indication_board').append("<p> Collision détectée </p>");
+		}
+		//scroll le div à la fin 
+		$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+	});
+
+
+	//Topic for hug event
+	var topic_hug_event = new ROSLIB.Topic({
+		ros : ros,
+		name : '/social_touch_event',
+		messageType : 'std_msgs/Bool'
+	});
+
+
+	var clignotement = function(){
+		if ( $("#hug").css('color') == 'rgb(255, 0, 0)') {
+			console.log($("#hug").css('color'));
+
+			$("#hug").css('color','rgb(0,0,0)');
+
+			console.log("red -> black");
+			console.log($("#hug").css('color'));
+		}
+		else{
+			console.log($("#hug").css('color'));
+
+			$("#hug").css('color','rgb(255,0,0)');
+
+			console.log("black -> red");
+			console.log($("#hug").css('color'));
+		}
+	};
+
+
+	topic_hug_event.subscribe(function(message) {
+		//console.log('Received message on' + topic_panic_event.name);
+		if(message.data) {
+			periode = setInterval(clignotement, 1000);
+			setTimeout(function(){clearInterval(periode)},4000);
+		}
+	});
+
+	//Topic for panic event
+	var topic_panic_event = new ROSLIB.Topic({
+		ros : ros,
+		name : '/panic_event',
+		messageType : 'std_msgs/Bool'
+	});
+
+	topic_panic_event.subscribe(function(message) {
+		//console.log('Received message on' + topic_panic_event.name);
+		if(message.data) {
+			$('#indication_board').append("<p> \"Panic button\" activé </p>");
+			//scroll le div à la fin 
+			$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+		}
+		else {
+			$('#indication_board').append("Nothing");
+		}
+	});
+
+	//Topic for proximity obstacles
+	var topic_proximity_obstacles = new ROSLIB.Topic({
+		ros : ros,
+		name : '/proximity_obstacles',
+		messageType : 'std_msgs/Int32MultiArray'
+	});
+
+	topic_proximity_obstacles.subscribe(function(message) {
+		console.log('Received message on' + topic_proximity_obstacles.name);
+		for (var iter = 0; i < 8; iter++){
+			//TODO  palliers  pb à partir de 20 cm
+			if(message.data[iter] < 10){
+				$('#indication_board').append("<p> Obstacle détecté à la position " + iter +" à la distance "+ message.data[iter] + "</p>");
+				//scroll le div à la fin 
+				$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+			}
+		}
+	});
+
+	//Topic for end_line_obstacles
+	var topic_end_line_obstacles = new ROSLIB.Topic({
+		ros : ros,
+		name : '/end_line_obstacles',
+		messageType : 'std_msgs/Int8MultiArray'
+	});
+
+	topic_end_line_obstacles.subscribe(function(message) {
+		console.log('Received message on' + topIic_end_line_obstacles.name);
+		//on parcourt les 8 capteurs
+		for (var iter = 0; i < 8; iter++){
+			if(message.data[iter]){
+				$('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter +"</p>");
+				//scroll le div à la fin 
+				$('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight},1000);
+			}
+		}
+	});
+
+	//Topic for bandwidth_quality	
+	var topic_bandwidth_quality = new ROSLIB.Topic({
+		ros : ros,
+		name : '/bandwidth_quality',
+		messageType : 'std_msgs/Byte'
+	});
+
+	topic_bandwidth_quality.subscribe(function(message) {
+		console.log('Received message on' + topic_bandwidth_quality.name);
+		$('#brandwith_quality').text(message.data);
+
+	});
+
+	//Topic for battery_level
+	var topic_battery_level = new ROSLIB.Topic({
+		ros : ros,
+		name : '/battery_level',
+		messageType : 'std_msgs/Byte'
+	});
+
+	topic_battery_level.subscribe(function(message) {
+		console.log('Received message on' + topic_battery_level.name);
+		console.log('Battery value' + message.battery_level);
+
+		//Update the battery view in room_user.html
+		var battery = $('battery');
+		var level = parseInt(message.data)/255 * 100;
+		var batteryLevel = $('#battery-level');
+		batteryLevel.css('width', level + '%');
+		if (level > 50) {  
+			batteryLevel.addClass('high'); 
+			batteryLevel.removeClass('medium');  
+			batteryLevel.removeClass('low'); 
+		} else if (level >= 25 ) {  
+			batteryLevel.addClass('medium');  
+			batteryLevel.removeClass('high');  
+			batteryLevel.removeClass('low');
+		} else {  
+			batteryLevel.addClass('low');
+			batteryLevel.removeClass('high');  
+			batteryLevel.removeClass('medium');  
+		}
+	});
 }
