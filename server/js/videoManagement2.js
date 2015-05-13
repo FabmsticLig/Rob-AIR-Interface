@@ -15,6 +15,17 @@ var webrtc = new SimpleWebRTC({
 	debug: true,
 	detectSpeakingEvents: true,
 	autoAdjustMic: false
+    media :{
+        audio:true,
+        video:{
+                mandatory:
+                    {
+                        maxWidth:320,
+                        maxHeight:100,
+                        maxFrameRate:60
+                    }
+              }
+    }
 });
 
 //add the remote video
