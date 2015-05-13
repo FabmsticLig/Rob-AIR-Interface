@@ -6,6 +6,28 @@
     margin: auto;
 }
 
+/* Video principale de video-conf */
+.videoContainer {
+	position: relative;
+	width: 200px;
+	height: 150px;
+}
+.videoContainer video {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+/* Video "assistance" */
+.videoContainerAssistance {
+	position: relative;
+	width: 100px;
+	height: 50px;
+}
+.videoContainerAssistance video {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+
 html {
     height: 100%;
     width: 100%;
