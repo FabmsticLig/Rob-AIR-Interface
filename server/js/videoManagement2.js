@@ -25,30 +25,19 @@ webrtc.on('videoAdded', function(video,peer) {
 	//console.log("remote video added");
 	nbPeers = nbPeers + 1; 
 	if (nbPeers == 2){ //caméra assistance du sol
-		var remotes = document.getElementById('remote_assistance');
+		var remotes = document.getElementById('div_cam2');
 		if (remotes) {
-			var container = document.createElement('div');
-			container.className = 'videoContainerAssistance';
-			container.id = 'container_' + webrtc.getDomId(peer);
-			container.appendChild(video);
-
 			//suppress contextMenu
 			video.oncontextMenu = function() {return false; };
-
-			remotes.appendChild(container);
+			remotes.appendChild(video);
 		}
 	} else { //caméra principale de vidéo-conf
-		var remotes = document.getElementById('remotes');
+		var remotes = document.getElementById('div_cam3');
 		if (remotes) {
-			var container = document.createElement('div');
-			container.className = 'videoContainer';
-			container.id = 'container_' + webrtc.getDomId(peer);
-			container.appendChild(video);
-
 			//suppress contextMenu
 			video.oncontextMenu = function() {return false; };
 
-			remotes.appendChild(container);
+			remotes.appendChild(video);
                         
                         // show the accelerometer
                     var accelerometer = document.createElement('div');
