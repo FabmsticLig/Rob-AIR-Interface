@@ -20,8 +20,8 @@ var webrtc = new SimpleWebRTC({
         video:{
                 mandatory:
                     {
-                        maxWidth:320,
-                        maxHeight:100,
+                        //maxWidth:320,
+                        //maxHeight:100,
                         maxFrameRate:60
                     }
               }
@@ -51,7 +51,7 @@ webrtc.on('videoAdded', function(video,peer) {
 			remotes.appendChild(video);
                         
                         // show the accelerometer
-                    var div_accelerometer = document.createElement('div');
+/*                    var div_accelerometer = document.createElement('div');
                     div_accelerometer.id = 'demoWidget';
                     div_accelerometer.style = 'position: relative';
 
@@ -62,45 +62,7 @@ webrtc.on('videoAdded', function(video,peer) {
                     div_accelerometer.appendChild(inside_accelerometer);
                     
                     remotes.appendChild(div_accelerometer);
-                    
-                    
-//                    <div id="demoWidget" style="position: relative;">
-//                        <div style="float: left;" id="gaugeContainer"></div>
-//                    </div>
-                    
-                    // JAVASCRIPT POUR ACCELEROMETER
-                    
-//                var labels = {visible: true, position: 'inside'};
-//                $('#gaugeContainer').jqxGauge({
-//                    ranges: [{startValue: 0, endValue: 220, style: {fill: '#e2e2e2', stroke: '#e2e2e2'}, startDistance: '50%', endDistance: '50%', endWidth: 13, startWidth: 13},
-//                        ],
-//                    startAngle : 0,
-//                    endAngle : 180,
-//                    value: 110,
-//                    style: {stroke: '#ffffff', 'stroke-width': '1px', fill: '#ffffff'},
-//                    animationDuration: 1500,
-//                    colorScheme: 'scheme04',
-//                    labels: labels,
-//                    ticksMinor: {interval: 5, size: '5%'},
-//                    ticksMajor: {interval: 10, size: '10%'}
-//                });
-//
-//                $('#gaugeContainer').on('valueChanging', function (e) {
-//                    $('#gaugeValue').text(Math.round(e.args.value) + ' kph');
-//                });
-//
-//                
-//                labels.visible = false;
-//                $('#gaugeContainer').jqxGauge('labels', labels);
-//                $('#gaugeContainer').jqxGauge('showRanges', false);
-//                $('#gaugeContainer').jqxGauge('border', { visible: false });
-//                //$('#gaugeContainer').jqxGauge('height', '200');
-//                //$('#gaugeContainer').jqxGauge({ pointer: { pointerType: 'default', style: { fill: '#ff0000', stroke: '#ff0000' }, length: '70%', width: '2%', visible: true }});
-//                $(document).keydown(function(e){
-//                    if(e.keyCode == 39){
-//                        $('#gaugeContainer').jqxGauge('value', $('#gaugeContainer').jqxGauge('value')+10);
-//                    }
-//                })
+                    */
 		}
 	}
 });
