@@ -12,7 +12,7 @@ html {
 }
 
 body {
-    background-color: aliceblue;
+    /*background-color: aliceblue;*/
     height: 100%;
     width : 100%;
 }
@@ -42,16 +42,16 @@ img {
     width: 100%;
 }
 
-.container-fluid{
-    /*background-color: #c1e2b3;*/
+/*.container-fluid{
+    background-color: #c1e2b3;
     background-color: #B0C4DE;
-}
+}*/
 
 /*.row {
     background-color: #eea236;
 }*/
 
-.col-sm-4 {
+/*.col-sm-4 {
     background-color: darkgrey;
 }
 
@@ -65,9 +65,9 @@ img {
 }
 
 .col-sm-12 {
-    /*background-color: lightgreen;*/
+    background-color: lightgreen;
     background-color: #008080;
-}
+}*/
 
 #divBB{
     color : white;
