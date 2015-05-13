@@ -6,35 +6,50 @@
     margin: auto;
 }
 
+.accelerometer {
+    position: absolute;
+    left: 10%;
+    width: 80%;
+    bottom: 5px;
+    height: 5px;
+    display: none;
+}
+
 /* Video principale de video-conf */
 .videoContainer {
-	position: relative;
-	width: 400px;
-	height: 400px;
+    /*	position: relative;
+            width: 400px;
+            height: 400px;*/
+/*    margin-left: auto;
+    margin-right: auto;
+    width: 100%;*/
 }
 .videoContainer video {
-	position: absolute;
-	width: 100%;
-	height: 100%;
+    /*position: absolute;*/
+    width: 50%;
+    height: 50%;
 }
 /* Video "assistance" */
 .videoContainerAssistance {
-	position: relative;
-	width: 200px;
-	height: 150px;
+    /*    position: relative;
+        width: 200px;
+        height: 150px;*/
+/*    margin-left: auto;
+    margin-right: auto;
+    width: 100%;*/
 }
 .videoContainerAssistance video {
-	position: absolute;
-	width: 100%;
-	height: 100%;
+    /*position: absolute;*/
+    width: 50%;
+    height: 50%;
 }
 /*Miniature de la vidéo locale */
 .miniature-video {
-	width: 100px;
-	height: 100px;
+    width: 100px;
+    height: 100px;
 }
 #miniature {
-	float : left;
+    float : left;
 }
 
 html {

@@ -49,8 +49,12 @@ webrtc.on('videoAdded', function(video,peer) {
 			video.oncontextMenu = function() {return false; };
 
 			remotes.appendChild(container);
-
-			// ici on peut rajouter l'indicateur du niveau de la tête 
+                        
+                        // show the accelerometer
+                    var accelerometer = document.createElement('div');
+                    accelerometer.id = 'accelerometer';
+                    accelerometer.className = 'accelerometer';
+                    container.appendChild(accelerometer);
 		}
 	}
 });
