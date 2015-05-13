@@ -1,4 +1,4 @@
-
+//Mediaoption
 
 // grab the room from the URL
 var room = location.href && location.href.split('room/')[1];
@@ -15,6 +15,17 @@ var webrtc = new SimpleWebRTC({
     debug: true,
     detectSpeakingEvents: true,
     autoAdjustMic: false
+    media :{
+        audio:true,
+        video:{
+                mandatory:
+                    {
+                        maxWidth:320,
+                        maxHeight:100,
+                        maxFrameRate:60
+                    }
+              }
+    }
 });
 
 // when it's ready, join if we got a room from the URL

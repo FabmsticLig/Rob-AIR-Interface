@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "description": "SimpleWebRTC server",
   "dependencies": {
-    "express": "",
-    "mysql": "",
     "body-parser": "",
+    "coffee-script": "^1.9.2",
     "cookie-parser": "",
+    "ejs": "",
+    "express": "",
     "express-session": "",
-    "ejs": "" 
- },
+    "mysql": ""
+  },
   "main": "server.js"
 }
