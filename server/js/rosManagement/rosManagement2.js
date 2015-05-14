@@ -435,7 +435,7 @@ window.onload = function () {
             //TODO : calibrate and vérify calcul
             var rx1 = (dx + (normX/2))/normX;
             var rx2 = 1 - rx1;
-            dy = (y0 - dy) * normY /127;
+            dy = (y0 - dy) * normY /255;
             var v = dy;
             
             console.log("X0 " + x0 +" Y0 "+ y0 +" rx1 "+ rx1+" rx2 " + rx2); 
