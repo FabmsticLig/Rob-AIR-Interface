@@ -40,28 +40,30 @@ window.onload = function () {
     //-------------------------------------------------------------------------
 
     //allow or not movement (if collision,panic_button,...)
-    var move_up = true;
-    var move_down = true;
-    var turn_left = true;
+    var move_up    = true;
+    var move_down  = true;
+    var turn_left  = true;
     var turn_right = true;
 
     //interval of speed
-    var speed_max = 127;
-    var speed_slow = 15;
-    var speed_stop = 0;
+    var speed_max  = 255;
+    var speed_stop = 127;
+    var speed_min  = 0;
 
-    //limit of speed in case proximity max=127 min=0
-    var speed_limit = speed_max;
+    //limit of speed in case proximity (ie 100% = 0)
+    var speed_limit = 0;
+    //max speed - speed reduction = speed limit
+    var speed_reduction  = 100;
 
     //Default keyboard control
-    var key_stop = 83; //'s' 
-    var key_forward = 38; // arrow up
-    var key_backward = 40; // arrow down
-    var key_turn_left = 37; // arrow left
+    var key_stop       = 83; //'s' 
+    var key_forward    = 38; // arrow up
+    var key_backward   = 40; // arrow down
+    var key_turn_left  = 37; // arrow left
     var key_turn_right = 39; // arrow right
-    var key_gaze_left = 81; //'q'
+    var key_gaze_left  = 81; //'q'
     var key_gaze_right = 68; //'d'
-    var key_head_left = 65; //'a'
+    var key_head_left  = 65; //'a'
     var key_head_right = 69; //'e'
 
     //initial Gaze_direction [0,255]
@@ -88,6 +90,18 @@ window.onload = function () {
     var brandwith_quality_L3 = 160;
     var brandwith_quality_L2 = 192;
     var brandwith_quality_L1 = 224;
+    
+    //define normal/warning/alert color
+    var white_ok         = 'rgb(255, 255, 255)';
+    var black_ok         = 'rgb(0, 0, 0)';
+    var green_ok         = 'rgb(0, 85, 0)';
+    var green_p_ok       = 'transparent transparent transparent rgb(0, 85, 0)';
+    var grey_ok          = 'rgb(102, 102, 102)';
+    var grey_p_ok        = 'transparent transparent transparent rgb(102, 102, 102)';
+    var orange_warning   = 'rgb(218, 97, 0)';
+    var orange_p_warning = 'transparent transparent transparent rgb(218, 97, 0)';
+    var red_alert        = 'rgb(255, 0, 0)';
+    var red_p_alert      = 'transparent transparent transparent rgb(255, 0, 0)';
 
     //-------------------------------------------------------------------------
     //============================================================
@@ -108,8 +122,8 @@ window.onload = function () {
     //Command_motor
     var topic_cmd = new ROSLIB.Topic({
         ros: ros,
-        name: '/command_motor',
-        messageType: 'MotorCmd'
+        name: '/cmdmotors',
+        messageType: 'md49test/MotorCmd'
     });
 
     //Angle_position
@@ -259,28 +273,28 @@ window.onload = function () {
     //Command_motor
     /** Object storing references to the remote screen DOM elements */
     this.remote = {
-        div: $('#remote'),
-        left: $('#remote-left'),
-        right: $('#remote-right'),
-        up: $('#remote-up'),
-        down: $('#remote-down'),
-        head_l: $('#remote-left-head'),
-        head_r: $('#remote-right-head'),
-        move: $('#remote-controls-mouse'),
-        stop: $('#remote-stop'),
-        img: $('#remote-img'),
+        div    : $('#remote'),
+        left   : $('#remote-left'),
+        right  : $('#remote-right'),
+        up     : $('#remote-up'),
+        down   : $('#remote-down'),
+        head_l : $('#remote-left-head'),
+        head_r : $('#remote-right-head'),
+        move   : $('#remote-controls-mouse'),
+        stop   : $('#remote-stop'),
+        img    : $('#remote-img'),
         visible: false
     };
 
     var but = {};
-    but[key_forward] = this.remote.up;
-    but[key_backward] = this.remote.down;
-    but[key_turn_left] = this.remote.left;
+    but[key_forward]    = this.remote.up;
+    but[key_backward]   = this.remote.down;
+    but[key_turn_left]  = this.remote.left;
     but[key_turn_right] = this.remote.right;
-    but[key_stop] = this.remote.stop;
-    but[key_head_left] = this.remote.head_l;
+    but[key_stop]       = this.remote.stop;
+    but[key_head_left]  = this.remote.head_l;
     but[key_head_right] = this.remote.head_r;
-    var lastPressed = this.remote.stop; // only one action at a time
+    var lastPressed     = this.remote.stop; // only one action at a time
 
     //-------------------------------------------------------------------------
     //Control with click button
@@ -311,23 +325,23 @@ window.onload = function () {
             if (key === key_forward && move_up) {
                 // up arrow
                 console.log("up Arrow");
-                speed1 = speed_limit;
-                speed2 = speed_limit;
+                speed1 = speed_max-speed_limit;
+                speed2 = speed_max-speed_limit;
             } else if (key === key_backward && move_down) {
                 // down arrow
                 console.log("down Arrow");
-                speed1 = -speed_limit;
-                speed2 = -speed_limit;
+                speed1 = speed_min+speed_limit;
+                speed2 = speed_min+speed_limit;
             } else if (key === key_turn_left && turn_left) {
                 // left arrow
                 console.log("left Arrow");
-                speed1 = speed_limit;
+                speed1 = speed_max-speed_limit;
                 speed2 = speed_stop;
             } else if (key === key_turn_right && turn_right) {
                 // right arrow
                 console.log("right Arrow");
                 speed1 = speed_stop;
-                speed2 = speed_limit;
+                speed2 = speed_max-speed_limit;
             } else if (key === key_stop
                     || !move_up
                     || !move_up
@@ -346,7 +360,7 @@ window.onload = function () {
             });
             //Publish on Topic
             topic_cmd.publish(msg);
-            console.log("published " + key);
+            console.log("published " + key + " speed1 " + speed1 + " speed2 " + speed2);
         }
     };
 
@@ -388,23 +402,19 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     // Control with mouse motion
     var mouseMotionCtrl = function mouseMotionCtrl(event) {
+        
+        // distance of the window 
+        var normX = $("#remote-controls-mouse").css('width');
+        var normY = $("#remote-controls-mouse").css('height');
+        var window_elem = $("#remote-controls-mouse").position();
+        //erase 'px' from norm
+        normX = normX.substring(normX.length - 2, 0);
+        normY = normY.substring(normY.length - 2, 0);
 
-        var x0;
-        var y0;
-        if (event.x !== undefined && event.y !== undefined)
-        {
-            x0 = event.x;
-            y0 = event.y;
-        }
-        else // Firefox method to get the position
-        {
-            x0 = event.clientX + document.body.scrollLeft +
-                    document.documentElement.scrollLeft;
-            y0 = event.clientY + document.body.scrollTop +
-                    document.documentElement.scrollTop;
-        }
-
-        mouse_event.onmouseup = function (event) {
+        var x0 = normX/2+ window_elem.left;
+        var y0 = normY/2+ window_elem.top;
+        
+        mouse_event.onmousemove = function (event) {
 
             var dx;
             var dy;
@@ -420,34 +430,55 @@ window.onload = function () {
                 dy = event.clientY + document.body.scrollTop +
                         document.documentElement.scrollTop;
             }
-
-            // distance of the window 
-            var normX = $("#remote-controls-mouse").css('width');
-            var normY = $("#remote-controls-mouse").css('height');
-            //erase 'px' from norm
-            normX = normX.substring(normX.length - 2, 0);
-            normY = normY.substring(normY.length - 2, 0);
+            
             
             //TODO : calibrate and vérify calcul
-            var rx1 = (x0 - dx) / (normX) * speed_limit;
-            var rx2 = (y0 - dy) / (normY) * speed_limit;
+            var rx1 = (dx + (normX/2))/normX;
+            var rx2 = 1 - rx1;
+            dy = (y0 - dy) * normY /127;
+            var v = dy;
+            
+            console.log("X0 " + x0 +" Y0 "+ y0 +" rx1 "+ rx1+" rx2 " + rx2); 
+            
 
             //process speed with ponderation
+            speed1 = v * rx1;
+            speed2 = v * rx2;
+            //var rx1 = (dx + (normX/2))/normX;
+            //var rx2 = 1 - rx1;
+            //var dx12 = dx;
+            //var dx13 = dy;
+//            dx = dx -x0;
+//            dy = dy - y0;
+//            x0 = dx12;
+//            y0 = dx13;
+//            var moX = normX/2-dx;
+//            var moY = normY/2-dy;
+//            var mod = Math.sqrt(dx*dx + dy*dy);
+            //var mod = Math.sqrt(moX*moX + moY*moY);
+            //var rx1 = (x0 - dx) / (normX) * speed_limit;
+            //var rx2 = (y0 - dy) / (normY) * speed_limit;
 
-            var speed1 = rx1 * 4;
-            var speed2 = rx2 * 4;
-
-            if (speed1 > speed_limit) {
-                speed1 = speed_limit;
+            //dy = (y0-event.y)*normY/255;
+            //v = dy+128;
+            
+            //process speed with ponderation
+//            console.log("dx " +dx + " dy " + dy + " mod " + mod); 
+//            
+//            var speed1 = 127*dx/mod*Math.cos(Math.atan(dy/dx));
+//            var speed2 = 127*dy/mod*Math.sin(Math.atan(dy/dx));
+            
+            if (speed1 > speed_max-speed_limit) {
+                speed1 = speed_max-speed_limit;
             }
-            if (speed1 < -speed_limit) {
-                speed1 = -speed_limit;
+            if (speed1 < speed_min+speed_limit) {
+                speed1 = speed_min+speed_limit;
             }
-            if (speed2 > speed_limit) {
-                speed2 = speed_limit;
+            if (speed2 > speed_max-speed_limit) {
+                speed2 = speed_max-speed_limit;
             }
-            if (speed2 < -speed_limit) {
-                speed2 = speed_limit;
+            if (speed2 < speed_min+speed_limit) {
+                speed2 = speed_min+speed_limit;
             }
             var msg = new ROSLIB.Message({
                 speed1: Math.round(speed1),
@@ -457,9 +488,9 @@ window.onload = function () {
             topic_cmd.publish(msg);
             console.log("published " + speed1 + " " + speed2);
         };
-        mouse_event.onmousemove = function () {
-            document.onmousemove = null;
-
+        mouse_event.onmouseup = function () {
+            //document.onmousemove = null;
+            return;
         };
 
     };
@@ -570,25 +601,25 @@ window.onload = function () {
         var clignotement = function () {
             if (boolClign === 0) {
                 boolClign = 1;
-                $("#circle").css('color', '#FF0000');
-                $("#circle").css('background', '#FFFFFF'); // blanc
-                $("#circle").css('border-color', '#FF0000');
+                $("#circle").css('color', red_alert);
+                $("#circle").css('background', white_ok); // blanc
+                $("#circle").css('border-color', red_alert);
 
             }
             else {
                 boolClign = 0;
-                $("#circle").css('color', '#FFFFFF');
-                $("#circle").css('background', '#FF0000'); // rouge
-                $("#circle").css('border-color', '#FFFFFF');
+                $("#circle").css('color', white_ok);
+                $("#circle").css('background', red_alert); // rouge
+                $("#circle").css('border-color', white_ok);
 
             }
         };
 
         if (message.data) {
             //movement are prohibited and robot stop
-            move_up = false;
-            move_down = false;
-            turn_left = false;
+            move_up    = false;
+            move_down  = false;
+            turn_left  = false;
             turn_right = false;
 
             var msg = new ROSLIB.Message({
@@ -603,18 +634,18 @@ window.onload = function () {
             $('#indication_board').append("<p> Collision détectée </p>");
             periode = setInterval(clignotement, 500);
 
-            $("#up_possibility").css('color', 'rgb(255,0,0)');
-            $("#down_possibility").css('color', 'rgb(255,0,0)');
-            $("#left_possibility").css('color', 'rgb(255,0,0)');
-            $("#right_possibility").css('color', 'rgb(255,0,0)');
+            $("#up_possibility").css('color', red_alert);
+            $("#down_possibility").css('color', red_alert);
+            $("#left_possibility").css('color', red_alert);
+            $("#right_possibility").css('color', red_alert);
 
         } else {
-            $("#circle").css('color', 'rgb(0,85,0)');
-            $("#circle").css('background', 'rgb(255,255,255)');
-            $("#up_possibility").css('color', 'rgb(255,255,255)');
-            $("#down_possibility").css('color', 'rgb(255,255,255)');
-            $("#left_possibility").css('color', 'rgb(255,255,255)');
-            $("#right_possibility").css('color', 'rgb(255,255,255)');
+            $("#circle").css('color', green_ok);
+            $("#circle").css('background', white_ok);
+            $("#up_possibility").css('color', black_ok);
+            $("#down_possibility").css('color', black_ok);
+            $("#left_possibility").css('color', black_ok);
+            $("#right_possibility").css('color', black_ok);
             //allow movement
             move_up = true;
             move_down = true;
@@ -637,11 +668,11 @@ window.onload = function () {
 
 
     var clignotement = function () {
-        if ($("#hug").css('color') === 'rgb(255, 0, 0)') {
-            $("#hug").css('color', 'rgb(255,255,255)');
+        if ($("#hug").css('color') === red_alert) {
+            $("#hug").css('color', white_ok);
         }
         else {
-            $("#hug").css('color', 'rgb(255,0,0)');
+            $("#hug").css('color', red_alert);
         }
     };
 
@@ -665,16 +696,16 @@ window.onload = function () {
 
     topic_panic_event.subscribe(function (message) {
         //console.log('Received message on' + topic_panic_event.name);
-
+        
         var boolClign;
         var clignotement = function () {
             if (boolClign === 0) {
                 boolClign = 1;
-                $("#circle").css('background', '#FFFFFF'); // blanc
+                $("#circle").css('background', white_ok);
             }
             else {
                 boolClign = 0;
-                $("#circle").css('background', 'rgb(215,113,0)'); // rouge
+                $("#circle").css('background', orange_warning);
             }
         };
 
@@ -697,7 +728,7 @@ window.onload = function () {
             }, 4000);
         }
         else {
-            $("#circle").css('background', 'rgb(255,255,255)');
+            $("#circle").css('background', white_ok);
         }
     });
 
@@ -706,175 +737,184 @@ window.onload = function () {
     var topic_proximity_obstacles = new ROSLIB.Topic({
         ros: ros,
         name: '/proximity_obstacles',
-        messageType: 'std_msgs/Int32MultiArray'
+        messageType: 'std_msgs/Float32MultiArray'
     });
 
     topic_proximity_obstacles.subscribe(function (message) {
-        console.log('Received message on' + topic_proximity_obstacles.name);
+        console.log('Received message on' + topic_proximity_obstacles.name + " " + message.data[0]
+                + " " + message.data[1]
+                + " " + message.data[2]
+                + " " + message.data[3]
+                + " " + message.data[4]
+                + " " + message.data[5]
+                + " " + message.data[6]
+                + " " + message.data[7]);
 
-        $("#proximity").css('border-color', 'rgb(102,102,102)');
-        $("#proximity_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity1_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity2").css('border-color', 'rgb(102,102,102)');
-        $("#proximity2_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity3").css('border-color', 'rgb(102,102,102)');
-        $("#proximity3_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity4").css('border-color', 'rgb(102,102,102)');
-        $("#proximity4_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity5").css('border-color', 'rgb(102,102,102)');
-        $("#proximity5_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity6").css('border-color', 'rgb(102,102,102)');
-        $("#proximity6_level1").css('border-color', 'rgb(102,102,102)');
-        $("#proximity7").css('border-color', 'rgb(102,102,102)');
-        $("#proximity7_level1").css('border-color', 'rgb(102,102,102)');
+        $("#proximity").css('border-color', grey_p_ok);
+        $("#proximity_level1").css('border-color', grey_p_ok);
+        $("#proximity1").css('border-color', grey_p_ok);
+        $("#proximity1_level1").css('border-color', grey_p_ok);
+        $("#proximity2").css('border-color', grey_p_ok);
+        $("#proximity2_level1").css('border-color', grey_p_ok);
+        $("#proximity3").css('border-color', grey_p_ok);
+        $("#proximity3_level1").css('border-color', grey_p_ok);
+        $("#proximity4").css('border-color', grey_p_ok);
+        $("#proximity4_level1").css('border-color', grey_p_ok);
+        $("#proximity5").css('border-color', grey_p_ok);
+        $("#proximity5_level1").css('border-color', grey_p_ok);
+        $("#proximity6").css('border-color', grey_p_ok);
+        $("#proximity6_level1").css('border-color', grey_p_ok);
+        $("#proximity7").css('border-color', grey_p_ok);
+        $("#proximity7_level1").css('border-color', grey_p_ok);
         var find = false;
         for (var iter = 0; i < 8; iter++) {
 
             if (message.data[iter] < proximity_level1) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity").css('border-color', green_p_ok);
                         break;
                     case 1 :
-                        $("#proximity1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity1").css('border-color', green_p_ok);
                         break;
                     case 2 :
-                        $("#proximity2").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity2").css('border-color', green_p_ok);
                         break;
                     case 3 :
-                        $("#proximity3").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity3").css('border-color', green_p_ok);
                         break;
                     case 4 :
-                        $("#proximity4").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity4").css('border-color', green_p_ok);
                         break;
                     case 5 :
-                        $("#proximity5").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity5").css('border-color', green_p_ok);
                         break;
                     case 6 :
-                        $("#proximity6").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity6").css('border-color', green_p_ok);
                         break;
                     default :
-                        $("#proximity7").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity7").css('border-color', green_p_ok);
                         break;
                 }
             }
             if (message.data[iter] < proximity_level2) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity").css('border-color', orange_p_warning);
+                        $("#proximity_level1").css('border-color', green_p_ok);
                         break;
                     case 1 :
-                        $("#proximity1").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity1_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity1").css('border-color', orange_p_warning);
+                        $("#proximity1_level1").css('border-color', green_p_ok);
                         break;
                     case 2 :
-                        $("#proximity2").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity2_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity2").css('border-color', orange_p_warning);
+                        $("#proximity2_level1").css('border-color', green_p_ok);
                         break;
                     case 3 :
-                        $("#proximity3").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity3_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity3").css('border-color', orange_p_warning);
+                        $("#proximity3_level1").css('border-color', green_p_ok);
                         break;
                     case 4 :
-                        $("#proximity4").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity4_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity4").css('border-color', orange_p_warning);
+                        $("#proximity4_level1").css('border-color', green_p_ok);
                         break;
                     case 5 :
-                        $("#proximity5").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity5_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity5").css('border-color', orange_p_warning);
+                        $("#proximity5_level1").css('border-color', green_p_ok);
                         break;
                     case 6 :
-                        $("#proximity6").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity6_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity6").css('border-color', orange_p_warning);
+                        $("#proximity6_level1").css('border-color', green_p_ok);
                         break;
                     default :
-                        $("#proximity7").css('border-color', 'rgb(204,78,0)');
-                        $("#proximity7_level1").css('border-color', 'rgb(85,0,0)');
+                        $("#proximity7").css('border-color', orange_p_warning);
+                        $("#proximity7_level1").css('border-color', green_p_ok);
                         break;
                 }
             }
             if (message.data[iter] < proximity_level3) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity").css('border-color', red_alert);
+                        $("#proximity_level1").css('border-color', orange_p_warning);
                         break;
                     case 1 :
-                        $("#proximity1").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity1_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity1").css('border-color', red_p_alert);
+                        $("#proximity1_level1").css('border-color', orange_p_warning);
                         break;
                     case 2 :
-                        $("#proximity2").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity2_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity2").css('border-color', red_p_alert);
+                        $("#proximity2_level1").css('border-color', orange_p_warning);
                         break;
                     case 3 :
-                        $("#proximity3").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity3_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity3").css('border-color', red_p_alert);
+                        $("#proximity3_level1").css('border-color', orange_p_warning);
                         break;
                     case 4 :
-                        $("#proximity4").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity4_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity4").css('border-color', red_p_alert);
+                        $("#proximity4_level1").css('border-color', orange_p_warning);
                         break;
                     case 5 :
-                        $("#proximity5").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity5_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity5").css('border-color', red_p_alert);
+                        $("#proximity5_level1").css('border-color', orange_p_warning);
                         break;
                     case 6 :
-                        $("#proximity6").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity6_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity6").css('border-color', red_p_alert);
+                        $("#proximity6_level1").css('border-color', orange_p_warning);
                         break;
                     default :
-                        $("#proximity7").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity7_level1").css('border-color', 'rgb(204,78,0)');
+                        $("#proximity7").css('border-color', red_p_alert);
+                        $("#proximity7_level1").css('border-color', orange_p_warning);
                         break;
                 }
             }
             if (message.data[iter] < proximity_level4) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity").css('border-color', red_p_alert);
+                        $("#proximity_level1").css('border-color', red_p_alert);
                         break;
                     case 1 :
-                        $("#proximity1").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity1_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity1").css('border-color', red_p_alert);
+                        $("#proximity1_level1").css('border-color', red_p_alert);
                         break;
                     case 2 :
-                        $("#proximity2").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity2_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity2").css('border-color', red_p_alert);
+                        $("#proximity2_level1").css('border-color', red_p_alert);
                         break;
                     case 3 :
-                        $("#proximity3").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity3_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity3").css('border-color', red_p_alert);
+                        $("#proximity3_level1").css('border-color', red_p_alert);
                         break;
                     case 4 :
-                        $("#proximity4").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity4_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity4").css('border-color', red_p_alert);
+                        $("#proximity4_level1").css('border-color', red_p_alert);
                         break;
                     case 5 :
-                        $("#proximity5").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity5_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity5").css('border-color', red_p_alert);
+                        $("#proximity5_level1").css('border-color', red_p_alert);
                         break;
                     case 6 :
-                        $("#proximity6").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity6_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity6").css('border-color', red_p_alert);
+                        $("#proximity6_level1").css('border-color', red_p_alert);
                         break;
                     default :
-                        $("#proximity7").css('border-color', 'rgb(255,0,0)');
-                        $("#proximity7_level1").css('border-color', 'rgb(255,0,0)');
+                        $("#proximity7").css('border-color', red_p_alert);
+                        $("#proximity7_level1").css('border-color', red_p_alert);
                         break;
                 }
                 find = true;
-                speed_limit = speed_slow;
+                //allow movement with speed limit 
+                speed_limit = speed_reduction;
                 $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + message.data[iter] + "</p>");
                 //scroll le div à la fin 
                 $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
             }
         }
         if (!find) {
-            speed_limit = speed_max;
+            //allow movement with full speed (ie 100%)
+            speed_limit = 0;
         }
     });
 
@@ -893,12 +933,12 @@ window.onload = function () {
         var clignotement = function () {
             if (boolClign === 0) { // Si rouge
                 boolClign = 1;
-                $("#circle").css('background', '#FFFFFF'); // blanc
+                $("#circle").css('background', white_ok); // blanc
 
             }
             else {
                 boolClign = 0;
-                $("#circle").css('background', 'rgb(215,113,0)'); // orange
+                $("#circle").css('background', orange_warning); // orange
 
             }
         };
@@ -920,60 +960,60 @@ window.onload = function () {
                 periode = setInterval(clignotement, 500);
                 switch (iter) {
                     case 0 :
-                        $("#endline_alert").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert").css('background', red_alert);
                         move_up = false;
                         turn_left = false;
-                        $("#up_possibility").css('color', 'rgb(255,0,0)');
-                        $("#left_possibility").css('color', 'rgb(255,0,0)');
+                        $("#up_possibility").css('color', red_alert);
+                        $("#left_possibility").css('color', red_alert);
                         break;
                     case 1 :
-                        $("#endline_alert").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert").css('background', red_alert);
                         move_up = false;
                         turn_right = false;
-                        $("#up_possibility").css('color', 'rgb(255,0,0)');
-                        $("#right_possibility").css('color', 'rgb(255,0,0)');
+                        $("#up_possibility").css('color', red_alert);
+                        $("#right_possibility").css('color', red_alert);
                         break;
                     case 2 :
-                        $("#endline_alert1").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert1").css('background', red_alert);
                         move_up = false;
                         turn_left = false;
-                        $("#up_possibility").css('color', 'rgb(255,0,0)');
-                        $("#left_possibility").css('color', 'rgb(255,0,0)');
+                        $("#up_possibility").css('color', red_alert);
+                        $("#left_possibility").css('color', red_alert);
                         break;
                     case 3 :
-                        $("#endline_alert1").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert1").css('background', red_alert);
                         move_down = false;
                         turn_right = false;
-                        $("#down_possibility").css('color', 'rgb(255,0,0)');
-                        $("#right_possibility").css('color', 'rgb(255,0,0)');
+                        $("#down_possibility").css('color', red_alert);
+                        $("#right_possibility").css('color', red_alert);
                         break;
                     case 4 :
-                        $("#endline_alert2").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert2").css('background', red_alert);
                         move_down = false;
                         turn_right = false;
-                        $("#down_possibility").css('color', 'rgb(255,0,0)');
-                        $("#right_possibility").css('color', 'rgb(255,0,0)');
+                        $("#down_possibility").css('color', red_alert);
+                        $("#right_possibility").css('color', red_alert);
                         break;
                     case 5 :
-                        $("#endline_alert2").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert2").css('background', red_alert);
                         move_down = false;
                         turn_left = false;
-                        $("#down_possibility").css('color', 'rgb(255,0,0)');
-                        $("#left_possibility").css('color', 'rgb(255,0,0)');
+                        $("#down_possibility").css('color', red_alert);
+                        $("#left_possibility").css('color', red_alert);
                         break;
                     case 6 :
-                        $("#endline_alert3").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert3").css('background', red_alert);
                         move_down = false;
                         turn_right = false;
-                        $("#down_possibility").css('color', 'rgb(255,0,0)');
-                        $("#right_possibility").css('color', 'rgb(255,0,0)');
+                        $("#down_possibility").css('color', red_alert);
+                        $("#right_possibility").css('color', red_alert);
                         break;
                     default :
-                        $("#endline_alert3").css('background', 'rgb(255,0,0)');
+                        $("#endline_alert3").css('background', red_alert);
                         move_down = false;
                         turn_left = false;
-                        $("#down_possibility").css('color', 'rgb(255,0,0)');
-                        $("#left_possibility").css('color', 'rgb(255,0,0)');
+                        $("#down_possibility").css('color', red_alert);
+                        $("#left_possibility").css('color', red_alert);
                         break;
 
                 }
@@ -986,15 +1026,15 @@ window.onload = function () {
             move_down = true;
             turn_left = true;
             turn_right = true;
-            $("#endline_alert").css('background', 'rgb(255,0,0)');
-            $("#endline_alert1").css('background', 'rgb(255,0,0)');
-            $("#endline_alert2").css('background', 'rgb(255,0,0)');
-            $("#endline_alert3").css('background', 'rgb(255,0,0)');
-            $("#up_possibility").css('color', 'rgb(255,255,255)');
-            $("#down_possibility").css('color', 'rgb(255,255,255)');
-            $("#left_possibility").css('color', 'rgb(255,255,255)');
-            $("#right_possibility").css('color', 'rgb(255,255,255)');
-            $("#circle").css('background', 'rgb(255,255,255)');
+            $("#endline_alert").css('background', red_alert);
+            $("#endline_alert1").css('background', red_alert);
+            $("#endline_alert2").css('background', red_alert);
+            $("#endline_alert3").css('background', red_alert);
+            $("#up_possibility").css('color', white_ok);
+            $("#down_possibility").css('color', white_ok);
+            $("#left_possibility").css('color', white_ok);
+            $("#right_possibility").css('color', white_ok);
+            $("#circle").css('background', white_ok);
         }
     });
 
@@ -1007,45 +1047,45 @@ window.onload = function () {
         messageType: 'std_msgs/Byte'
     });
 
-    //$("#proximity").css('border-color', 'rgb(102,102,102)');
+    //$("#proximity").css('border-color', grey_ok);
     topic_bandwidth_quality.subscribe(function (message) {
-        console.log('Received message on' + topic_bandwidth_quality.name);
+        console.log('Received message on' + topic_bandwidth_quality.name + + " " + message.data);
 
-        $("#brandwith_quality_critical").css('background', 'rgb(0,255,0)');
-        $("#brandwith_quality_low").css('background', 'rgb(0,255,0)');
-        $("#brandwith_quality_medium").css('background', 'rgb(0,255,0)');
-        $("#brandwith_quality_high").css('background', 'rgb(0,255,0)');
+        $("#brandwith_quality_critical").css('background', green_ok);
+        $("#brandwith_quality_low").css('background', green_ok);
+        $("#brandwith_quality_medium").css('background', green_ok);
+        $("#brandwith_quality_high").css('background', green_ok);
 
         if (message.data < brandwith_quality_L1) {
-            $("#brandwith_quality_high").css('background', 'rgb(255,71,0)');
+            $("#brandwith_quality_high").css('background', orange_warning);
         }
         if (message.data < brandwith_quality_L2) {
-            $("#brandwith_quality_high").css('background', 'rgb(102,102,102)');
+            $("#brandwith_quality_high").css('background', grey_ok);
         }
         if (message.data < brandwith_quality_L3) {
-            $("#brandwith_quality_medium").css('background', 'rgb(255,71,0)');
+            $("#brandwith_quality_medium").css('background', orange_warning);
         }
         if (message.data < brandwith_quality_L4) {
-            $("#brandwith_quality_medium").css('background', 'rgb(102,102,102)');
+            $("#brandwith_quality_medium").css('background', grey_ok);
         }
         if (message.data < brandwith_quality_L5) {
-            $("#brandwith_quality_low").css('background', 'rgb(255,71,0)');
-            $("#brandwith_quality_critical").css('background', 'rgb(255,71,0)');
+            $("#brandwith_quality_low").css('background', orange_warning);
+            $("#brandwith_quality_critical").css('background', orange_warning);
         }
         if (message.data < brandwith_quality_L6) {
-            $("#brandwith_quality_low").css('background', 'rgb(102,102,102)');
-            $("#brandwith_quality_critical").css('background', 'rgb(255,0,0)');
+            $("#brandwith_quality_low").css('background', grey_ok);
+            $("#brandwith_quality_critical").css('background', red_alert);
         }
         if (message.data < brandwith_quality_L7) {
             var boolClign;
             var clignotement = function () {
                 if (boolClign === 0) {
                     boolClign = 1;
-                    $("#brandwith_quality_critical").css('background', '#FFFFFF'); // blanc
+                    $("#brandwith_quality_critical").css('background', white_ok); 
                 }
                 else {
                     boolClign = 0;
-                    $("#brandwith_quality_critical").css('background', 'rgb(255,0,0)'); // rouge
+                    $("#brandwith_quality_critical").css('background', red_alert); 
                 }
             };
             periode = setInterval(clignotement, 500);
