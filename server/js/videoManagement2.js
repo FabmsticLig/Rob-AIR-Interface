@@ -14,14 +14,14 @@ var webrtc = new SimpleWebRTC({
 	autoRequestMedia: true,
 	debug: true,
 	detectSpeakingEvents: true,
-	autoAdjustMic: false
+	autoAdjustMic: false,
     media :{
         audio:true,
         video:{
                 mandatory:
                     {
-                        maxWidth:320,
-                        maxHeight:100,
+                        //maxWidth:320,
+                        //maxHeight:100,
                         maxFrameRate:60
                     }
               }
@@ -36,42 +36,44 @@ webrtc.on('videoAdded', function(video,peer) {
 	//console.log("remote video added");
 	nbPeers = nbPeers + 1; 
 	if (nbPeers == 2){ //caméra assistance du sol
-		var remotes = document.getElementById('remote_assistance');
+		var remotes = document.getElementById('div_cam2');
 		if (remotes) {
-			var container = document.createElement('div');
-			container.className = 'videoContainerAssistance';
-			container.id = 'container_' + webrtc.getDomId(peer);
-			container.appendChild(video);
-
 			//suppress contextMenu
 			video.oncontextMenu = function() {return false; };
-
-			remotes.appendChild(container);
+			remotes.appendChild(video);
 		}
 	} else { //caméra principale de vidéo-conf
-		var remotes = document.getElementById('remotes');
+		var remotes = document.getElementById('div_cam3');
 		if (remotes) {
-			var container = document.createElement('div');
-			container.className = 'videoContainer';
-			container.id = 'container_' + webrtc.getDomId(peer);
-			container.appendChild(video);
-
 			//suppress contextMenu
 			video.oncontextMenu = function() {return false; };
 
-			remotes.appendChild(container);
+			remotes.appendChild(video);
                         
                         // show the accelerometer
-                    var accelerometer = document.createElement('div');
-                    accelerometer.id = 'accelerometer';
-                    accelerometer.className = 'accelerometer';
-                    container.appendChild(accelerometer);
+/*                    var div_accelerometer = document.createElement('div');
+                    div_accelerometer.id = 'demoWidget';
+                    div_accelerometer.style = 'position: relative';
+
+                    var inside_accelerometer = document.createElement('div');
+                    inside_accelerometer.id = 'gaugeContainer';
+                    inside_accelerometer.style = 'float: left';
+                    
+                    div_accelerometer.appendChild(inside_accelerometer);
+                    
+                    remotes.appendChild(div_accelerometer);
+                    */
 		}
 	}
 });
 webrtc.on('videoRemoved', function(video, peer) {
 	//console.log('video removed', peer);
 	if (peer) {
+		var remotes = document.getElementById('remotes');
+		var el = document.getElementById('container_' + webrtc.getDomId(peer));
+		if (remotes && el) {
+			remotes.removeChild(el);
+		}
 		nbPeers = nbPeers - 1;
 	}
 });

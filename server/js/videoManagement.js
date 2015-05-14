@@ -9,19 +9,19 @@ var webrtc = new SimpleWebRTC({
     // the id/element dom element that will hold "our" video
     localVideoEl: 'localVideo',
     // the id/element dom element that will hold remote videos
-    remoteVideosEl: 'remotes',
+    remoteVideosEl: 'principal',
     // immediately ask for camera access
     autoRequestMedia: true,
     debug: true,
     detectSpeakingEvents: true,
-    autoAdjustMic: false
+    autoAdjustMic: false,
     media :{
         audio:true,
         video:{
                 mandatory:
                     {
-                        maxWidth:320,
-                        maxHeight:100,
+                        //maxWidth:320,
+                        //maxHeight:100,
                         maxFrameRate:60
                     }
               }
