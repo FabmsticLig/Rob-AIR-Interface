@@ -424,40 +424,103 @@ window.onload = function () {
         //erase 'px' from norm
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
+        
+        var kx = 127/normX;
+        var ky = 127/normY;
 
         var x0 = normX/2+ window_elem.left;
         var y0 = normY/2+ window_elem.top;
         
         mouse_event.onmousemove = function (event) {
 
-            var dx;
-            var dy;
+            var x;
+            var y;
             if (event.x !== undefined && event.y !== undefined)
             {
-                dx = event.x;
-                dy = event.y;
+                x = event.x;
+                y = event.y;
             }
             else // Firefox method to get the position
             {
-                dx = event.clientX + document.body.scrollLeft +
+                x = event.clientX + document.body.scrollLeft +
                         document.documentElement.scrollLeft;
-                dy = event.clientY + document.body.scrollTop +
+                y = event.clientY + document.body.scrollTop +
                         document.documentElement.scrollTop;
             }
             
             
-            //TODO : calibrate and vérify calcul
-            var rx1 = (dx + (normX/2))/normX;
-            var rx2 = 1 - rx1;
-            dy = (y0 - dy) * normY /255;
-            var v = dy;
             
-            console.log("X0 " + x0 +" Y0 "+ y0 +" rx1 "+ rx1+" rx2 " + rx2); 
+            
+            var dx = x - x0;
+            var dy = y - y0;
+            
+            var theta = Math.atan(dy/dx); // En radian
+            if((dx <=0 && dy >= 0) || (dx <=0 && dy <= 0) ){ // Fix problem de atan entre -Pi/2 et Pi/2 seulement
+                theta += Math.Pi;
+            } else if(theta <=0){
+                theta += 2*Math.Pi;
+            }
+            
+            var v, speedx, speedy;
+            
+        if(theta >= 0 && theta <= Math.Pi/2){ // 1er cadran
+            if(theta <= Math.Pi/4){ // 1ère moitié du 1er cadran
+                v = dx;
+            } else{
+                v = dy;
+            }
+            speedx = v;
+            speedy = v*Math.sin(theta);
+        } else if(theta > Math.Pi/2 && theta <= Math.Pi){ // 2ème cadran
+            if(theta <= 3*Math.Pi/4){ // 1ère moitié du 2ème cadran
+                v = dy;
+            } else{
+                v = dx;
+            }
+            speedx = v*Math.sin(theta);
+            speedy = v;
+        } else if(theta > Math.Pi && theta <= 3*Math.Pi/2){ // 3ème cadran
+            if(theta <= 5*Math.Pi/4){ // 1ère moitié du 3ème cadran
+                v = dx;
+            } else{
+                v = dy;
+            }
+            speedx = -v*Math.sin(theta);
+            speedy = -v;
+        } else{ // 4ème cadran
+            if(theta <= 7*Math.Pi/4){ // 1ère moitié du 4ème cadran
+                v = dy;
+            } else{
+                v = dx;
+            }
+            speedx = -v;
+            speedy = -v*Math.sin(theta);
+        }
+        
+        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speedx +"," + speedy +")"); 
+            
+            
+            
+            /* COMMENT */
+                       
+            //TODO : calibrate and vérify calcul
+//            var rx1 = (dx + (normX/2))/normX;
+//            var rx2 = 1 - rx1;
+//            dy = (y0 - dy) * normY /255;
+//            var v = dy;
+//            
+//            console.log("X0 " + x0 +" Y0 "+ y0 +" rx1 "+ rx1+" rx2 " + rx2); 
             
 
             //process speed with ponderation
-            speed1 = v * rx1;
-            speed2 = v * rx2;
+//            speed1 = v * rx1;
+//            speed2 = v * rx2;
+                    
+            /*  END COMMENT */
+            
+            
+            
+            
             //var rx1 = (dx + (normX/2))/normX;
             //var rx2 = 1 - rx1;
             //var dx12 = dx;
@@ -482,25 +545,34 @@ window.onload = function () {
 //            var speed1 = 127*dx/mod*Math.cos(Math.atan(dy/dx));
 //            var speed2 = 127*dy/mod*Math.sin(Math.atan(dy/dx));
             
-            if (speed1 > speed_max-speed_limit) {
-                speed1 = speed_max-speed_limit;
-            }
-            if (speed1 < speed_min+speed_limit) {
-                speed1 = speed_min+speed_limit;
-            }
-            if (speed2 > speed_max-speed_limit) {
-                speed2 = speed_max-speed_limit;
-            }
-            if (speed2 < speed_min+speed_limit) {
-                speed2 = speed_min+speed_limit;
-            }
+            
+            
+            
+            /* COMMENT */
+            
+//            if (speed1 > speed_max-speed_limit) {
+//                speed1 = speed_max-speed_limit;
+//            }
+//            if (speed1 < speed_min+speed_limit) {
+//                speed1 = speed_min+speed_limit;
+//            }
+//            if (speed2 > speed_max-speed_limit) {
+//                speed2 = speed_max-speed_limit;
+//            }
+//            if (speed2 < speed_min+speed_limit) {
+//                speed2 = speed_min+speed_limit;
+//            }
+            
+            /* END COMMENT */
+            
+            
             var msg = new ROSLIB.Message({
-                speed1: Math.round(speed1),
-                speed2: Math.round(speed2)
+                speed1: Math.round(speedx),
+                speed2: Math.round(speedy)
             });
             //Publish on Topic
             topic_cmd.publish(msg);
-            console.log("published " + speed1 + " " + speed2);
+            console.log("published " + speedx + " " + speedy);
         };
         mouse_event.onmouseup = function () {
             //document.onmousemove = null;
