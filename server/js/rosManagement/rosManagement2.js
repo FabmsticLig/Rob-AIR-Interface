@@ -52,8 +52,8 @@ window.onload = function () {
 
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
-    //max speed - speed reduction = speed limit
-    var speed_reduction  = 100;
+    //max speed - speed reduction = speed limit a mettre a 
+    var speed_reduction  = 0;
 
     //Default keyboard control
     var key_stop       = 83; //'s' 
@@ -69,8 +69,9 @@ window.onload = function () {
     //initial Gaze_direction [0,255]
     var gazeValue = 127;
 
-    //initial Head_Direction [0,255]
-    var headDirection = 127;
+    //initial Head_Direction [0,180]
+    var headDirection  = 90;
+    var head_increment = 5;
 
     //proximity level in centimeter
     var proximity_level2 = 40;
@@ -117,7 +118,7 @@ window.onload = function () {
     var topic_gaze_direction = new ROSLIB.Topic({
         ros: ros,
         name: '/gaze_direction',
-        messageType: 'std_msgs/Byte'
+        messageType: 'std_msgs/Uint8'
     });
 
     //Command_motor
@@ -131,7 +132,7 @@ window.onload = function () {
     var topic_angle_position = new ROSLIB.Topic({
         ros: ros,
         name: '/angle_position',
-        messageType: 'std_msgs/Byte'
+        messageType: 'std_msgs/UInt8'
     });
 
 
@@ -235,7 +236,7 @@ window.onload = function () {
     
     //indication of head rotation
     var setHeadIndication = function (key) {
-        var angle = 90/127*(key-127);        
+        var angle = 90-key;        
         var string1 = "'" + "rotate(" + Math.round(angle) + "deg)'";
         var string2 = string1.substring(string1.length - 2,1);
         console.log(string1);
@@ -252,8 +253,8 @@ window.onload = function () {
         elem = document.getElementById('triangle-up');
         if (key === key_head_left)
         {
-            if (headDirection !== 0) {
-                headDirection--;
+            if (headDirection !== 180) {
+                headDirection += head_increment;
                 console.log("Turn head to Left");
             }
             else {
@@ -262,8 +263,8 @@ window.onload = function () {
             }
 
         } else if (key === key_head_right) {
-            if (headDirection !== 255) {
-                headDirection++;
+            if (headDirection !== 0) {
+                headDirection -= head_increment;
                 console.log("Turn head to Right");
             }
             else {
