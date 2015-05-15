@@ -738,18 +738,21 @@ window.onload = function () {
     var topic_proximity_obstacles = new ROSLIB.Topic({
         ros: ros,
         name: '/proximity_obstacles',
-        messageType: 'std_msgs/Float32MultiArray'
+        messageType: 'md49test/Sonars'
     });
 
     topic_proximity_obstacles.subscribe(function (message) {
-        console.log('Received message on' + topic_proximity_obstacles.name + " " + message.data[0]
-                + " " + message.data[1]
-                + " " + message.data[2]
-                + " " + message.data[3]
-                + " " + message.data[4]
-                + " " + message.data[5]
-                + " " + message.data[6]
-                + " " + message.data[7]);
+        console.log('Received message on' + topic_proximity_obstacles.name
+                + " " + message.x1
+                + " " + message.x2
+                + " " + message.x3
+                + " " + message.x4
+                + " " + message.x5
+                + " " + message.x6
+                + " " + message.x7
+		+ " " + message.x8);
+	
+	var data = [message.x1, message.x2, message.x3, message.x4, message.x5, message.x6, message.x7, message.x8];
 
         $("#proximity").css('border-color', grey_p_ok);
         $("#proximity_level1").css('border-color', grey_p_ok);
@@ -768,9 +771,9 @@ window.onload = function () {
         $("#proximity7").css('border-color', grey_p_ok);
         $("#proximity7_level1").css('border-color', grey_p_ok);
         var find = false;
-        for (var iter = 0; i < 8; iter++) {
+        for (var iter = 0; iter < 8; iter++) {
 
-            if (message.data[iter] < proximity_level1) {
+            if (data[iter] < proximity_level1) {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', green_p_ok);
@@ -798,7 +801,7 @@ window.onload = function () {
                         break;
                 }
             }
-            if (message.data[iter] < proximity_level2) {
+            if (data[iter] < proximity_level2) {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', orange_p_warning);
@@ -834,7 +837,7 @@ window.onload = function () {
                         break;
                 }
             }
-            if (message.data[iter] < proximity_level3) {
+            if (data[iter] < proximity_level3) {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', red_alert);
@@ -870,7 +873,7 @@ window.onload = function () {
                         break;
                 }
             }
-            if (message.data[iter] < proximity_level4) {
+            if (data[iter] < proximity_level4) {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', red_p_alert);
@@ -908,7 +911,7 @@ window.onload = function () {
                 find = true;
                 //allow movement with speed limit 
                 speed_limit = speed_reduction;
-                $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + message.data[iter] + "</p>");
+                $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + data[iter] + "</p>");
                 //scroll le div à la fin 
                 $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
             }
