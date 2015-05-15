@@ -35,7 +35,7 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     //============================================================
-    //==================Global-Variables==================
+    //=============Global Variables and Constant======
     //============================================================
     //-------------------------------------------------------------------------
 
@@ -52,8 +52,8 @@ window.onload = function () {
 
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
-    //max speed - speed reduction = speed limit a mettre a 
-    var speed_reduction  = 0;
+    //max speed - speed reduction = speed limit
+    var speed_reduction = 64;
 
     //Default keyboard control
     var key_stop       = 83; //'s' 
@@ -67,11 +67,21 @@ window.onload = function () {
     var key_head_right = 69; //'e'
 
     //initial Gaze_direction [0,255]
-    var gazeValue = 127;
+    var gaze_max         = 255;
+    var gaze_min         = 0;
+    //in this case 127
+    var gaze_front_value = (gaze_max - gaze_min)/2 -1;
+    var gaze_value       = gaze_front_value;
+    //In this case 8 possibility whith 64 degres by increments or decrements
+    var gaze_increment   = gaze_front_value/4;
 
     //initial Head_Direction [0,180]
-    var headDirection  = 90;
-    var head_increment = 5;
+    var head_max             = 180;
+    var head_min             = 0;
+    var head_front_direction = (head_max- head_min)/2;
+    var head_direction       = head_front_direction;
+    //In this case 36 possibility whith 5 degres by increments or decrements 
+    var head_increment       = head_front_direction/18;
 
     //proximity level in centimeter
     var proximity_level2 = 40;
@@ -91,7 +101,7 @@ window.onload = function () {
     var brandwith_quality_L3 = 85;
     var brandwith_quality_L2 = 90;
     var brandwith_quality_L1 = 95;
-    
+
     //define normal/warning/alert color
     var white_ok         = 'rgb(255, 255, 255)';
     var black_ok         = 'rgb(0, 0, 0)';
@@ -105,38 +115,95 @@ window.onload = function () {
     var red_alert        = 'rgb(255, 0, 0)';
     var red_p_alert      = 'transparent transparent transparent rgb(255, 0, 0)';
 
+
     //-------------------------------------------------------------------------
     //============================================================
-    //==================Publisher============================
+    //==================Topics declaration==================
     //============================================================
     //-------------------------------------------------------------------------
 
 
-    //==================Topics=================================
+    //-------------------------------------------------------------------------
+    // Publishers
 
-    //Gaze_direction
+    //Gaze direction
     var topic_gaze_direction = new ROSLIB.Topic({
         ros: ros,
         name: '/gaze_direction',
         messageType: 'std_msgs/Uint8'
     });
 
-    //Command_motor
+    //Command motor
     var topic_cmd = new ROSLIB.Topic({
         ros: ros,
         name: '/cmdmotors',
         messageType: 'md49test/MotorCmd'
     });
 
-    //Angle_position
+    //Head position
     var topic_angle_position = new ROSLIB.Topic({
         ros: ros,
         name: '/angle_position',
         messageType: 'std_msgs/UInt8'
     });
 
+    //-------------------------------------------------------------------------
+    // Subscribers
 
-    //==================Publications======================
+    //Topic for battery_level
+    var topic_battery_level = new ROSLIB.Topic({
+        ros: ros,
+        name: '/battery_level',
+        messageType: 'std_msgs/Int32'
+    });
+
+    //Topic for collision
+    var topic_collision = new ROSLIB.Topic({
+        ros: ros,
+        name: '/collision_event',
+        messageType: 'std_msgs/Bool'
+    });
+
+    //Topic for panic event
+    var topic_panic_event = new ROSLIB.Topic({
+        ros: ros,
+        name: '/panic_event',
+        messageType: 'std_msgs/Bool'
+    });
+
+    //Topic for hug event
+    var topic_hug_event = new ROSLIB.Topic({
+        ros: ros,
+        name: '/social_touch_event',
+        messageType: 'std_msgs/Bool'
+    });
+
+    //Topic for proximity obstacles
+    var topic_proximity_obstacles = new ROSLIB.Topic({
+        ros: ros,
+        name: '/proximity_obstacles',
+        messageType: 'md49test/Sonars'
+    });
+
+    //Topic for end_line_obstacles (not yet implemented)
+    var topic_end_line_obstacles = new ROSLIB.Topic({
+        ros: ros,
+        name: '/end_line_obstacles',
+        messageType: 'std_msgs/Int8MultiArray'
+    });
+
+    //Topic for bandwidth_quality	
+    var topic_bandwidth_quality = new ROSLIB.Topic({
+        ros: ros,
+        name: '/wifi_quality',
+        messageType: 'std_msgs/Int8'
+    });
+
+    //-------------------------------------------------------------------------
+    //============================================================
+    //==================Publisher============================
+    //============================================================
+
 
     //-------------------------------------------------------------------------
     //Gaze_direction
@@ -147,8 +214,8 @@ window.onload = function () {
         //d 68
         if (key === key_gaze_left)
         {
-            if (gazeValue !== 0) {
-                gazeValue--;
+            if (gaze_value !== gaze_min) {
+                gaze_value -= gaze_increment;
                 console.log("Turn sight to Left");
             }
             else {
@@ -156,8 +223,8 @@ window.onload = function () {
             }
 
         } else if (key === key_gaze_right) {
-            if (gazeValue !== 255) {
-                gazeValue++;
+            if (gaze_value !== gaze_max) {
+                gaze_value += gaze_increment;
                 console.log("Turn sight to Right");
             }
             else {
@@ -165,9 +232,9 @@ window.onload = function () {
             }
 
         }
-        console.log(gazeValue);
+        console.log(gaze_value);
         var gaze = new ROSLIB.Message({
-            data: gazeValue
+            data: gaze_value
         });
         topic_gaze_direction.publish(gaze);
         console.log("gaze direction published " + key);
@@ -176,6 +243,7 @@ window.onload = function () {
 
     //gaze direction with mouse clic on video
     //x and y are calculate but only x is used
+    //TODO calculate great gaze
     var screenGazeDirection = function (event) {
         var x0;
         var y0;
@@ -196,7 +264,7 @@ window.onload = function () {
         var window_elem = $("#div_cam3").position();
         var normX = $("#div_cam3").css('width');
         var normY = $("#div_cam3").css('height');
-        //erase 'px' from norm and window_elem;
+        //erase 'px' from norm string;
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
 
@@ -205,27 +273,28 @@ window.onload = function () {
 
         var dy = (window_elem.top + normY / 2) - (y0 - window_elem.top);
         var ry = -dy * 127 / (normY / 2);
-        
-        if (rx > 255) {
-            rx = 255;
+
+        if (rx > gaze_max) {
+            rx = gaze_max;
         }
-        if (rx < 0) {
-            rx = 0;
+        if (rx < gaze_min) {
+            rx = gaze_min;
         }
-        if (ry > 255) {
-            ry = 255;
+        if (ry > gaze_max) {
+            ry = gaze_max;
         }
-        if (ry < 0) {
-            ry = 0;
+        if (ry < gaze_min) {
+            ry = gaze_min;
         }
-        //gazeValueY not yet implemented
-        gazeValue =Math.round(rx);
+        //gaze_valueY not yet implemented
+        //TODO divide by 4
+        gaze_value = Math.round(rx);
         var gaze = new ROSLIB.Message({
-            data: gazeValue
+            data: gaze_value
         });
         topic_gaze_direction.publish(gaze);
-        console.log("gaze direction published " + gazeValue);
-        
+        console.log("gaze direction published " + gaze_value);
+
     };
     var mouse_event_gaze = document.getElementById('div_cam3');
     mouse_event_gaze.onclick = function (e) {
@@ -233,18 +302,20 @@ window.onload = function () {
         screenGazeDirection(e);
     };
 
+    //-------------------------------------------------------------------------
+    // Head rotation
     
     //indication of head rotation
     var setHeadIndication = function (key) {
-        var angle = 90-key;        
+        var angle = head_front_direction - key;
         var string1 = "'" + "rotate(" + Math.round(angle) + "deg)'";
-        var string2 = string1.substring(string1.length - 2,1);
-        console.log(string1);
+        //remove  "" from string
+        var string2 = string1.substring(string1.length - 2, 1);
+        console.log(string2);
         $('#triangle-up').css('transform', string2);
     };
     
-    //-------------------------------------------------------------------------
-    //Angle_position
+    // head rotation command
     var setHeadDirection = function (key) {
 
         //Key code
@@ -253,8 +324,8 @@ window.onload = function () {
         elem = document.getElementById('triangle-up');
         if (key === key_head_left)
         {
-            if (headDirection !== 180) {
-                headDirection += head_increment;
+            if (head_direction !== 180) {
+                head_direction += head_increment;
                 console.log("Turn head to Left");
             }
             else {
@@ -263,8 +334,8 @@ window.onload = function () {
             }
 
         } else if (key === key_head_right) {
-            if (headDirection !== 0) {
-                headDirection -= head_increment;
+            if (head_direction !== 0) {
+                head_direction -= head_increment;
                 console.log("Turn head to Right");
             }
             else {
@@ -274,42 +345,42 @@ window.onload = function () {
 
         }
         //change the head indication
-        setHeadIndication(headDirection);
+        setHeadIndication(head_direction);
 
-        console.log(headDirection);
+        console.log(head_direction);
         var head = new ROSLIB.Message({
-            data: headDirection
+            data: head_direction
         });
         topic_angle_position.publish(head);
-        console.log("head direction published " + headDirection);
+        console.log("head direction published " + head_direction);
     };
 
     //-------------------------------------------------------------------------
     //Command_motor
     /** Object storing references to the remote screen DOM elements */
     this.remote = {
-        div    : $('#remote'),
-        left   : $('#remote-left'),
-        right  : $('#remote-right'),
-        up     : $('#remote-up'),
-        down   : $('#remote-down'),
-        head_l : $('#remote-left-head'),
-        head_r : $('#remote-right-head'),
-        move   : $('#remote-controls-mouse'),
-        stop   : $('#remote-stop'),
-        img    : $('#remote-img'),
+        div: $('#remote'),
+        left: $('#remote-left'),
+        right: $('#remote-right'),
+        up: $('#remote-up'),
+        down: $('#remote-down'),
+        head_l: $('#remote-left-head'),
+        head_r: $('#remote-right-head'),
+        move: $('#remote-controls-mouse'),
+        stop: $('#remote-stop'),
+        img: $('#remote-img'),
         visible: false
     };
 
     var but = {};
-    but[key_forward]    = this.remote.up;
-    but[key_backward]   = this.remote.down;
-    but[key_turn_left]  = this.remote.left;
+    but[key_forward] = this.remote.up;
+    but[key_backward] = this.remote.down;
+    but[key_turn_left] = this.remote.left;
     but[key_turn_right] = this.remote.right;
-    but[key_stop]       = this.remote.stop;
-    but[key_head_left]  = this.remote.head_l;
+    but[key_stop] = this.remote.stop;
+    but[key_head_left] = this.remote.head_l;
     but[key_head_right] = this.remote.head_r;
-    var lastPressed     = this.remote.stop; // only one action at a time
+    var lastPressed = this.remote.stop; // only one action at a time
 
     //-------------------------------------------------------------------------
     //Control with click button
@@ -340,23 +411,23 @@ window.onload = function () {
             if (key === key_forward && move_up) {
                 // up arrow
                 console.log("up Arrow");
-                speed1 = speed_max-speed_limit;
-                speed2 = speed_max-speed_limit;
+                speed1 = speed_max - speed_limit;
+                speed2 = speed_max - speed_limit;
             } else if (key === key_backward && move_down) {
                 // down arrow
                 console.log("down Arrow");
-                speed1 = speed_min+speed_limit;
-                speed2 = speed_min+speed_limit;
+                speed1 = speed_min + speed_limit;
+                speed2 = speed_min + speed_limit;
             } else if (key === key_turn_left && turn_left) {
                 // left arrow
                 console.log("left Arrow");
-                speed1 = speed_max-speed_limit;
+                speed1 = speed_max - speed_limit;
                 speed2 = speed_stop;
             } else if (key === key_turn_right && turn_right) {
                 // right arrow
                 console.log("right Arrow");
                 speed1 = speed_stop;
-                speed2 = speed_max-speed_limit;
+                speed2 = speed_max - speed_limit;
             } else if (key === key_stop
                     || !move_up
                     || !move_up
@@ -371,7 +442,6 @@ window.onload = function () {
             var msg = new ROSLIB.Message({
                 speed1: speed1,
                 speed2: speed2
-                        //mode : 1			
             });
             //Publish on Topic
             topic_cmd.publish(msg);
@@ -417,7 +487,7 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     // Control with mouse motion
     var mouseMotionCtrl = function mouseMotionCtrl(event) {
-        
+
         // distance of the window 
         var normX = $("#remote-controls-mouse").css('width');
         var normY = $("#remote-controls-mouse").css('height');
@@ -425,111 +495,111 @@ window.onload = function () {
         //erase 'px' from norm
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
-        
-        var kx = speed_max/normX;
-        var ky = speed_max/normY;
 
-        var x0 = normX/2+ window_elem.left;
-        var y0 = normY/2+ window_elem.top;
-        
+        var kx = speed_max / normX;
+        var ky = speed_max / normY;
+
+        var x0 = normX / 2 + window_elem.left;
+        var y0 = normY / 2 + window_elem.top;
+
         mouse_event.onmousemove = function (event) {
-            if(mouse_event_enter === true){
+            if (mouse_event_enter === true) {
 
-            var x;
-            var y;
-            if (event.x !== undefined && event.y !== undefined)
-            {
-                x = event.x;
-                y = event.y;
-            }
-            else // Firefox method to get the position
-            {
-                x = event.clientX + document.body.scrollLeft +
-                        document.documentElement.scrollLeft;
-                y = event.clientY + document.body.scrollTop +
-                        document.documentElement.scrollTop;
-            }
-            
-            
-            
-            
-            var dx = x - x0;
-            var dy = -(y - y0);
-            var log;
-            
-            var theta = Math.atan(dy/dx); // En radian
-            if(dx <=0 && dy >= 0){
-                theta = theta + Math.PI;
-            } else if(dx <=0 && dy <= 0){
-                theta = theta + Math.PI;
-            } else if(dx >=0 && dy <= 0){
-                theta = theta + 2*Math.PI;
-            }
-            
-            var v, speed1, speed2;
-            
-        if(theta >= 0 && theta <= Math.PI/2){ // 1er cadran
-            if(theta <= Math.PI/4){ // 1ère moitié du 1er cadran
-                v = dx*kx;
-                speed1 = v;
-                speed2 = v*Math.sin(theta);
-            } else{
-                v = dy*ky;
-                speed1 = v;
-                speed2 = v*Math.sin(theta);
-            }
-            log = 1;
-        } else if(theta > Math.PI/2 && theta <= Math.PI){ // 2ème cadran
-            if(theta <= 3*Math.PI/4){ // 1ère moitié du 2ème cadran
-                v = dy*ky;
-                speed1 = v*Math.sin(theta);
-                speed2 = v;
-            } else{
-                v = -dx*kx;
-                speed1 = v*Math.sin(theta);
-                speed2 = v;
-            }
-            
-            log = 2;
-        } else if(theta > Math.PI && theta <= 3*Math.PI/2){ // 3ème cadran
-            if(theta <= 5*Math.PI/4){ // 1ère moitié du 3ème cadran
-                v = dx*kx;
-                speed1 = -v*Math.sin(theta);
-                speed2 = v;
-            } else{
-                v = dy*ky;
-                speed1 = -v*Math.sin(theta);
-                speed2 = v;  
-            }
-            log = 3;
-        } else{ // 4ème cadran
-            if(theta <= 7*Math.PI/4){ // 1ère moitié du 4ème cadran
-                v = dy*ky;
-                speed1 = v;
-                speed2 = -v*Math.sin(theta);
-            } else{
-                v = -dx*kx;
-                speed1 = v;
-                speed2 = -v*Math.sin(theta);
-            }
-            log = 4;            
-        }
-        
-        speed1 += 128;
-        speed2 += 128;
-        
+                var x;
+                var y;
+                if (event.x !== undefined && event.y !== undefined)
+                {
+                    x = event.x;
+                    y = event.y;
+                }
+                else // Firefox method to get the position
+                {
+                    x = event.clientX + document.body.scrollLeft +
+                            document.documentElement.scrollLeft;
+                    y = event.clientY + document.body.scrollTop +
+                            document.documentElement.scrollTop;
+                }
+
+
+
+
+                var dx = x - x0;
+                var dy = -(y - y0);
+                var log;
+
+                var theta = Math.atan(dy / dx); // En radian
+                if (dx <= 0 && dy >= 0) {
+                    theta = theta + Math.PI;
+                } else if (dx <= 0 && dy <= 0) {
+                    theta = theta + Math.PI;
+                } else if (dx >= 0 && dy <= 0) {
+                    theta = theta + 2 * Math.PI;
+                }
+
+                var v, speed1, speed2;
+
+                if (theta >= 0 && theta <= Math.PI / 2) { // 1er cadran
+                    if (theta <= Math.PI / 4) { // 1ère moitié du 1er cadran
+                        v = dx * kx;
+                        speed1 = v;
+                        speed2 = v * Math.sin(theta);
+                    } else {
+                        v = dy * ky;
+                        speed1 = v;
+                        speed2 = v * Math.sin(theta);
+                    }
+                    log = 1;
+                } else if (theta > Math.PI / 2 && theta <= Math.PI) { // 2ème cadran
+                    if (theta <= 3 * Math.PI / 4) { // 1ère moitié du 2ème cadran
+                        v = dy * ky;
+                        speed1 = v * Math.sin(theta);
+                        speed2 = v;
+                    } else {
+                        v = -dx * kx;
+                        speed1 = v * Math.sin(theta);
+                        speed2 = v;
+                    }
+
+                    log = 2;
+                } else if (theta > Math.PI && theta <= 3 * Math.PI / 2) { // 3ème cadran
+                    if (theta <= 5 * Math.PI / 4) { // 1ère moitié du 3ème cadran
+                        v = dx * kx;
+                        speed1 = -v * Math.sin(theta);
+                        speed2 = v;
+                    } else {
+                        v = dy * ky;
+                        speed1 = -v * Math.sin(theta);
+                        speed2 = v;
+                    }
+                    log = 3;
+                } else { // 4ème cadran
+                    if (theta <= 7 * Math.PI / 4) { // 1ère moitié du 4ème cadran
+                        v = dy * ky;
+                        speed1 = v;
+                        speed2 = -v * Math.sin(theta);
+                    } else {
+                        v = -dx * kx;
+                        speed1 = v;
+                        speed2 = -v * Math.sin(theta);
+                    }
+                    log = 4;
+                }
+
+                speed1 += 128;
+                speed2 += 128;
+
 //        console.log("log : "+log+" et theta : " + theta); 
 //        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speed1 +"," + speed2 +")"); 
-                      
-            
-            var msg = new ROSLIB.Message({
-                speed1: Math.round(speed1),
-                speed2: Math.round(speed2)
-            });
-            //Publish on Topic
-            topic_cmd.publish(msg);
-            console.log("published " + speed1 + " " + speed2);
-        }
+
+
+                var msg = new ROSLIB.Message({
+                    speed1: Math.round(speed1),
+                    speed2: Math.round(speed2)
+                });
+                //Publish on Topic
+                topic_cmd.publish(msg);
+                console.log("published " + speed1 + " " + speed2);
+            }
         };
 //        mouse_event.onmouseup = function () {
 //            //document.onmousemove = null;
@@ -537,13 +607,13 @@ window.onload = function () {
 //        };
 
     };
-    
+
     var mouse_event_enter = false;
     // bind mouse
     var mouse_event = document.getElementById('remote-controls-mouse');
     mouse_event.onclick = function (e) {
         e = e || window.event;
-        if(mouse_event_enter === false){
+        if (mouse_event_enter === false) {
             mouse_event_enter = true;
             mouseMotionCtrl(e);
         } else {
@@ -554,94 +624,13 @@ window.onload = function () {
 
 
     //-------------------------------------------------------------------------
-    //=====================================================================
-    //===================GAMEPAD CONTROL=========================
-    //=====================================================================
-
-    //Tested with a xbox pad
-    var start;
-    var rAF = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
-            window.requestAnimationFrame;
-
-    var rAFStop = window.mozCancelRequestAnimationFrame || window.webkitCancelRequestAnimationFrame ||
-            window.cancelRequestAnimationFrame;
-
-    window.addEventListener("gamepadconnected", function () {
-        var gp = navigator.getGamepads()[0];
-        console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
-        gameLoop();
-    });
-
-    window.addEventListener("gamepaddisconnected", function () {
-        console.log("Waiting for gamepad.");
-        rAFStop(start);
-    });
-
-    if (!('GamepadEvent' in window)) {
-        // No gamepad events available, poll instead.
-        var interval = setInterval(pollGamepads, 500);
-    }
-
-    function pollGamepads() {
-        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-        for (var i = 0; i < gamepads.length; i++) {
-            var gp = gamepads[i];
-            if (gp) {
-                console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
-                gameLoop();
-                clearInterval(interval);
-            }
-        }
-    }
-
-
-    function gameLoop() {
-        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-        if (!gamepads)
-            return;
-        var gp = gamepads[0];
-        var x = gp.axes[0];
-        var speed = gp.buttons[0].value;
-        var isPressed = gp.buttons[0].pressed;
-        if (!isPressed) {
-            var start = rAF(gameLoop);
-            return;
-        }
-
-        var angular_val = -x;
-        var msg = new ROSLIB.Message({
-            linear: {
-                x: speed,
-                y: 0.0,
-                z: 0.0
-            },
-            angular: {
-                x: 0.0,
-                y: 0.0,
-                z: angular_val
-            }
-        });
-
-        //Publish on Topic
-        topic_cmd.publish(msg);
-
-        var start = rAF(gameLoop);
-    }
-    ;
-
-    //-------------------------------------------------------------------------
     //===================================================
     //================Subscriber=====================
     //===================================================
     //-------------------------------------------------------------------------
 
     //-------------------------------------------------------------------------
-    //Topic for collision
-    var topic_collision = new ROSLIB.Topic({
-        ros: ros,
-        name: '/collision_event',
-        messageType: 'std_msgs/Bool'
-    });
+    // Collision event control
 
     topic_collision.subscribe(function (message) {
         console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
@@ -667,16 +656,16 @@ window.onload = function () {
 
         if (message.data) {
             //movement are prohibited and robot stop
-            move_up    = false;
-            move_down  = false;
-            turn_left  = false;
+            move_up = false;
+            move_down = false;
+            turn_left = false;
             turn_right = false;
 
             var msg = new ROSLIB.Message({
                 speed1: speed_stop,
                 speed2: speed_stop
-                        //mode : 1			
             });
+
             topic_cmd.publish(msg);
             console.log("published : Emergency Stop");
 
@@ -709,25 +698,20 @@ window.onload = function () {
     });
 
     //-------------------------------------------------------------------------
-    //Topic for hug event
-    var topic_hug_event = new ROSLIB.Topic({
-        ros: ros,
-        name: '/social_touch_event',
-        messageType: 'std_msgs/Bool'
-    });
-
-
-    var clignotement = function () {
-        if ($("#hug").css('color') === red_alert) {
-            $("#hug").css('color', white_ok);
-        }
-        else {
-            $("#hug").css('color', red_alert);
-        }
-    };
+    // Hug event control
 
 
     topic_hug_event.subscribe(function (message) {
+
+        var clignotement = function () {
+            if ($("#hug").css('color') === red_alert) {
+                $("#hug").css('color', white_ok);
+            }
+            else {
+                $("#hug").css('color', red_alert);
+            }
+        };
+
         if (message.data) {
             periode = setInterval(clignotement, 1000);
             setTimeout(function () {
@@ -737,16 +721,12 @@ window.onload = function () {
     });
 
     //-------------------------------------------------------------------------
-    //Topic for panic event
-    var topic_panic_event = new ROSLIB.Topic({
-        ros: ros,
-        name: '/panic_event',
-        messageType: 'std_msgs/Bool'
-    });
+    // Panic button event control
 
+    //TODO ajouté 15s ou mouvement impossible
     topic_panic_event.subscribe(function (message) {
-        //console.log('Received message on' + topic_panic_event.name);
-        
+        console.log('Received message on' + topic_panic_event.name + " " + topic_panic_event.data);
+
         var boolClign;
         var clignotement = function () {
             if (boolClign === 0) {
@@ -759,7 +739,7 @@ window.onload = function () {
             }
         };
 
-        if (message.data) {
+        if (message.data === true) {
             //Stop the robot
             var msg = new ROSLIB.Message({
                 speed1: speed_stop,
@@ -783,12 +763,7 @@ window.onload = function () {
     });
 
     //-------------------------------------------------------------------------
-    //Topic for proximity obstacles
-    var topic_proximity_obstacles = new ROSLIB.Topic({
-        ros: ros,
-        name: '/proximity_obstacles',
-        messageType: 'md49test/Sonars'
-    });
+    // Proximity obstacle event control
 
     topic_proximity_obstacles.subscribe(function (message) {
         console.log('Received message on' + topic_proximity_obstacles.name
@@ -799,9 +774,9 @@ window.onload = function () {
                 + " " + message.x5
                 + " " + message.x6
                 + " " + message.x7
-		+ " " + message.x8);
-	
-	var data = [message.x1, message.x2, message.x3, message.x4, message.x5, message.x6, message.x7, message.x8];
+                + " " + message.x8);
+
+        var data = [message.x1, message.x2, message.x3, message.x4, message.x5, message.x6, message.x7, message.x8];
 
         $("#proximity").css('border-color', grey_p_ok);
         $("#proximity_level2").css('border-color', grey_p_ok);
@@ -971,13 +946,86 @@ window.onload = function () {
         }
     });
 
+
     //-------------------------------------------------------------------------
-    //Topic for end_line_obstacles
-    var topic_end_line_obstacles = new ROSLIB.Topic({
-        ros: ros,
-        name: '/end_line_obstacles',
-        messageType: 'std_msgs/Int8MultiArray'
+    // Bandwith quality event control
+
+    topic_bandwidth_quality.subscribe(function (message) {
+        console.log('Received message on' + topic_bandwidth_quality.name + +" " + message.data);
+
+        $("#brandwith_quality_critical").css('background', green_ok);
+        $("#brandwith_quality_low").css('background', green_ok);
+        $("#brandwith_quality_medium").css('background', green_ok);
+        $("#brandwith_quality_high").css('background', green_ok);
+
+        if (message.data < brandwith_quality_L1) {
+            $("#brandwith_quality_high").css('background', green_warning);
+        }
+        if (message.data < brandwith_quality_L2) {
+            $("#brandwith_quality_high").css('background', grey_ok);
+        }
+        if (message.data < brandwith_quality_L3) {
+            $("#brandwith_quality_medium").css('background', green_warning);
+        }
+        if (message.data < brandwith_quality_L4) {
+            $("#brandwith_quality_medium").css('background', grey_ok);
+        }
+        if (message.data < brandwith_quality_L5) {
+            $("#brandwith_quality_low").css('background', orange_warning);
+            $("#brandwith_quality_critical").css('background', orange_warning);
+        }
+        if (message.data < brandwith_quality_L6) {
+            $("#brandwith_quality_low").css('background', grey_ok);
+            $("#brandwith_quality_critical").css('background', red_alert);
+        }
+        if (message.data < brandwith_quality_L7) {
+            var boolClign;
+            var clignotement = function () {
+                if (boolClign === 0) {
+                    boolClign = 1;
+                    $("#brandwith_quality_critical").css('background', grey_ok);
+                }
+                else {
+                    boolClign = 0;
+                    $("#brandwith_quality_critical").css('background', red_alert);
+                }
+            };
+            periode = setInterval(clignotement, 500);
+        }
+
     });
+
+    //-------------------------------------------------------------------------
+    // battery level control
+
+    topic_battery_level.subscribe(function (message) {
+        console.log('Received message on' + topic_battery_level.name);
+        console.log('Battery value ' + message.data);
+
+        //Update the battery view in room_user.html
+        var battery = $('battery');
+        var level = parseInt(message.data) / 255 * 100;
+        var batteryLevel = $('#battery-level');
+        batteryLevel.css('width', level + '%');
+        if (level > battery_level2) {
+            batteryLevel.addClass('high');
+            batteryLevel.removeClass('medium');
+            batteryLevel.removeClass('low');
+        } else if (level <= battery_level2 && level > battery_level1) {
+            batteryLevel.addClass('medium');
+            batteryLevel.removeClass('high');
+            batteryLevel.removeClass('low');
+        } else {
+            batteryLevel.addClass('low');
+            batteryLevel.removeClass('high');
+            batteryLevel.removeClass('medium');
+        }
+    });
+
+
+//-------------------------------------------------------------------------
+    // End line obstacle event control
+    // /!\ not yet implemented and tested
 
     topic_end_line_obstacles.subscribe(function (message) {
         console.log('Received message on' + topIic_end_line_obstacles.name);
@@ -997,7 +1045,7 @@ window.onload = function () {
         };
         find = false;
         //on parcourt les 8 capteurs
-        for (var iter = 0; i < 8; iter++) {
+        for (var iter = 0; iter < 8; iter++) {
             if (message.data[iter]) {
                 find = true;
                 //Stop the robot
@@ -1091,91 +1139,80 @@ window.onload = function () {
         }
     });
 
+//-------------------------------------------------------------------------
+//=====================================================================
+//===================GAMEPAD CONTROL=========================
+//=====================================================================
 
-    //-------------------------------------------------------------------------
-    //Topic for bandwidth_quality	
-    var topic_bandwidth_quality = new ROSLIB.Topic({
-        ros: ros,
-        name: '/wifi_quality',
-        messageType: 'std_msgs/Int8'
-    });
-
-    //$("#proximity").css('border-color', grey_ok);
-    topic_bandwidth_quality.subscribe(function (message) {
-        console.log('Received message on' + topic_bandwidth_quality.name + + " " + message.data);
-
-        $("#brandwith_quality_critical").css('background', green_ok);
-        $("#brandwith_quality_low").css('background', green_ok);
-        $("#brandwith_quality_medium").css('background', green_ok);
-        $("#brandwith_quality_high").css('background', green_ok);
-
-        if (message.data < brandwith_quality_L1) {
-            $("#brandwith_quality_high").css('background', green_warning);
-        }
-        if (message.data < brandwith_quality_L2) {
-            $("#brandwith_quality_high").css('background', grey_ok);
-        }
-        if (message.data < brandwith_quality_L3) {
-            $("#brandwith_quality_medium").css('background', green_warning);
-        }
-        if (message.data < brandwith_quality_L4) {
-            $("#brandwith_quality_medium").css('background', grey_ok);
-        }
-        if (message.data < brandwith_quality_L5) {
-            $("#brandwith_quality_low").css('background', orange_warning);
-            $("#brandwith_quality_critical").css('background', orange_warning);
-        }
-        if (message.data < brandwith_quality_L6) {
-            $("#brandwith_quality_low").css('background', grey_ok);
-            $("#brandwith_quality_critical").css('background', red_alert);
-        }
-        if (message.data < brandwith_quality_L7) {
-            var boolClign;
-            var clignotement = function () {
-                if (boolClign === 0) {
-                    boolClign = 1;
-                    $("#brandwith_quality_critical").css('background', grey_ok); 
-                }
-                else {
-                    boolClign = 0;
-                    $("#brandwith_quality_critical").css('background', red_alert); 
-                }
-            };
-            periode = setInterval(clignotement, 500);
-        }
-
-    });
-
-    //-------------------------------------------------------------------------
-    //Topic for battery_level
-    var topic_battery_level = new ROSLIB.Topic({
-        ros: ros,
-        name: '/battery_level',
-        messageType: 'std_msgs/Int32'
-    });
-
-    topic_battery_level.subscribe(function (message) {
-        console.log('Received message on' + topic_battery_level.name);
-        console.log('Battery value ' + message.data);
-
-        //Update the battery view in room_user.html
-        var battery = $('battery');
-        var level = parseInt(message.data) / 255 * 100;
-        var batteryLevel = $('#battery-level');
-        batteryLevel.css('width', level + '%');
-        if (level > battery_level2) {
-            batteryLevel.addClass('high');
-            batteryLevel.removeClass('medium');
-            batteryLevel.removeClass('low');
-        } else if (level <= battery_level2 && level > battery_level1) {
-            batteryLevel.addClass('medium');
-            batteryLevel.removeClass('high');
-            batteryLevel.removeClass('low');
-        } else {
-            batteryLevel.addClass('low');
-            batteryLevel.removeClass('high');
-            batteryLevel.removeClass('medium');
-        }
-    });
+// /!\ not yet implemented and tested
+//Tested with a xbox pad 
+//    var start;
+//    var rAF = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
+//            window.requestAnimationFrame;
+//
+//    var rAFStop = window.mozCancelRequestAnimationFrame || window.webkitCancelRequestAnimationFrame ||
+//            window.cancelRequestAnimationFrame;
+//
+//    window.addEventListener("gamepadconnected", function () {
+//        var gp = navigator.getGamepads()[0];
+//        console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
+//        gameLoop();
+//    });
+//
+//    window.addEventListener("gamepaddisconnected", function () {
+//        console.log("Waiting for gamepad.");
+//        rAFStop(start);
+//    });
+//
+//    if (!('GamepadEvent' in window)) {
+//        // No gamepad events available, poll instead.
+//        var interval = setInterval(pollGamepads, 500);
+//    }
+//
+//    function pollGamepads() {
+//        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+//        for (var i = 0; i < gamepads.length; i++) {
+//            var gp = gamepads[i];
+//            if (gp) {
+//                console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
+//                gameLoop();
+//                clearInterval(interval);
+//            }
+//        }
+//    }
+//
+//
+//    function gameLoop() {
+//        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+//        if (!gamepads)
+//            return;
+//        var gp = gamepads[0];
+//        var x = gp.axes[0];
+//        var speed = gp.buttons[0].value;
+//        var isPressed = gp.buttons[0].pressed;
+//        if (!isPressed) {
+//            var start = rAF(gameLoop);
+//            return;
+//        }
+//
+//        var angular_val = -x;
+//        var msg = new ROSLIB.Message({
+//            linear: {
+//                x: speed,
+//                y: 0.0,
+//                z: 0.0
+//            },
+//            angular: {
+//                x: 0.0,
+//                y: 0.0,
+//                z: angular_val
+//            }
+//        });
+//
+//        //Publish on Topic
+//        topic_cmd.publish(msg);
+//
+//        var start = rAF(gameLoop);
+//    };
 
 };
