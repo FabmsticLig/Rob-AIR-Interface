@@ -82,14 +82,14 @@ window.onload = function () {
     var battery_level1 = 50;
     var battery_level2 = 25;
 
-    //brandwith quality level [0,255]
-    var brandwith_quality_L7 = 32;
-    var brandwith_quality_L6 = 64;
-    var brandwith_quality_L5 = 96;
-    var brandwith_quality_L4 = 128;
-    var brandwith_quality_L3 = 160;
-    var brandwith_quality_L2 = 192;
-    var brandwith_quality_L1 = 224;
+    //brandwith quality level [0,100]
+    var brandwith_quality_L7 = 65;
+    var brandwith_quality_L6 = 70;
+    var brandwith_quality_L5 = 75;
+    var brandwith_quality_L4 = 80;
+    var brandwith_quality_L3 = 85;
+    var brandwith_quality_L2 = 90;
+    var brandwith_quality_L1 = 95;
     
     //define normal/warning/alert color
     var white_ok         = 'rgb(255, 255, 255)';
@@ -1043,8 +1043,8 @@ window.onload = function () {
     //Topic for bandwidth_quality	
     var topic_bandwidth_quality = new ROSLIB.Topic({
         ros: ros,
-        name: '/bandwidth_quality',
-        messageType: 'std_msgs/Byte'
+        name: '/wifi_quality',
+        messageType: 'std_msgs/Int8'
     });
 
     //$("#proximity").css('border-color', grey_ok);
