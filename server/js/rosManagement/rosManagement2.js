@@ -80,7 +80,7 @@ window.onload = function () {
 
     //battery level in percent
     var battery_level2 = 50;
-    var battery_level2 = 25;
+    var battery_level1 = 25;
 
     //brandwith quality level [0,100]
     var brandwith_quality_L7 = 65;
@@ -1150,12 +1150,12 @@ window.onload = function () {
     var topic_battery_level = new ROSLIB.Topic({
         ros: ros,
         name: '/battery_level',
-        messageType: 'std_msgs/Byte'
+        messageType: 'std_msgs/Int32'
     });
 
     topic_battery_level.subscribe(function (message) {
         console.log('Received message on' + topic_battery_level.name);
-        console.log('Battery value' + message.battery_level);
+        console.log('Battery value ' + message.data);
 
         //Update the battery view in room_user.html
         var battery = $('battery');
@@ -1166,7 +1166,7 @@ window.onload = function () {
             batteryLevel.addClass('high');
             batteryLevel.removeClass('medium');
             batteryLevel.removeClass('low');
-        } else if (level >= battery_level2) {
+        } else if (level <= battery_level2 && level > battery_level1) {
             batteryLevel.addClass('medium');
             batteryLevel.removeClass('high');
             batteryLevel.removeClass('low');
