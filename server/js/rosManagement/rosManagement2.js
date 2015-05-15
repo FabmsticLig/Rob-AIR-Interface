@@ -420,18 +420,19 @@ window.onload = function () {
         // distance of the window 
         var normX = $("#remote-controls-mouse").css('width');
         var normY = $("#remote-controls-mouse").css('height');
-        var window_elem = $("#remote-controls-mouse").position();
+        var window_elem = $("#remote-controls-mouse").offset();
         //erase 'px' from norm
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
         
-        var kx = 127/normX;
-        var ky = 127/normY;
+        var kx = speed_max/normX;
+        var ky = speed_max/normY;
 
         var x0 = normX/2+ window_elem.left;
         var y0 = normY/2+ window_elem.top;
         
         mouse_event.onmousemove = function (event) {
+            if(mouse_event_enter === true){
 
             var x;
             var y;
@@ -452,119 +453,73 @@ window.onload = function () {
             
             
             var dx = x - x0;
-            var dy = y - y0;
+            var dy = -(y - y0);
+            var log;
             
             var theta = Math.atan(dy/dx); // En radian
-            if((dx <=0 && dy >= 0) || (dx <=0 && dy <= 0) ){ // Fix problem de atan entre -Pi/2 et Pi/2 seulement
-                theta += Math.Pi;
-            } else if(theta <=0){
-                theta += 2*Math.Pi;
+            if(dx <=0 && dy >= 0){
+                theta = theta + Math.PI;
+            } else if(dx <=0 && dy <= 0){
+                theta = theta + Math.PI;
+            } else if(dx >=0 && dy <= 0){
+                theta = theta + 2*Math.PI;
             }
             
             var v, speed1, speed2;
             
-        if(theta >= 0 && theta <= Math.Pi/2){ // 1er cadran
-            if(theta <= Math.Pi/4){ // 1ère moitié du 1er cadran
+        if(theta >= 0 && theta <= Math.PI/2){ // 1er cadran
+            if(theta <= Math.PI/4){ // 1ère moitié du 1er cadran
                 v = dx*kx;
+                speed1 = v;
+                speed2 = v*Math.sin(theta);
             } else{
                 v = dy*ky;
+                speed1 = v;
+                speed2 = v*Math.sin(theta);
             }
-            speed1 = v;
-            speed2 = v*Math.sin(theta);
-        } else if(theta > Math.Pi/2 && theta <= Math.Pi){ // 2ème cadran
-            if(theta <= 3*Math.Pi/4){ // 1ère moitié du 2ème cadran
+            log = 1;
+        } else if(theta > Math.PI/2 && theta <= Math.PI){ // 2ème cadran
+            if(theta <= 3*Math.PI/4){ // 1ère moitié du 2ème cadran
                 v = dy*ky;
+                speed1 = v*Math.sin(theta);
+                speed2 = v;
             } else{
-                v = dx*kx;
+                v = -dx*kx;
+                speed1 = v*Math.sin(theta);
+                speed2 = v;
             }
-            speed1 = v*Math.sin(theta);
-            speed2 = v;
-        } else if(theta > Math.Pi && theta <= 3*Math.Pi/2){ // 3ème cadran
-            if(theta <= 5*Math.Pi/4){ // 1ère moitié du 3ème cadran
+            
+            log = 2;
+        } else if(theta > Math.PI && theta <= 3*Math.PI/2){ // 3ème cadran
+            if(theta <= 5*Math.PI/4){ // 1ère moitié du 3ème cadran
                 v = dx*kx;
+                speed1 = -v*Math.sin(theta);
+                speed2 = v;
             } else{
                 v = dy*ky;
+                speed1 = -v*Math.sin(theta);
+                speed2 = v;  
             }
-            speed1 = -v*Math.sin(theta);
-            speed2 = -v;
+            log = 3;
         } else{ // 4ème cadran
-            if(theta <= 7*Math.Pi/4){ // 1ère moitié du 4ème cadran
+            if(theta <= 7*Math.PI/4){ // 1ère moitié du 4ème cadran
                 v = dy*ky;
+                speed1 = v;
+                speed2 = -v*Math.sin(theta);
             } else{
-                v = dx*kx;
+                v = -dx*kx;
+                speed1 = v;
+                speed2 = -v*Math.sin(theta);
             }
-            speed1 = -v;
-            speed2 = -v*Math.sin(theta);
+            log = 4;            
         }
         
-        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speed1 +"," + speed2 +")"); 
-            
-            
-            
-            /* COMMENT */
-                       
-            //TODO : calibrate and vérify calcul
-//            var rx1 = (dx + (normX/2))/normX;
-//            var rx2 = 1 - rx1;
-//            dy = (y0 - dy) * normY /255;
-//            var v = dy;
-//            
-//            console.log("X0 " + x0 +" Y0 "+ y0 +" rx1 "+ rx1+" rx2 " + rx2); 
-            
-
-            //process speed with ponderation
-//            speed1 = v * rx1;
-//            speed2 = v * rx2;
-                    
-            /*  END COMMENT */
-            
-            
-            
-            
-            //var rx1 = (dx + (normX/2))/normX;
-            //var rx2 = 1 - rx1;
-            //var dx12 = dx;
-            //var dx13 = dy;
-//            dx = dx -x0;
-//            dy = dy - y0;
-//            x0 = dx12;
-//            y0 = dx13;
-//            var moX = normX/2-dx;
-//            var moY = normY/2-dy;
-//            var mod = Math.sqrt(dx*dx + dy*dy);
-            //var mod = Math.sqrt(moX*moX + moY*moY);
-            //var rx1 = (x0 - dx) / (normX) * speed_limit;
-            //var rx2 = (y0 - dy) / (normY) * speed_limit;
-
-            //dy = (y0-event.y)*normY/255;
-            //v = dy+128;
-            
-            //process speed with ponderation
-//            console.log("dx " +dx + " dy " + dy + " mod " + mod); 
-//            
-//            var speed1 = 127*dx/mod*Math.cos(Math.atan(dy/dx));
-//            var speed2 = 127*dy/mod*Math.sin(Math.atan(dy/dx));
-            
-            
-            
-            
-            /* COMMENT */
-            
-//            if (speed1 > speed_max-speed_limit) {
-//                speed1 = speed_max-speed_limit;
-//            }
-//            if (speed1 < speed_min+speed_limit) {
-//                speed1 = speed_min+speed_limit;
-//            }
-//            if (speed2 > speed_max-speed_limit) {
-//                speed2 = speed_max-speed_limit;
-//            }
-//            if (speed2 < speed_min+speed_limit) {
-//                speed2 = speed_min+speed_limit;
-//            }
-            
-            /* END COMMENT */
-            
+        speed1 += 128;
+        speed2 += 128;
+        
+//        console.log("log : "+log+" et theta : " + theta); 
+//        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speed1 +"," + speed2 +")"); 
+                      
             
             var msg = new ROSLIB.Message({
                 speed1: Math.round(speed1),
@@ -573,18 +528,26 @@ window.onload = function () {
             //Publish on Topic
             topic_cmd.publish(msg);
             console.log("published " + speed1 + " " + speed2);
+        }
         };
-        mouse_event.onmouseup = function () {
-            //document.onmousemove = null;
-            return;
-        };
+//        mouse_event.onmouseup = function () {
+//            //document.onmousemove = null;
+//            return;
+//        };
 
     };
+    
+    var mouse_event_enter = false;
     // bind mouse
     var mouse_event = document.getElementById('remote-controls-mouse');
     mouse_event.onclick = function (e) {
         e = e || window.event;
-        mouseMotionCtrl(e);
+        if(mouse_event_enter === false){
+            mouse_event_enter = true;
+            mouseMotionCtrl(e);
+        } else {
+            mouse_event_enter = false;
+        }
     };
 
 
