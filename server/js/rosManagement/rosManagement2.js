@@ -232,6 +232,16 @@ window.onload = function () {
         screenGazeDirection(e);
     };
 
+    
+    //indication of head rotation
+    var setHeadIndication = function (key) {
+        var angle = 90/127*(key-127);        
+        var string1 = "'" + "rotate(" + Math.round(angle) + "deg)'";
+        var string2 = string1.substring(string1.length - 2,1);
+        console.log(string1);
+        $('#triangle-up').css('transform', string2);
+    };
+    
     //-------------------------------------------------------------------------
     //Angle_position
     var setHeadDirection = function (key) {
@@ -248,7 +258,7 @@ window.onload = function () {
             }
             else {
                 console.log("Max left position reached");
-                $('#indication_board').append("<p> Limite de rotation de la tête à gauche atteinte </p>");
+                $('#indication_board').append("<p> Limite de rotation de la tete a gauche atteinte </p>");
             }
 
         } else if (key === key_head_right) {
@@ -258,10 +268,13 @@ window.onload = function () {
             }
             else {
                 console.log("Max right position reached");
-                $('#indication_board').append("<p> Limite de rotation de la tête à droite atteinte </p>");
+                $('#indication_board').append("<p> Limite de rotation de la tete a droite atteinte </p>");
             }
 
         }
+        //change the head indication
+        setHeadIndication(headDirection);
+
         console.log(headDirection);
         var head = new ROSLIB.Message({
             data: headDirection
@@ -768,7 +781,7 @@ window.onload = function () {
         $("#proximity7").css('border-color', grey_p_ok);
         $("#proximity7_level1").css('border-color', grey_p_ok);
         var find = false;
-        for (var iter = 0; i < 8; iter++) {
+        for (var iter = 0; iter < 8; iter++) {
 
             if (message.data[iter] < proximity_level1) {
                 switch (iter) {
