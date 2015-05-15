@@ -73,13 +73,13 @@ window.onload = function () {
     var headDirection = 127;
 
     //proximity level in centimeter
-    var proximity_level1 = 40;
+    var proximity_level2 = 40;
     var proximity_level2 = 30;
     var proximity_level3 = 20;
     var proximity_level4 = 10;
 
     //battery level in percent
-    var battery_level1 = 50;
+    var battery_level2 = 50;
     var battery_level2 = 25;
 
     //brandwith quality level [0,100]
@@ -803,25 +803,25 @@ window.onload = function () {
 	var data = [message.x1, message.x2, message.x3, message.x4, message.x5, message.x6, message.x7, message.x8];
 
         $("#proximity").css('border-color', grey_p_ok);
-        $("#proximity_level1").css('border-color', grey_p_ok);
+        $("#proximity_level2").css('border-color', grey_p_ok);
         $("#proximity1").css('border-color', grey_p_ok);
-        $("#proximity1_level1").css('border-color', grey_p_ok);
+        $("#proximity1_level2").css('border-color', grey_p_ok);
         $("#proximity2").css('border-color', grey_p_ok);
-        $("#proximity2_level1").css('border-color', grey_p_ok);
+        $("#proximity2_level2").css('border-color', grey_p_ok);
         $("#proximity3").css('border-color', grey_p_ok);
-        $("#proximity3_level1").css('border-color', grey_p_ok);
+        $("#proximity3_level2").css('border-color', grey_p_ok);
         $("#proximity4").css('border-color', grey_p_ok);
-        $("#proximity4_level1").css('border-color', grey_p_ok);
+        $("#proximity4_level2").css('border-color', grey_p_ok);
         $("#proximity5").css('border-color', grey_p_ok);
-        $("#proximity5_level1").css('border-color', grey_p_ok);
+        $("#proximity5_level2").css('border-color', grey_p_ok);
         $("#proximity6").css('border-color', grey_p_ok);
-        $("#proximity6_level1").css('border-color', grey_p_ok);
+        $("#proximity6_level2").css('border-color', grey_p_ok);
         $("#proximity7").css('border-color', grey_p_ok);
-        $("#proximity7_level1").css('border-color', grey_p_ok);
+        $("#proximity7_level2").css('border-color', grey_p_ok);
         var find = false;
         for (var iter = 0; iter < 8; iter++) {
 
-            if (data[iter] < proximity_level1) {
+            if (data[iter] < proximity_level2) {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', green_p_ok);
@@ -853,35 +853,35 @@ window.onload = function () {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', orange_p_warning);
-                        $("#proximity_level1").css('border-color', green_p_ok);
+                        $("#proximity_level2").css('border-color', green_p_ok);
                         break;
                     case 1 :
                         $("#proximity1").css('border-color', orange_p_warning);
-                        $("#proximity1_level1").css('border-color', green_p_ok);
+                        $("#proximity1_level2").css('border-color', green_p_ok);
                         break;
                     case 2 :
                         $("#proximity2").css('border-color', orange_p_warning);
-                        $("#proximity2_level1").css('border-color', green_p_ok);
+                        $("#proximity2_level2").css('border-color', green_p_ok);
                         break;
                     case 3 :
                         $("#proximity3").css('border-color', orange_p_warning);
-                        $("#proximity3_level1").css('border-color', green_p_ok);
+                        $("#proximity3_level2").css('border-color', green_p_ok);
                         break;
                     case 4 :
                         $("#proximity4").css('border-color', orange_p_warning);
-                        $("#proximity4_level1").css('border-color', green_p_ok);
+                        $("#proximity4_level2").css('border-color', green_p_ok);
                         break;
                     case 5 :
                         $("#proximity5").css('border-color', orange_p_warning);
-                        $("#proximity5_level1").css('border-color', green_p_ok);
+                        $("#proximity5_level2").css('border-color', green_p_ok);
                         break;
                     case 6 :
                         $("#proximity6").css('border-color', orange_p_warning);
-                        $("#proximity6_level1").css('border-color', green_p_ok);
+                        $("#proximity6_level2").css('border-color', green_p_ok);
                         break;
                     default :
                         $("#proximity7").css('border-color', orange_p_warning);
-                        $("#proximity7_level1").css('border-color', green_p_ok);
+                        $("#proximity7_level2").css('border-color', green_p_ok);
                         break;
                 }
             }
@@ -889,35 +889,35 @@ window.onload = function () {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', red_alert);
-                        $("#proximity_level1").css('border-color', orange_p_warning);
+                        $("#proximity_level2").css('border-color', orange_p_warning);
                         break;
                     case 1 :
                         $("#proximity1").css('border-color', red_p_alert);
-                        $("#proximity1_level1").css('border-color', orange_p_warning);
+                        $("#proximity1_level2").css('border-color', orange_p_warning);
                         break;
                     case 2 :
                         $("#proximity2").css('border-color', red_p_alert);
-                        $("#proximity2_level1").css('border-color', orange_p_warning);
+                        $("#proximity2_level2").css('border-color', orange_p_warning);
                         break;
                     case 3 :
                         $("#proximity3").css('border-color', red_p_alert);
-                        $("#proximity3_level1").css('border-color', orange_p_warning);
+                        $("#proximity3_level2").css('border-color', orange_p_warning);
                         break;
                     case 4 :
                         $("#proximity4").css('border-color', red_p_alert);
-                        $("#proximity4_level1").css('border-color', orange_p_warning);
+                        $("#proximity4_level2").css('border-color', orange_p_warning);
                         break;
                     case 5 :
                         $("#proximity5").css('border-color', red_p_alert);
-                        $("#proximity5_level1").css('border-color', orange_p_warning);
+                        $("#proximity5_level2").css('border-color', orange_p_warning);
                         break;
                     case 6 :
                         $("#proximity6").css('border-color', red_p_alert);
-                        $("#proximity6_level1").css('border-color', orange_p_warning);
+                        $("#proximity6_level2").css('border-color', orange_p_warning);
                         break;
                     default :
                         $("#proximity7").css('border-color', red_p_alert);
-                        $("#proximity7_level1").css('border-color', orange_p_warning);
+                        $("#proximity7_level2").css('border-color', orange_p_warning);
                         break;
                 }
             }
@@ -925,35 +925,35 @@ window.onload = function () {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', red_p_alert);
-                        $("#proximity_level1").css('border-color', red_p_alert);
+                        $("#proximity_level2").css('border-color', red_p_alert);
                         break;
                     case 1 :
                         $("#proximity1").css('border-color', red_p_alert);
-                        $("#proximity1_level1").css('border-color', red_p_alert);
+                        $("#proximity1_level2").css('border-color', red_p_alert);
                         break;
                     case 2 :
                         $("#proximity2").css('border-color', red_p_alert);
-                        $("#proximity2_level1").css('border-color', red_p_alert);
+                        $("#proximity2_level2").css('border-color', red_p_alert);
                         break;
                     case 3 :
                         $("#proximity3").css('border-color', red_p_alert);
-                        $("#proximity3_level1").css('border-color', red_p_alert);
+                        $("#proximity3_level2").css('border-color', red_p_alert);
                         break;
                     case 4 :
                         $("#proximity4").css('border-color', red_p_alert);
-                        $("#proximity4_level1").css('border-color', red_p_alert);
+                        $("#proximity4_level2").css('border-color', red_p_alert);
                         break;
                     case 5 :
                         $("#proximity5").css('border-color', red_p_alert);
-                        $("#proximity5_level1").css('border-color', red_p_alert);
+                        $("#proximity5_level2").css('border-color', red_p_alert);
                         break;
                     case 6 :
                         $("#proximity6").css('border-color', red_p_alert);
-                        $("#proximity6_level1").css('border-color', red_p_alert);
+                        $("#proximity6_level2").css('border-color', red_p_alert);
                         break;
                     default :
                         $("#proximity7").css('border-color', red_p_alert);
-                        $("#proximity7_level1").css('border-color', red_p_alert);
+                        $("#proximity7_level2").css('border-color', red_p_alert);
                         break;
                 }
                 find = true;
@@ -1162,7 +1162,7 @@ window.onload = function () {
         var level = parseInt(message.data) / 255 * 100;
         var batteryLevel = $('#battery-level');
         batteryLevel.css('width', level + '%');
-        if (level > battery_level1) {
+        if (level > battery_level2) {
             batteryLevel.addClass('high');
             batteryLevel.removeClass('medium');
             batteryLevel.removeClass('low');
