@@ -465,33 +465,33 @@ window.onload = function () {
             
         if(theta >= 0 && theta <= Math.Pi/2){ // 1er cadran
             if(theta <= Math.Pi/4){ // 1ère moitié du 1er cadran
-                v = dx;
+                v = dx*kx;
             } else{
-                v = dy;
+                v = dy*ky;
             }
             speed1 = v;
             speed2 = v*Math.sin(theta);
         } else if(theta > Math.Pi/2 && theta <= Math.Pi){ // 2ème cadran
             if(theta <= 3*Math.Pi/4){ // 1ère moitié du 2ème cadran
-                v = dy;
+                v = dy*ky;
             } else{
-                v = dx;
+                v = dx*kx;
             }
             speed1 = v*Math.sin(theta);
             speed2 = v;
         } else if(theta > Math.Pi && theta <= 3*Math.Pi/2){ // 3ème cadran
             if(theta <= 5*Math.Pi/4){ // 1ère moitié du 3ème cadran
-                v = dx;
+                v = dx*kx;
             } else{
-                v = dy;
+                v = dy*ky;
             }
             speed1 = -v*Math.sin(theta);
             speed2 = -v;
         } else{ // 4ème cadran
             if(theta <= 7*Math.Pi/4){ // 1ère moitié du 4ème cadran
-                v = dy;
+                v = dy*ky;
             } else{
-                v = dx;
+                v = dx*kx;
             }
             speed1 = -v;
             speed2 = -v*Math.sin(theta);
