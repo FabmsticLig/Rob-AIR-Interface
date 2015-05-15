@@ -17,13 +17,13 @@
 
 /* Video principale de video-conf */
 #div_cam3 video {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 70%;
 }
 /* Video "assistance" */
 #div_cam2 video {
-    width: 100%;
-    height: 100%;
+    width: 70%;
+    height: 55%;
 }
 /*Miniature de la vidéo locale */
 .miniature-video {
