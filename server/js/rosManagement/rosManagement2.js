@@ -94,10 +94,11 @@ window.onload = function () {
     //define normal/warning/alert color
     var white_ok         = 'rgb(255, 255, 255)';
     var black_ok         = 'rgb(0, 0, 0)';
-    var green_ok         = 'rgb(0, 85, 0)';
+    var green_ok         = 'rgb(0, 200, 0)';
     var green_p_ok       = 'transparent transparent transparent rgb(0, 85, 0)';
     var grey_ok          = 'rgb(102, 102, 102)';
     var grey_p_ok        = 'transparent transparent transparent rgb(102, 102, 102)';
+    var green_warning    = 'rgb(0, 85, 0)';
     var orange_warning   = 'rgb(218, 97, 0)';
     var orange_p_warning = 'transparent transparent transparent rgb(218, 97, 0)';
     var red_alert        = 'rgb(255, 0, 0)';
@@ -1057,13 +1058,13 @@ window.onload = function () {
         $("#brandwith_quality_high").css('background', green_ok);
 
         if (message.data < brandwith_quality_L1) {
-            $("#brandwith_quality_high").css('background', orange_warning);
+            $("#brandwith_quality_high").css('background', green_warning);
         }
         if (message.data < brandwith_quality_L2) {
             $("#brandwith_quality_high").css('background', grey_ok);
         }
         if (message.data < brandwith_quality_L3) {
-            $("#brandwith_quality_medium").css('background', orange_warning);
+            $("#brandwith_quality_medium").css('background', green_warning);
         }
         if (message.data < brandwith_quality_L4) {
             $("#brandwith_quality_medium").css('background', grey_ok);
@@ -1081,7 +1082,7 @@ window.onload = function () {
             var clignotement = function () {
                 if (boolClign === 0) {
                     boolClign = 1;
-                    $("#brandwith_quality_critical").css('background', white_ok); 
+                    $("#brandwith_quality_critical").css('background', grey_ok); 
                 }
                 else {
                     boolClign = 0;
