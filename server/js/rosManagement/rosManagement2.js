@@ -461,7 +461,7 @@ window.onload = function () {
                 theta += 2*Math.Pi;
             }
             
-            var v, speedx, speedy;
+            var v, speed1, speed2;
             
         if(theta >= 0 && theta <= Math.Pi/2){ // 1er cadran
             if(theta <= Math.Pi/4){ // 1ère moitié du 1er cadran
@@ -469,35 +469,35 @@ window.onload = function () {
             } else{
                 v = dy;
             }
-            speedx = v;
-            speedy = v*Math.sin(theta);
+            speed1 = v;
+            speed2 = v*Math.sin(theta);
         } else if(theta > Math.Pi/2 && theta <= Math.Pi){ // 2ème cadran
             if(theta <= 3*Math.Pi/4){ // 1ère moitié du 2ème cadran
                 v = dy;
             } else{
                 v = dx;
             }
-            speedx = v*Math.sin(theta);
-            speedy = v;
+            speed1 = v*Math.sin(theta);
+            speed2 = v;
         } else if(theta > Math.Pi && theta <= 3*Math.Pi/2){ // 3ème cadran
             if(theta <= 5*Math.Pi/4){ // 1ère moitié du 3ème cadran
                 v = dx;
             } else{
                 v = dy;
             }
-            speedx = -v*Math.sin(theta);
-            speedy = -v;
+            speed1 = -v*Math.sin(theta);
+            speed2 = -v;
         } else{ // 4ème cadran
             if(theta <= 7*Math.Pi/4){ // 1ère moitié du 4ème cadran
                 v = dy;
             } else{
                 v = dx;
             }
-            speedx = -v;
-            speedy = -v*Math.sin(theta);
+            speed1 = -v;
+            speed2 = -v*Math.sin(theta);
         }
         
-        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speedx +"," + speedy +")"); 
+        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speed1 +"," + speed2 +")"); 
             
             
             
@@ -567,12 +567,12 @@ window.onload = function () {
             
             
             var msg = new ROSLIB.Message({
-                speed1: Math.round(speedx),
-                speed2: Math.round(speedy)
+                speed1: Math.round(speed1),
+                speed2: Math.round(speed2)
             });
             //Publish on Topic
             topic_cmd.publish(msg);
-            console.log("published " + speedx + " " + speedy);
+            console.log("published " + speed1 + " " + speed2);
         };
         mouse_event.onmouseup = function () {
             //document.onmousemove = null;
