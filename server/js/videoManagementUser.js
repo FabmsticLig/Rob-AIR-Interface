@@ -17,7 +17,8 @@ var webrtc = new SimpleWebRTC({
 	autoAdjustMic: false,
     media :{
         audio:true,
-        video:{
+        //essai pour améliorer la qualité du flux vidéo en diminuant la qualité des caméra HD 
+		video:{
                 mandatory:
                     {
                         //maxWidth:320,
@@ -40,6 +41,7 @@ webrtc.on('videoAdded', function(video,peer) {
 		if (remotes) {
 			//suppress contextMenu
 			video.oncontextMenu = function() {return false; };
+			//add the video
 			remotes.appendChild(video);
 		}
 	} else { //caméra principale de vidéo-conf
@@ -47,22 +49,8 @@ webrtc.on('videoAdded', function(video,peer) {
 		if (remotes) {
 			//suppress contextMenu
 			video.oncontextMenu = function() {return false; };
-
+			//add the video
 			remotes.appendChild(video);
-                        
-                        // show the accelerometer
-/*                    var div_accelerometer = document.createElement('div');
-                    div_accelerometer.id = 'demoWidget';
-                    div_accelerometer.style = 'position: relative';
-
-                    var inside_accelerometer = document.createElement('div');
-                    inside_accelerometer.id = 'gaugeContainer';
-                    inside_accelerometer.style = 'float: left';
-                    
-                    div_accelerometer.appendChild(inside_accelerometer);
-                    
-                    remotes.appendChild(div_accelerometer);
-                    */
 		}
 	}
 });

@@ -99,13 +99,14 @@ var printPageWithLayout = function (req, res, contentFile, data) {
 
     //print(userToRooms);
     //print(roomToUsers);
-    // Premier rendu
+    // Premier rendu: res.render(contentFile) créée la page html contentFile 
+	// puis appel la fonction de callback avec la contenu dans la paramète "html"
     res.render(contentFile, data, function (err, html) {
         console.log(err);
         if (err) {
             res.redirect('/404');
         } else {
-            // Second rendu
+            // Second rendu: page principale càd la layout + html dans balide jsp "content"
 
 	    if (req.session.isLogged) {
 
@@ -280,35 +281,6 @@ app.get('/profil/:user', function (req, res) {
     } else {
         res.redirect('/');
     };
-});
-
-/**
- * Profil d'un autre utilisateur (ancienne fonction)
- * TODO: a supprimer
- */
-app.get('/ancienprofil', function (req, res) {
-    if (req.session.isLogged) {
-        var user = req.query.name;
-        console.log(user);
-        var q = connection.query('SELECT * FROM users,fablab WHERE login= "' + 
-                                 user + '" AND fablab.nom = users.fablab');
-        q.on('result', function (row, index) {
-            var profil = {};
-            profil.name = user;
-            profil.mail = row.mail;
-            profil.fablab = row.fablab;
-            profil.adresse = row.adresse;
-            profil.ville = row.ville;
-            profil.cp = row.cp;
-            console.log(row);
-
-            res.render('profil.html', {
-                session: profil
-            });
-        });
-    } else {
-        res.redirect('/');
-     }
 });
 
 /**
