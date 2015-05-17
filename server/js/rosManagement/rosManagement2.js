@@ -40,15 +40,15 @@ window.onload = function () {
     //-------------------------------------------------------------------------
 
     //allow or not movement (if collision,panic_button,...)
-    var move_up    = true;
-    var move_down  = true;
-    var turn_left  = true;
+    var move_up = true;
+    var move_down = true;
+    var turn_left = true;
     var turn_right = true;
 
     //interval of speed
-    var speed_max  = 255;
+    var speed_max = 255;
     var speed_stop = 127;
-    var speed_min  = 0;
+    var speed_min = 0;
 
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
@@ -56,32 +56,32 @@ window.onload = function () {
     var speed_reduction = 64;
 
     //Default keyboard control
-    var key_stop       = 83; //'s' 
-    var key_forward    = 38; // arrow up
-    var key_backward   = 40; // arrow down
-    var key_turn_left  = 37; // arrow left
+    var key_stop = 83; //'s' 
+    var key_forward = 38; // arrow up
+    var key_backward = 40; // arrow down
+    var key_turn_left = 37; // arrow left
     var key_turn_right = 39; // arrow right
-    var key_gaze_left  = 81; //'q'
+    var key_gaze_left = 81; //'q'
     var key_gaze_right = 68; //'d'
-    var key_head_left  = 65; //'a'
+    var key_head_left = 65; //'a'
     var key_head_right = 69; //'e'
 
     //initial Gaze_direction [0,255]
-    var gaze_max         = 255;
-    var gaze_min         = 0;
+    var gaze_max = 255;
+    var gaze_min = 0;
     //in this case 127
-    var gaze_front_value = (gaze_max - gaze_min)/2 -1;
-    var gaze_value       = gaze_front_value;
+    var gaze_front_value = Math.round((gaze_max - gaze_min) / 2) - 1;
+    var gaze_value = gaze_front_value;
     //In this case 8 possibility whith 64 degres by increments or decrements
-    var gaze_increment   = gaze_front_value/4;
+    var gaze_increment = gaze_front_value / 4;
 
     //initial Head_Direction [0,180]
-    var head_max             = 180;
-    var head_min             = 0;
-    var head_front_direction = (head_max- head_min)/2;
-    var head_direction       = head_front_direction;
+    var head_max = 180;
+    var head_min = 0;
+    var head_front_direction = Math.round((head_max - head_min) / 2);
+    var head_direction = head_front_direction;
     //In this case 36 possibility whith 5 degres by increments or decrements 
-    var head_increment       = head_front_direction/18;
+    var head_increment = head_front_direction / 18;
 
     //proximity level in centimeter
     var proximity_level2 = 40;
@@ -93,7 +93,7 @@ window.onload = function () {
     var battery_level2 = 50;
     var battery_level1 = 25;
 
-    //brandwith quality level [0,100]
+    //brandwith quality level [60,100]
     var brandwith_quality_L7 = 65;
     var brandwith_quality_L6 = 70;
     var brandwith_quality_L5 = 75;
@@ -101,19 +101,22 @@ window.onload = function () {
     var brandwith_quality_L3 = 85;
     var brandwith_quality_L2 = 90;
     var brandwith_quality_L1 = 95;
+    //in ms
+    var periode_of_brandwith = 500;
 
     //define normal/warning/alert color
-    var white_ok         = 'rgb(255, 255, 255)';
-    var black_ok         = 'rgb(0, 0, 0)';
-    var green_ok         = 'rgb(0, 200, 0)';
-    var green_p_ok       = 'transparent transparent transparent rgb(0, 85, 0)';
-    var grey_ok          = 'rgb(102, 102, 102)';
-    var grey_p_ok        = 'transparent transparent transparent rgb(102, 102, 102)';
-    var green_warning    = 'rgb(0, 85, 0)';
-    var orange_warning   = 'rgb(218, 97, 0)';
+    var white_ok = 'rgb(255, 255, 255)';
+    var black_ok = 'rgb(0, 0, 0)';
+    var green_ok = 'rgb(0, 200, 0)';
+    var yellow_ok = 'rgb(255, 204, 0)';
+    var green_p_ok = 'transparent transparent transparent rgb(0, 85, 0)';
+    var grey_ok = 'rgb(102, 102, 102)';
+    var grey_p_ok = 'transparent transparent transparent rgb(102, 102, 102)';
+    var green_warning = 'rgb(0, 85, 0)';
+    var orange_warning = 'rgb(218, 97, 0)';
     var orange_p_warning = 'transparent transparent transparent rgb(218, 97, 0)';
-    var red_alert        = 'rgb(255, 0, 0)';
-    var red_p_alert      = 'transparent transparent transparent rgb(255, 0, 0)';
+    var red_alert = 'rgb(255, 0, 0)';
+    var red_p_alert = 'transparent transparent transparent rgb(255, 0, 0)';
 
 
     //-------------------------------------------------------------------------
@@ -214,7 +217,7 @@ window.onload = function () {
         //d 68
         if (key === key_gaze_left)
         {
-            if (gaze_value !== gaze_min) {
+            if (gaze_value <= gaze_min) {
                 gaze_value -= gaze_increment;
                 console.log("Turn sight to Left");
             }
@@ -223,7 +226,7 @@ window.onload = function () {
             }
 
         } else if (key === key_gaze_right) {
-            if (gaze_value !== gaze_max) {
+            if (gaze_value >= gaze_max) {
                 gaze_value += gaze_increment;
                 console.log("Turn sight to Right");
             }
@@ -269,10 +272,10 @@ window.onload = function () {
         normY = normY.substring(normY.length - 2, 0);
 
         var dx = (window_elem.left + normX / 2) - (x0 - window_elem.left);
-        var rx = -dx * 127 / (normX / 2) + 128;
+        var rx = -dx * gaze_front_value / (normX / 2) + gaze_front_value;
 
         var dy = (window_elem.top + normY / 2) - (y0 - window_elem.top);
-        var ry = -dy * 127 / (normY / 2);
+        var ry = -dy * gaze_front_value / (normY / 2) + gaze_front_value;
 
         if (rx > gaze_max) {
             rx = gaze_max;
@@ -286,8 +289,8 @@ window.onload = function () {
         if (ry < gaze_min) {
             ry = gaze_min;
         }
+
         //gaze_valueY not yet implemented
-        //TODO divide by 4
         gaze_value = Math.round(rx);
         var gaze = new ROSLIB.Message({
             data: gaze_value
@@ -304,17 +307,16 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     // Head rotation
-    
+
     //indication of head rotation
     var setHeadIndication = function (key) {
         var angle = head_front_direction - key;
         var string1 = "'" + "rotate(" + Math.round(angle) + "deg)'";
         //remove  "" from string
         var string2 = string1.substring(string1.length - 2, 1);
-        console.log(string2);
         $('#triangle-up').css('transform', string2);
     };
-    
+
     // head rotation command
     var setHeadDirection = function (key) {
 
@@ -324,7 +326,7 @@ window.onload = function () {
         elem = document.getElementById('triangle-up');
         if (key === key_head_left)
         {
-            if (head_direction !== 180) {
+            if (head_direction >= head_max) {
                 head_direction += head_increment;
                 console.log("Turn head to Left");
             }
@@ -334,7 +336,7 @@ window.onload = function () {
             }
 
         } else if (key === key_head_right) {
-            if (head_direction !== 0) {
+            if (head_direction <= head_min) {
                 head_direction -= head_increment;
                 console.log("Turn head to Right");
             }
@@ -407,6 +409,7 @@ window.onload = function () {
             console.log("Head Movement");
             setHeadDirection(key);
         } else {
+
             //Robot movement
             if (key === key_forward && move_up) {
                 // up arrow
@@ -486,6 +489,23 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     // Control with mouse motion
+    
+    //allow/disable mouse control by clic on mouse pad
+    var mouse_event_enter = false;
+    // bind mouse
+    var mouse_event = document.getElementById('remote-controls-mouse');
+    mouse_event.onclick = function (e) {
+        e = e || window.event;
+        if (mouse_event_enter === false) {
+            mouse_event_enter = true;
+            $("#remote-controls-mouse").css('background-color',green_ok);
+            mouseMotionCtrl(e);
+        } else {
+            $("#remote-controls-mouse").css('background-color',yellow_ok);
+            mouse_event_enter = false;
+        }
+    };
+    
     var mouseMotionCtrl = function mouseMotionCtrl(event) {
 
         // distance of the window 
@@ -521,11 +541,8 @@ window.onload = function () {
                 }
 
 
-
-
                 var dx = x - x0;
                 var dy = -(y - y0);
-                var log;
 
                 var theta = Math.atan(dy / dx); // En radian
                 if (dx <= 0 && dy >= 0) {
@@ -548,7 +565,7 @@ window.onload = function () {
                         speed1 = v;
                         speed2 = v * Math.sin(theta);
                     }
-                    log = 1;
+
                 } else if (theta > Math.PI / 2 && theta <= Math.PI) { // 2ème cadran
                     if (theta <= 3 * Math.PI / 4) { // 1ère moitié du 2ème cadran
                         v = dy * ky;
@@ -560,7 +577,6 @@ window.onload = function () {
                         speed2 = v;
                     }
 
-                    log = 2;
                 } else if (theta > Math.PI && theta <= 3 * Math.PI / 2) { // 3ème cadran
                     if (theta <= 5 * Math.PI / 4) { // 1ère moitié du 3ème cadran
                         v = dx * kx;
@@ -571,7 +587,7 @@ window.onload = function () {
                         speed1 = -v * Math.sin(theta);
                         speed2 = v;
                     }
-                    log = 3;
+
                 } else { // 4ème cadran
                     if (theta <= 7 * Math.PI / 4) { // 1ère moitié du 4ème cadran
                         v = dy * ky;
@@ -582,15 +598,28 @@ window.onload = function () {
                         speed1 = v;
                         speed2 = -v * Math.sin(theta);
                     }
-                    log = 4;
+
                 }
 
-                speed1 += 128;
-                speed2 += 128;
 
-//        console.log("log : "+log+" et theta : " + theta); 
-//        console.log("dx et dy = (" + dx +","+ dy +") et speedX et speedY = ("+ speed1 +"," + speed2 +")"); 
+                speed1 += speed_stop;
+                speed2 += speed_stop;
 
+                if (speed1 >= speed_max - speed_limit) {
+                    speed1 = speed_max - speed_limit;
+                }
+
+                if (speed1 <= speed_min + speed_limit) {
+                    speed1 = speed_min + speed_limit;
+                }
+
+                if (speed2 >= speed_max - speed_limit) {
+                    speed2 = speed_max - speed_limit;
+                }
+
+                if (speed2 <= speed_min + speed_limit) {
+                    speed2 = speed_min + speed_limit;
+                }
 
                 var msg = new ROSLIB.Message({
                     speed1: Math.round(speed1),
@@ -601,28 +630,10 @@ window.onload = function () {
                 console.log("published " + speed1 + " " + speed2);
             }
         };
-//        mouse_event.onmouseup = function () {
-//            //document.onmousemove = null;
-//            return;
-//        };
 
     };
 
-    var mouse_event_enter = false;
-    // bind mouse
-    var mouse_event = document.getElementById('remote-controls-mouse');
-    mouse_event.onclick = function (e) {
-        e = e || window.event;
-        if (mouse_event_enter === false) {
-            mouse_event_enter = true;
-            mouseMotionCtrl(e);
-        } else {
-            mouse_event_enter = false;
-        }
-    };
-
-
-
+    
     //-------------------------------------------------------------------------
     //===================================================
     //================Subscriber=====================
@@ -632,6 +643,7 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     // Collision event control
 
+    var collision_periode=false;
     topic_collision.subscribe(function (message) {
         console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
         //get indication_board div and append the message only if there is a collision
@@ -641,14 +653,14 @@ window.onload = function () {
             if (boolClign === 0) {
                 boolClign = 1;
                 $("#circle").css('color', red_alert);
-                $("#circle").css('background', white_ok); // blanc
+                $("#circle").css('background', white_ok);
                 $("#circle").css('border-color', red_alert);
 
             }
             else {
                 boolClign = 0;
                 $("#circle").css('color', white_ok);
-                $("#circle").css('background', red_alert); // rouge
+                $("#circle").css('background', red_alert);
                 $("#circle").css('border-color', white_ok);
 
             }
@@ -671,7 +683,12 @@ window.onload = function () {
 
             //display error
             $('#indication_board').append("<p> Collision détectée </p>");
-            periode = setInterval(clignotement, 500);
+            //scroll le div à la fin 
+            $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+            
+            if (!collision_periode) {
+                collision_periode = setInterval(clignotement, 500);
+            }
 
             $("#up_possibility").css('color', red_alert);
             $("#down_possibility").css('color', red_alert);
@@ -679,6 +696,10 @@ window.onload = function () {
             $("#right_possibility").css('color', red_alert);
 
         } else {
+            if (collision_periode) {
+                clearInterval(collision_periode);
+                collision_periode = false;
+            }
             $("#circle").css('color', green_ok);
             $("#circle").css('background', white_ok);
             $("#up_possibility").css('color', black_ok);
@@ -691,39 +712,46 @@ window.onload = function () {
             turn_left = true;
             turn_right = true;
         }
-        //scroll le div à la fin 
-        $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
-
+        
 
     });
 
     //-------------------------------------------------------------------------
     // Hug event control
 
-
+    var hug_periode = false;
     topic_hug_event.subscribe(function (message) {
 
         var clignotement = function () {
             if ($("#hug").css('color') === red_alert) {
-                $("#hug").css('color', white_ok);
+                $("#hug").css('color', black_ok);
             }
             else {
                 $("#hug").css('color', red_alert);
             }
         };
 
+        var stop = function () {
+            $("#hug").css('color', black_ok);
+            hug_periode = false;
+        }
+
+        //TODO Add sound
         if (message.data) {
-            periode = setInterval(clignotement, 1000);
-            setTimeout(function () {
-                clearInterval(periode);
-            }, 4000);
+            if (!hug_periode) {
+                hug_periode = setInterval(clignotement, 500);
+                setTimeout(function () {
+                    clearInterval(hug_periode);
+                }, 5000);
+                setTimeout(stop, 5001);
+            }
         }
     });
 
     //-------------------------------------------------------------------------
     // Panic button event control
 
-    //TODO ajouté 15s ou mouvement impossible
+    var panic_periode = false;
     topic_panic_event.subscribe(function (message) {
         console.log('Received message on' + topic_panic_event.name + " " + topic_panic_event.data);
 
@@ -738,6 +766,21 @@ window.onload = function () {
                 $("#circle").css('background', orange_warning);
             }
         };
+        
+        var stop = function () {
+            $("#circle").css('background', white_ok);
+            $("#up_possibility").css('color', black_ok);
+            $("#down_possibility").css('color', black_ok);
+            $("#left_possibility").css('color', black_ok);
+            $("#right_possibility").css('color', black_ok);
+            //allow movement
+            move_up = true;
+            move_down = true;
+            turn_left = true;
+            turn_right = true;
+            
+            panic_periode = false;
+        }
 
         if (message.data === true) {
             //Stop the robot
@@ -748,18 +791,29 @@ window.onload = function () {
             topic_cmd.publish(msg);
             console.log("published : Panic Button");
 
+            //movement are prohibited during 15s
+            $("#up_possibility").css('color', red_alert);
+            $("#down_possibility").css('color', red_alert);
+            $("#left_possibility").css('color', red_alert);
+            $("#right_possibility").css('color', red_alert);
+            move_up = false;
+            move_down = false;
+            turn_left = false;
+            turn_right = false;
+
             //display error
             $('#indication_board').append("<p> \"Panic button\" activé </p>");
             //scroll le div à la fin 
             $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
-            periode = setInterval(clignotement, 1000);
-            setTimeout(function () {
-                clearInterval(periode);
-            }, 4000);
+            if (!panic_periode) {
+                panic_periode = setInterval(clignotement, 700);
+                setTimeout(function () {
+                    clearInterval(panic_periode);
+                }, 15000);
+                setTimeout(stop, 15001);
+            }
         }
-        else {
-            $("#circle").css('background', white_ok);
-        }
+        
     });
 
     //-------------------------------------------------------------------------
@@ -950,6 +1004,7 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     // Bandwith quality event control
 
+    var periode_brandwith;
     topic_bandwidth_quality.subscribe(function (message) {
         console.log('Received message on' + topic_bandwidth_quality.name + +" " + message.data);
 
@@ -979,7 +1034,7 @@ window.onload = function () {
             $("#brandwith_quality_critical").css('background', red_alert);
         }
         if (message.data < brandwith_quality_L7) {
-            var boolClign;
+            var boolClign = 0;
             var clignotement = function () {
                 if (boolClign === 0) {
                     boolClign = 1;
@@ -990,7 +1045,9 @@ window.onload = function () {
                     $("#brandwith_quality_critical").css('background', red_alert);
                 }
             };
-            periode = setInterval(clignotement, 500);
+            periode_brandwith = setInterval(clignotement, periode_of_brandwith);
+        } else {
+            clearInterval(periode_brandwith);
         }
 
     });
