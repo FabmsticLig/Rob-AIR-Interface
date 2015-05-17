@@ -70,37 +70,6 @@ img {
     width: 100%;
 }
 
-/*.container-fluid{
-    background-color: #c1e2b3;
-=======
-.container-fluid {
-    /*background-color: #c1e2b3;
-}*/
-
-/*.row {
-    background-color: #eea236;
-}*/
-
-/*.col-sm-4 {
-=======
-.col-sm-4 {
->>>>>>> d4328a3d6173b939ff352e42b1474452309b28bb
-    background-color: darkgrey;
-}
-
-.col-sm-6 {
-    background-color: wheat;
-}
-
-
-.col-sm-8 {
-    background-color: #66afe9;
-}
-
-.col-sm-12 {
-    background-color: lightgreen;
-    background-color: #008080;
-}*/
 
 #divBB{
     color : white;
@@ -189,6 +158,7 @@ img {
     overflow-y:auto; 
 }
 
+/*hug statement*/
 #hug {
     color : rgb(0,0,0);
     margin: auto;
@@ -415,7 +385,7 @@ img {
 
 }
 
-
+/*collision detection*/
 #circle{
     position:relative;
     width:78px;
@@ -529,7 +499,7 @@ div.tabContent.hide {
     display: none;
 }
 
-
+/*Head position*/
 #triangle-up {
     margin-left: auto;
     margin-right: auto;
