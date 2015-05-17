@@ -22,8 +22,8 @@
 }
 /* Video "assistance" */
 #div_cam2 video {
-    width: 70%;
-    height: 55%;
+    width: 50%;
+    height: 20%;
 }
 /*Miniature de la vidéo locale */
 .miniature-video {
