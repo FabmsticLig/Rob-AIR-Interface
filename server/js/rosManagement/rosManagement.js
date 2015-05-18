@@ -193,11 +193,11 @@ window.onload = function () {
     });
 
     //Topic for end_line_obstacles (not yet implemented)
-    var topic_end_line_obstacles = new ROSLIB.Topic({
-        ros: ros,
-        name: '/end_line_obstacles',
-        messageType: 'std_msgs/Int8MultiArray'
-    });
+//    var topic_end_line_obstacles = new ROSLIB.Topic({
+//        ros: ros,
+//        name: '/end_line_obstacles',
+//        messageType: 'std_msgs/Int8MultiArray'
+//    });
 
     //Topic for bandwidth_quality	
     var topic_bandwidth_quality = new ROSLIB.Topic({
