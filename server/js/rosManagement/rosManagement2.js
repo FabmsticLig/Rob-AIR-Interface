@@ -86,7 +86,7 @@ window.onload = function () {
     var head_increment = head_front_direction /36;
 
     //proximity level in centimeter
-    var proximity_level2 = 40;
+    var proximity_level1 = 40;
     var proximity_level2 = 30;
     var proximity_level3 = 20;
     var proximity_level4 = 10;
@@ -874,7 +874,7 @@ window.onload = function () {
         var find = false;
         for (var iter = 0; iter < 8; iter++) {
 
-            if (data[iter] < proximity_level2) {
+            if (data[iter] < proximity_level1) {
                 switch (iter) {
                     case 0 :
                         $("#proximity").css('border-color', green_p_ok);
