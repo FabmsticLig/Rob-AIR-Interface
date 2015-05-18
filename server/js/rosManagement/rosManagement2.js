@@ -73,15 +73,17 @@ window.onload = function () {
     var gaze_front_value = Math.round((gaze_max - gaze_min) / 2) - 1;
     var gaze_value = gaze_front_value;
     //In this case 8 possibility whith 64 degres by increments or decrements
-    var gaze_increment = gaze_front_value / 4;
+    var gaze_increment = 50;
+    //55 100 101 155 200 255
 
     //initial Head_Direction [0,180]
     var head_max = 180;
     var head_min = 0;
     var head_front_direction = Math.round((head_max - head_min) / 2);
     var head_direction = head_front_direction;
-    //In this case 36 possibility whith 5 degres by increments or decrements 
-    var head_increment = head_front_direction / 18;
+    //In this case 36 possibility whith 5 degres by increments or decrements
+    //pas de
+    var head_increment = head_front_direction /36;
 
     //proximity level in centimeter
     var proximity_level2 = 40;
@@ -101,8 +103,10 @@ window.onload = function () {
     var brandwith_quality_L3 = 85;
     var brandwith_quality_L2 = 90;
     var brandwith_quality_L1 = 95;
+    
     //in ms
     var periode_of_brandwith = 500;
+    var periode_of_panic_buton = 15000;
 
     //define normal/warning/alert color
     var white_ok = 'rgb(255, 255, 255)';
@@ -217,27 +221,38 @@ window.onload = function () {
         //d 68
         if (key === key_gaze_left)
         {
-            if (gaze_value <= gaze_min) {
+            if (gaze_value > gaze_min - gaze_increment) {
                 gaze_value -= gaze_increment;
                 console.log("Turn sight to Left");
             }
             else {
                 console.log("Max left position reached");
+                gaze_value = gaze_min;
             }
 
         } else if (key === key_gaze_right) {
-            if (gaze_value >= gaze_max) {
+            if (gaze_value < gaze_max + gaze_increment) {
                 gaze_value += gaze_increment;
                 console.log("Turn sight to Right");
             }
             else {
                 console.log("Max right position reached");
+                gaze_value = gaze_max;
             }
 
         }
+        
+        if (gaze_value > gaze_max) {
+            gaze_value = gaze_max;
+        }
+        if (gaze_value < gaze_min) {
+            gaze_value = gaze_min;
+        }
+        
+        
         console.log(gaze_value);
         var gaze = new ROSLIB.Message({
-            data: gaze_value
+            data: Math.round(gaze_value)
         });
         topic_gaze_direction.publish(gaze);
         console.log("gaze direction published " + key);
@@ -326,25 +341,33 @@ window.onload = function () {
         elem = document.getElementById('triangle-up');
         if (key === key_head_left)
         {
-            if (head_direction >= head_max) {
+            if (head_direction < head_max + head_increment) {
                 head_direction += head_increment;
                 console.log("Turn head to Left");
             }
             else {
                 console.log("Max left position reached");
+                head_direction = head_max;
                 $('#indication_board').append("<p> Limite de rotation de la tete a gauche atteinte </p>");
             }
 
         } else if (key === key_head_right) {
-            if (head_direction <= head_min) {
+            if (head_direction > head_min - head_increment) {
                 head_direction -= head_increment;
                 console.log("Turn head to Right");
             }
             else {
                 console.log("Max right position reached");
+                head_direction = head_min;
                 $('#indication_board').append("<p> Limite de rotation de la tete a droite atteinte </p>");
             }
 
+        }
+        if (head_direction > head_max) {
+            head_direction = head_max;
+        }
+        if (head_direction < head_min) {
+            head_direction = head_min;
         }
         //change the head indication
         setHeadIndication(head_direction);
@@ -721,7 +744,7 @@ window.onload = function () {
 
     var hug_periode = false;
     topic_hug_event.subscribe(function (message) {
-
+    console.log('Received message on ' + topic_hug_event.name);
         var clignotement = function () {
             if ($("#hug").css('color') === red_alert) {
                 $("#hug").css('color', black_ok);
@@ -753,7 +776,7 @@ window.onload = function () {
 
     var panic_periode = false;
     topic_panic_event.subscribe(function (message) {
-        console.log('Received message on' + topic_panic_event.name + " " + topic_panic_event.data);
+        console.log('Received message on ' + topic_panic_event.name + " " + topic_panic_event.data);
 
         var boolClign;
         var clignotement = function () {
@@ -809,8 +832,8 @@ window.onload = function () {
                 panic_periode = setInterval(clignotement, 700);
                 setTimeout(function () {
                     clearInterval(panic_periode);
-                }, 15000);
-                setTimeout(stop, 15001);
+                }, periode_of_panic_buton);
+                setTimeout(stop, periode_of_panic_buton+1);
             }
         }
         
@@ -1085,7 +1108,7 @@ window.onload = function () {
     // /!\ not yet implemented and tested
 
     topic_end_line_obstacles.subscribe(function (message) {
-        console.log('Received message on' + topIic_end_line_obstacles.name);
+        console.log('Received message on' + topic_end_line_obstacles.name);
 
         var boolClign;
         var clignotement = function () {
