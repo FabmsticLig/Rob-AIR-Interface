@@ -86,14 +86,16 @@ window.onload = function () {
     var head_increment = 5;
 
     //proximity level in centimeter
-    var proximity_level1 = 40;
-    var proximity_level2 = 30;
-    var proximity_level3 = 20;
-    var proximity_level4 = 10;
+    var proximity_level1 = 100;
+    var proximity_level2 = 80;
+    var proximity_level3 = 40;
+    var proximity_level4 = 20;
 
-    //battery level in percent
-    var battery_level2 = 50;
-    var battery_level1 = 25;
+    //max battery level
+    var battery_max = 24;
+    //battery level in percent of battery_max
+    var battery_level2 = Math.round(battery_max*0.5);
+    var battery_level1 = Math.round(battery_max*0.25);
 
     //brandwith quality level [60,100]
     var brandwith_quality_L7 = 65;
@@ -103,7 +105,7 @@ window.onload = function () {
     var brandwith_quality_L3 = 85;
     var brandwith_quality_L2 = 90;
     var brandwith_quality_L1 = 95;
-    
+
     //in ms
     var periode_of_brandwith = 500;
     var periode_of_panic_buton = 15000;
@@ -241,15 +243,15 @@ window.onload = function () {
             }
 
         }
-        
+
         if (gaze_value > gaze_max) {
             gaze_value = gaze_max;
         }
         if (gaze_value < gaze_min) {
             gaze_value = gaze_min;
         }
-        
-        
+
+
         console.log(gaze_value);
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
@@ -512,39 +514,70 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     // Control with mouse motion
-    
-    //allow/disable mouse control by clic on mouse pad
+
+    //allow/disable mouse control by clicdown on mouse pad
     var mouse_event_enter = false;
     // bind mouse
     var mouse_event = document.getElementById('remote-controls-mouse');
-    mouse_event.onclick = function (e) {
+    mouse_event.onmousedown = function (e) {
         e = e || window.event;
         if (mouse_event_enter === false) {
             mouse_event_enter = true;
-            $("#remote-controls-mouse").css('background-color',green_ok);
+            $("#remote-controls-mouse").css('background-color', green_ok);
             mouseMotionCtrl(e);
         } else {
-            $("#remote-controls-mouse").css('background-color',yellow_ok);
-            mouse_event_enter = false;
+            exitMouseCtrl();
+
         }
     };
-    
-    var mouseMotionCtrl = function mouseMotionCtrl(event) {
+
+    //stop the robot and disable mouse control when click is up or pointer exit area
+    var exitMouseCtrl = function () {
+        $("#remote-controls-mouse").css('background-color', yellow_ok);
+        mouse_event_enter = false;
+        var speed1 = speed_stop;
+        var speed2 = speed_stop;
+        var msg = new ROSLIB.Message({
+            speed1: Math.round(speed1),
+            speed2: Math.round(speed2)
+        });
+        //Publish on Topic
+        topic_cmd.publish(msg);
+        console.log("published " + speed1 + " " + speed2);
+    };
+
+    //fonction which calculate robot movement with mouse control
+    var mouseMotionCtrl = function mouseMotionCtrl() {
 
         // distance of the window 
         var normX = $("#remote-controls-mouse").css('width');
         var normY = $("#remote-controls-mouse").css('height');
-        var window_elem = $("#remote-controls-mouse").offset();
+        var window_elem = $("#remote-controls-mouse").position();
         //erase 'px' from norm
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
 
-        var kx = 2*speed_max / normX;
-        var ky = 2*speed_max / normY;
+        var kx = 2 * speed_max / normX;
+        var ky = 2 * speed_max / normY;
 
         var x0 = normX / 2 + window_elem.left;
         var y0 = normY / 2 + window_elem.top;
-
+       
+        //stop mouse control if pointer exit the area
+        mouse_event.onmouseout = function () {
+            if (mouse_event_enter === true) {
+                exitMouseCtrl();
+            }
+        };
+        
+        //stop mouse control left button is up
+        mouse_event.onmouseup = function () {
+            if (mouse_event_enter === true) {
+                exitMouseCtrl();
+            }
+        };
+        
+        //allow mouse control on area
         mouse_event.onmousemove = function (event) {
             if (mouse_event_enter === true) {
 
@@ -656,7 +689,7 @@ window.onload = function () {
 
     };
 
-    
+
     //-------------------------------------------------------------------------
     //===================================================
     //================Subscriber=====================
@@ -666,7 +699,7 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     // Collision event control
 
-    var collision_periode=false;
+    var collision_periode = false;
     topic_collision.subscribe(function (message) {
         console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
         //get indication_board div and append the message only if there is a collision
@@ -708,7 +741,7 @@ window.onload = function () {
             $('#indication_board').append("<p> Collision détectée </p>");
             //scroll le div à la fin 
             $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
-            
+
             if (!collision_periode) {
                 collision_periode = setInterval(clignotement, 500);
             }
@@ -735,7 +768,7 @@ window.onload = function () {
             turn_left = true;
             turn_right = true;
         }
-        
+
 
     });
 
@@ -744,7 +777,7 @@ window.onload = function () {
 
     var hug_periode = false;
     topic_hug_event.subscribe(function (message) {
-    console.log('Received message on ' + topic_hug_event.name);
+        console.log('Received message on ' + topic_hug_event.name);
         var clignotement = function () {
             if ($("#hug").css('color') === red_alert) {
                 $("#hug").css('color', black_ok);
@@ -789,7 +822,7 @@ window.onload = function () {
                 $("#circle").css('background', orange_warning);
             }
         };
-        
+
         var stop = function () {
             $("#circle").css('background', white_ok);
             $("#up_possibility").css('color', black_ok);
@@ -801,7 +834,7 @@ window.onload = function () {
             move_down = true;
             turn_left = true;
             turn_right = true;
-            
+
             panic_periode = false;
         }
 
@@ -833,10 +866,10 @@ window.onload = function () {
                 setTimeout(function () {
                     clearInterval(panic_periode);
                 }, periode_of_panic_buton);
-                setTimeout(stop, periode_of_panic_buton+1);
+                setTimeout(stop, periode_of_panic_buton + 1);
             }
         }
-        
+
     });
 
     //-------------------------------------------------------------------------
