@@ -67,23 +67,23 @@ window.onload = function () {
     var key_head_right = 69; //'e'
 
     //initial Gaze_direction [0,255]
-    var gaze_max = 127;
+    var gaze_max = 255;
     var gaze_min = 0;
     //in this case 127
-    var gaze_front_value = 63;
+    var gaze_front_value = 127;
     var gaze_value = gaze_front_value;
     //In this case 8 possibility whith 64 degres by increments or decrements
-    var gaze_increment = 10;
+    var gaze_increment = 32;
     //55 100 101 155 200 255
 
     //initial Head_Direction [0,180]
     var head_max = 180;
     var head_min = 0;
-    var head_front_direction = Math.round((head_max - head_min) / 2);
+    var head_front_direction = 90;
     var head_direction = head_front_direction;
     //In this case 36 possibility whith 5 degres by increments or decrements
     //pas de
-    var head_increment = head_front_direction /36;
+    var head_increment = 5;
 
     //proximity level in centimeter
     var proximity_level1 = 40;
