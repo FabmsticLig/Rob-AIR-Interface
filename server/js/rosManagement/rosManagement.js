@@ -67,13 +67,13 @@ window.onload = function () {
     var key_head_right = 69; //'e'
 
     //initial Gaze_direction [0,255]
-    var gaze_max = 255;
+    var gaze_max = 127;
     var gaze_min = 0;
     //in this case 127
-    var gaze_front_value = 127;
+    var gaze_front_value = 63;
     var gaze_value = gaze_front_value;
     //In this case 8 possibility whith 64 degres by increments or decrements
-    var gaze_increment = 25;
+    var gaze_increment = 10;
     //55 100 101 155 200 255
 
     //initial Head_Direction [0,180]
