@@ -1107,117 +1107,117 @@ window.onload = function () {
     // End line obstacle event control
     // /!\ not yet implemented and tested
 
-    topic_end_line_obstacles.subscribe(function (message) {
-        console.log('Received message on' + topic_end_line_obstacles.name);
-
-        var boolClign;
-        var clignotement = function () {
-            if (boolClign === 0) { // Si rouge
-                boolClign = 1;
-                $("#circle").css('background', white_ok); // blanc
-
-            }
-            else {
-                boolClign = 0;
-                $("#circle").css('background', orange_warning); // orange
-
-            }
-        };
-        find = false;
-        //on parcourt les 8 capteurs
-        for (var iter = 0; iter < 8; iter++) {
-            if (message.data[iter]) {
-                find = true;
-                //Stop the robot
-                var msg = new ROSLIB.Message({
-                    speed1: speed_stop,
-                    speed2: speed_stop
-                });
-                topic_cmd.publish(msg);
-                console.log("published : End line obstacles");
-                $('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter + "</p>");
-                //scroll le div à la fin 
-                $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
-                periode = setInterval(clignotement, 500);
-                switch (iter) {
-                    case 0 :
-                        $("#endline_alert").css('background', red_alert);
-                        move_up = false;
-                        turn_left = false;
-                        $("#up_possibility").css('color', red_alert);
-                        $("#left_possibility").css('color', red_alert);
-                        break;
-                    case 1 :
-                        $("#endline_alert").css('background', red_alert);
-                        move_up = false;
-                        turn_right = false;
-                        $("#up_possibility").css('color', red_alert);
-                        $("#right_possibility").css('color', red_alert);
-                        break;
-                    case 2 :
-                        $("#endline_alert1").css('background', red_alert);
-                        move_up = false;
-                        turn_left = false;
-                        $("#up_possibility").css('color', red_alert);
-                        $("#left_possibility").css('color', red_alert);
-                        break;
-                    case 3 :
-                        $("#endline_alert1").css('background', red_alert);
-                        move_down = false;
-                        turn_right = false;
-                        $("#down_possibility").css('color', red_alert);
-                        $("#right_possibility").css('color', red_alert);
-                        break;
-                    case 4 :
-                        $("#endline_alert2").css('background', red_alert);
-                        move_down = false;
-                        turn_right = false;
-                        $("#down_possibility").css('color', red_alert);
-                        $("#right_possibility").css('color', red_alert);
-                        break;
-                    case 5 :
-                        $("#endline_alert2").css('background', red_alert);
-                        move_down = false;
-                        turn_left = false;
-                        $("#down_possibility").css('color', red_alert);
-                        $("#left_possibility").css('color', red_alert);
-                        break;
-                    case 6 :
-                        $("#endline_alert3").css('background', red_alert);
-                        move_down = false;
-                        turn_right = false;
-                        $("#down_possibility").css('color', red_alert);
-                        $("#right_possibility").css('color', red_alert);
-                        break;
-                    default :
-                        $("#endline_alert3").css('background', red_alert);
-                        move_down = false;
-                        turn_left = false;
-                        $("#down_possibility").css('color', red_alert);
-                        $("#left_possibility").css('color', red_alert);
-                        break;
-
-                }
-                break;
-            }
-
-        }
-        if (!find) {
-            move_up = true;
-            move_down = true;
-            turn_left = true;
-            turn_right = true;
-            $("#endline_alert").css('background', red_alert);
-            $("#endline_alert1").css('background', red_alert);
-            $("#endline_alert2").css('background', red_alert);
-            $("#endline_alert3").css('background', red_alert);
-            $("#up_possibility").css('color', white_ok);
-            $("#down_possibility").css('color', white_ok);
-            $("#left_possibility").css('color', white_ok);
-            $("#right_possibility").css('color', white_ok);
-            $("#circle").css('background', white_ok);
-        }
-    });
+//    topic_end_line_obstacles.subscribe(function (message) {
+//        console.log('Received message on' + topic_end_line_obstacles.name);
+//
+//        var boolClign;
+//        var clignotement = function () {
+//            if (boolClign === 0) { // Si rouge
+//                boolClign = 1;
+//                $("#circle").css('background', white_ok); // blanc
+//
+//            }
+//            else {
+//                boolClign = 0;
+//                $("#circle").css('background', orange_warning); // orange
+//
+//            }
+//        };
+//        find = false;
+//        //on parcourt les 8 capteurs
+//        for (var iter = 0; iter < 8; iter++) {
+//            if (message.data[iter]) {
+//                find = true;
+//                //Stop the robot
+//                var msg = new ROSLIB.Message({
+//                    speed1: speed_stop,
+//                    speed2: speed_stop
+//                });
+//                topic_cmd.publish(msg);
+//                console.log("published : End line obstacles");
+//                $('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter + "</p>");
+//                //scroll le div à la fin 
+//                $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+//                periode = setInterval(clignotement, 500);
+//                switch (iter) {
+//                    case 0 :
+//                        $("#endline_alert").css('background', red_alert);
+//                        move_up = false;
+//                        turn_left = false;
+//                        $("#up_possibility").css('color', red_alert);
+//                        $("#left_possibility").css('color', red_alert);
+//                        break;
+//                    case 1 :
+//                        $("#endline_alert").css('background', red_alert);
+//                        move_up = false;
+//                        turn_right = false;
+//                        $("#up_possibility").css('color', red_alert);
+//                        $("#right_possibility").css('color', red_alert);
+//                        break;
+//                    case 2 :
+//                        $("#endline_alert1").css('background', red_alert);
+//                        move_up = false;
+//                        turn_left = false;
+//                        $("#up_possibility").css('color', red_alert);
+//                        $("#left_possibility").css('color', red_alert);
+//                        break;
+//                    case 3 :
+//                        $("#endline_alert1").css('background', red_alert);
+//                        move_down = false;
+//                        turn_right = false;
+//                        $("#down_possibility").css('color', red_alert);
+//                        $("#right_possibility").css('color', red_alert);
+//                        break;
+//                    case 4 :
+//                        $("#endline_alert2").css('background', red_alert);
+//                        move_down = false;
+//                        turn_right = false;
+//                        $("#down_possibility").css('color', red_alert);
+//                        $("#right_possibility").css('color', red_alert);
+//                        break;
+//                    case 5 :
+//                        $("#endline_alert2").css('background', red_alert);
+//                        move_down = false;
+//                        turn_left = false;
+//                        $("#down_possibility").css('color', red_alert);
+//                        $("#left_possibility").css('color', red_alert);
+//                        break;
+//                    case 6 :
+//                        $("#endline_alert3").css('background', red_alert);
+//                        move_down = false;
+//                        turn_right = false;
+//                        $("#down_possibility").css('color', red_alert);
+//                        $("#right_possibility").css('color', red_alert);
+//                        break;
+//                    default :
+//                        $("#endline_alert3").css('background', red_alert);
+//                        move_down = false;
+//                        turn_left = false;
+//                        $("#down_possibility").css('color', red_alert);
+//                        $("#left_possibility").css('color', red_alert);
+//                        break;
+//
+//                }
+//                break;
+//            }
+//
+//        }
+//        if (!find) {
+//            move_up = true;
+//            move_down = true;
+//            turn_left = true;
+//            turn_right = true;
+//            $("#endline_alert").css('background', red_alert);
+//            $("#endline_alert1").css('background', red_alert);
+//            $("#endline_alert2").css('background', red_alert);
+//            $("#endline_alert3").css('background', red_alert);
+//            $("#up_possibility").css('color', white_ok);
+//            $("#down_possibility").css('color', white_ok);
+//            $("#left_possibility").css('color', white_ok);
+//            $("#right_possibility").css('color', white_ok);
+//            $("#circle").css('background', white_ok);
+//        }
+//    });
 
 //-------------------------------------------------------------------------
 //=====================================================================
