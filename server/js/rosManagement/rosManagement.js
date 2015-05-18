@@ -308,7 +308,7 @@ window.onload = function () {
         //gaze_valueY not yet implemented
         gaze_value = Math.round(rx);
         var gaze = new ROSLIB.Message({
-            data: gaze_value
+            data: Math.round(gaze_value)
         });
         topic_gaze_direction.publish(gaze);
         console.log("gaze direction published " + gaze_value);
@@ -374,7 +374,7 @@ window.onload = function () {
 
         console.log(head_direction);
         var head = new ROSLIB.Message({
-            data: head_direction
+            data: Math.round(head_direction)
         });
         topic_angle_position.publish(head);
         console.log("head direction published " + head_direction);
