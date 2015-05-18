@@ -46,9 +46,9 @@ window.onload = function () {
     var turn_right = true;
 
     //interval of speed
-    var speed_max = 255;
-    var speed_stop = 127;
-    var speed_min = 0;
+    var speed_max = 127;
+    var speed_stop = 0;
+    var speed_min = -127;
 
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
@@ -70,10 +70,10 @@ window.onload = function () {
     var gaze_max = 255;
     var gaze_min = 0;
     //in this case 127
-    var gaze_front_value = Math.round((gaze_max - gaze_min) / 2) - 1;
+    var gaze_front_value = 127;
     var gaze_value = gaze_front_value;
     //In this case 8 possibility whith 64 degres by increments or decrements
-    var gaze_increment = 50;
+    var gaze_increment = 25;
     //55 100 101 155 200 255
 
     //initial Head_Direction [0,180]
@@ -161,7 +161,7 @@ window.onload = function () {
     var topic_battery_level = new ROSLIB.Topic({
         ros: ros,
         name: '/battery_level',
-        messageType: 'std_msgs/Int32'
+        messageType: 'std_msgs/Byte'
     });
 
     //Topic for collision
@@ -189,7 +189,7 @@ window.onload = function () {
     var topic_proximity_obstacles = new ROSLIB.Topic({
         ros: ros,
         name: '/proximity_obstacles',
-        messageType: 'md49test/Sonars'
+        messageType: 'm49test/Sonars'
     });
 
     //Topic for end_line_obstacles (not yet implemented)
