@@ -137,7 +137,7 @@ window.onload = function () {
     var topic_gaze_direction = new ROSLIB.Topic({
         ros: ros,
         name: '/gaze_direction',
-        messageType: 'std_msgs/Uint8'
+        messageType: 'std_msgs/UInt8'
     });
 
     //Command motor
