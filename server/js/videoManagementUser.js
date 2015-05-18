@@ -43,6 +43,7 @@ webrtc.on('videoAdded', function(video,peer) {
 			video.oncontextMenu = function() {return false; };
 			//add the video
 			remotes.appendChild(video);
+			video.volume = 0; //on enlève le son
 		}
 	} else { //caméra principale de vidéo-conf
 		var remotes = document.getElementById('div_cam3');
