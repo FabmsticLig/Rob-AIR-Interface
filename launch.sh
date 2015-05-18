@@ -2,9 +2,9 @@
 
 echo -e "Lancement des serveurs"
 cd server
-node server.js &
+nodejs server.js &
 sleep 3
-node ../signalingserver/server.js &
+nodejs ../signalingserver/server.js &
 
 echo -e "Serveur lancé"
 namevariable=$(uname)
