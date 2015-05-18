@@ -46,9 +46,9 @@ window.onload = function () {
     var turn_right = true;
 
     //interval of speed
-    var speed_max = 127;
+    var speed_max = -127;
     var speed_stop = 0;
-    var speed_min = -127;
+    var speed_min = 127;
 
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
@@ -539,8 +539,8 @@ window.onload = function () {
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
 
-        var kx = speed_max / normX;
-        var ky = speed_max / normY;
+        var kx = 2*speed_max / normX;
+        var ky = 2*speed_max / normY;
 
         var x0 = normX / 2 + window_elem.left;
         var y0 = normY / 2 + window_elem.top;
