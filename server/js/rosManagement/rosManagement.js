@@ -46,9 +46,9 @@ window.onload = function () {
     var turn_right = true;
 
     //interval of speed
-    var speed_max = -127;
+    var speed_max = 127;
     var speed_stop = 0;
-    var speed_min = 127;
+    var speed_min = -127;
 
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
@@ -193,11 +193,11 @@ window.onload = function () {
     });
 
     //Topic for end_line_obstacles (not yet implemented)
-    var topic_end_line_obstacles = new ROSLIB.Topic({
-        ros: ros,
-        name: '/end_line_obstacles',
-        messageType: 'std_msgs/Int8MultiArray'
-    });
+//    var topic_end_line_obstacles = new ROSLIB.Topic({
+//        ros: ros,
+//        name: '/end_line_obstacles',
+//        messageType: 'std_msgs/Int8MultiArray'
+//    });
 
     //Topic for bandwidth_quality	
     var topic_bandwidth_quality = new ROSLIB.Topic({
