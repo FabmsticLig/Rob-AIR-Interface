@@ -109,6 +109,7 @@ window.onload = function () {
     //in ms
     var periode_of_brandwith = 500;
     var periode_of_panic_buton = 15000;
+    var periode_of_gaze_reset = 30000;
 
     //define normal/warning/alert color
     var white_ok = 'rgb(255, 255, 255)';
@@ -216,6 +217,19 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     //Gaze_direction
+    
+    //function called after 30s of setting gaze direction
+    var resetGazeDirection = function (){
+        gaze_value = gaze_front_value;
+        var gaze = new ROSLIB.Message({
+            data: Math.round(gaze_value)
+        });
+        console.log("gaze direction published 127");
+        topic_gaze_direction.publish(gaze);
+        gaze_timeout = false;
+    };
+    
+    var gaze_timeout = false;
     var setGazeDirection = function (key) {
 
         //Key code
@@ -250,14 +264,20 @@ window.onload = function () {
         if (gaze_value < gaze_min) {
             gaze_value = gaze_min;
         }
+        
+        //prepare reset of gaze reset
+        if (!gaze_timeout) {
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        }else {
+            clearTimeout(gaze_timeout);
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        }
 
-
-        console.log(gaze_value);
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
         });
         topic_gaze_direction.publish(gaze);
-        console.log("gaze direction published " + key);
+        console.log("gaze direction published " + gaze_value);
 
     };
 
@@ -306,14 +326,22 @@ window.onload = function () {
         if (ry < gaze_min) {
             ry = gaze_min;
         }
-
+        
+        //prepare reset of gaze reset
+        if (!gaze_timeout) {
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        }else {
+            clearTimeout(gaze_timeout);
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        }
+        
         //gaze_valueY not yet implemented
         gaze_value = Math.round(rx);
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
         });
         topic_gaze_direction.publish(gaze);
-        console.log("gaze direction published " + gaze_value);
+        console.log("gaze direction published " + Math.round(gaze_value));
 
     };
     var mouse_event_gaze = document.getElementById('div_cam3');
