@@ -86,16 +86,16 @@ window.onload = function () {
     var head_increment = 5;
 
     //proximity level in centimeter in [0,255]
-    var proximity_level1 = 100;
-    var proximity_level2 = 80;
-    var proximity_level3 = 40;
-    var proximity_level4 = 20;
+    var proximity_level1 = 80;
+    var proximity_level2 = 60;
+    var proximity_level3 = 50;
+    var proximity_level4 = 30;
 
     //max battery level
     var battery_max = 24;
     //battery level in percent of battery_max
-    var battery_level2 = Math.round(battery_max*0.5);
-    var battery_level1 = Math.round(battery_max*0.25);
+    var battery_level2 = Math.round(battery_max * 0.5);
+    var battery_level1 = Math.round(battery_max * 0.25);
 
     //brandwith quality level [60,100]
     var brandwith_quality_L7 = 65;
@@ -217,9 +217,9 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     //Gaze_direction
-    
+
     //function called after 30s of setting gaze direction
-    var resetGazeDirection = function (){
+    var resetGazeDirection = function () {
         gaze_value = gaze_front_value;
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
@@ -228,7 +228,7 @@ window.onload = function () {
         topic_gaze_direction.publish(gaze);
         gaze_timeout = false;
     };
-    
+
     var gaze_timeout = false;
     var setGazeDirection = function (key) {
 
@@ -264,11 +264,11 @@ window.onload = function () {
         if (gaze_value < gaze_min) {
             gaze_value = gaze_min;
         }
-        
+
         //prepare reset of gaze reset
         if (!gaze_timeout) {
             gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
-        }else {
+        } else {
             clearTimeout(gaze_timeout);
             gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
         }
@@ -326,15 +326,15 @@ window.onload = function () {
         if (ry < gaze_min) {
             ry = gaze_min;
         }
-        
+
         //prepare reset of gaze reset
         if (!gaze_timeout) {
             gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
-        }else {
+        } else {
             clearTimeout(gaze_timeout);
             gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
         }
-        
+
         //gaze_valueY not yet implemented
         gaze_value = Math.round(rx);
         var gaze = new ROSLIB.Message({
@@ -590,21 +590,21 @@ window.onload = function () {
 
         var x0 = normX / 2 + window_elem.left;
         var y0 = normY / 2 + window_elem.top;
-       
+
         //stop mouse control if pointer exit the area
         mouse_event.onmouseout = function () {
             if (mouse_event_enter === true) {
                 exitMouseCtrl();
             }
         };
-        
+
         //stop mouse control left button is up
         mouse_event.onmouseup = function () {
             if (mouse_event_enter === true) {
                 exitMouseCtrl();
             }
         };
-        
+
         //allow mouse control on area
         mouse_event.onmousemove = function (event) {
             if (mouse_event_enter === true) {
@@ -902,7 +902,7 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     // Proximity obstacle event control
-
+    var proximity_alert = false;
     topic_proximity_obstacles.subscribe(function (message) {
         console.log('Received message on' + topic_proximity_obstacles.name
                 + " " + message.x1
@@ -1072,15 +1072,20 @@ window.onload = function () {
                 }
                 find = true;
                 //allow movement with speed limit 
-                speed_limit = speed_reduction;
-                $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + data[iter] + "</p>");
-                //scroll le div à la fin 
-                $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+                if (!proximity_alert) {
+                    speed_limit = speed_reduction;
+                    $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + data[iter] + "</p>");
+                    //scroll le div à la fin 
+                    $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+                    proximity_alert = true;
+                }
+
             }
         }
         if (!find) {
             //allow movement with full speed (ie 100%)
             speed_limit = 0;
+            proximity_alert = false;
         }
     });
 
