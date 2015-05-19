@@ -85,7 +85,7 @@ window.onload = function () {
     //pas de
     var head_increment = 5;
 
-    //proximity level in centimeter
+    //proximity level in centimeter in [0,255]
     var proximity_level1 = 100;
     var proximity_level2 = 80;
     var proximity_level3 = 40;
@@ -1144,8 +1144,7 @@ window.onload = function () {
         console.log('Battery value ' + message.data);
 
         //Update the battery view in room_user.html
-        var battery = $('battery');
-        var level = parseInt(message.data) / 255 * 100;
+        var level = parseInt(message.data) / battery_max * 100;
         var batteryLevel = $('#battery-level');
         batteryLevel.css('width', level + '%');
         if (level > battery_level2) {
