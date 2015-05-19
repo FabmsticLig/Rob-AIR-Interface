@@ -50,10 +50,13 @@ window.onload = function () {
     var speed_stop = 0;
     var speed_min = -127;
 
+    //current speed
+    var current_speed1 = speed_stop;
+    var current_speed2 = speed_stop;
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
     //max speed - speed reduction = speed limit
-    var speed_reduction = 64;
+    var speed_reduction = 100;
 
     //Default keyboard control
     var key_stop = 83; //'s' 
@@ -87,9 +90,9 @@ window.onload = function () {
 
     //proximity level in centimeter in [0,255]
     var proximity_level1 = 80;
-    var proximity_level2 = 60;
-    var proximity_level3 = 50;
-    var proximity_level4 = 30;
+    var proximity_level2 = 70;
+    var proximity_level3 = 60;
+    var proximity_level4 = 40;
 
     //max battery level
     var battery_max = 24;
@@ -500,6 +503,8 @@ window.onload = function () {
                 speed2: speed2
             });
             //Publish on Topic
+            current_speed1 = speed1;
+            current_speed2 = speed2;
             topic_cmd.publish(msg);
             console.log("published " + key + " speed1 " + speed1 + " speed2 " + speed2);
         }
@@ -570,6 +575,8 @@ window.onload = function () {
             speed2: Math.round(speed2)
         });
         //Publish on Topic
+        current_speed1 = speed1;
+        current_speed2 = speed2;
         topic_cmd.publish(msg);
         console.log("published " + speed1 + " " + speed2);
     };
@@ -710,6 +717,8 @@ window.onload = function () {
                     speed2: Math.round(speed2)
                 });
                 //Publish on Topic
+                current_speed1 = Math.round(speed1);
+                current_speed2 = Math.round(speed2);
                 topic_cmd.publish(msg);
                 console.log("published " + speed1 + " " + speed2);
             }
@@ -762,6 +771,8 @@ window.onload = function () {
                 speed2: speed_stop
             });
 
+            current_speed1 = speed1;
+            current_speed2 = speed2;
             topic_cmd.publish(msg);
             console.log("published : Emergency Stop");
 
@@ -872,6 +883,8 @@ window.onload = function () {
                 speed1: speed_stop,
                 speed2: speed_stop
             });
+            current_speed1 = speed1;
+            current_speed2 = speed2;
             topic_cmd.publish(msg);
             console.log("published : Panic Button");
 
@@ -1078,6 +1091,23 @@ window.onload = function () {
                     //scroll le div à la fin 
                     $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
                     proximity_alert = true;
+                    var speed1 = speed_stop;
+                    var speed2 = speed_stop;
+                    if (current_speed1 > speed_stop) {
+                        speed1 = current_speed1 - speed_limit;
+                    } else if (current_speed1 < speed_stop) {
+                        speed1 = current_speed1 - speed_limit;
+                    }
+                    if (current_speed2 > speed_stop) {
+                        speed2 = current_speed2 - speed_limit;
+                    } else if (current_speed1 < speed_stop) {
+                        speed2 = current_speed2 - speed_limit;
+                    }
+                    var msg = new ROSLIB.Message({
+                        speed1: speed1,
+                        speed2: speed2
+                    });s
+                    topic_cmd.publish(msg);
                 }
 
             }
