@@ -85,15 +85,17 @@ window.onload = function () {
     //pas de
     var head_increment = 5;
 
-    //proximity level in centimeter
-    var proximity_level1 = 40;
-    var proximity_level2 = 30;
-    var proximity_level3 = 20;
-    var proximity_level4 = 10;
+    //proximity level in centimeter in [0,255]
+    var proximity_level1 = 80;
+    var proximity_level2 = 60;
+    var proximity_level3 = 50;
+    var proximity_level4 = 30;
 
-    //battery level in percent
-    var battery_level2 = 50;
-    var battery_level1 = 25;
+    //max battery level
+    var battery_max = 24;
+    //battery level in percent of battery_max
+    var battery_level2 = Math.round(battery_max * 0.5);
+    var battery_level1 = Math.round(battery_max * 0.25);
 
     //brandwith quality level [60,100]
     var brandwith_quality_L7 = 65;
@@ -103,10 +105,11 @@ window.onload = function () {
     var brandwith_quality_L3 = 85;
     var brandwith_quality_L2 = 90;
     var brandwith_quality_L1 = 95;
-    
+
     //in ms
     var periode_of_brandwith = 500;
     var periode_of_panic_buton = 15000;
+    var periode_of_gaze_reset = 30000;
 
     //define normal/warning/alert color
     var white_ok = 'rgb(255, 255, 255)';
@@ -214,6 +217,19 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     //Gaze_direction
+
+    //function called after 30s of setting gaze direction
+    var resetGazeDirection = function () {
+        gaze_value = gaze_front_value;
+        var gaze = new ROSLIB.Message({
+            data: Math.round(gaze_value)
+        });
+        console.log("gaze direction published 127");
+        topic_gaze_direction.publish(gaze);
+        gaze_timeout = false;
+    };
+
+    var gaze_timeout = false;
     var setGazeDirection = function (key) {
 
         //Key code
@@ -241,21 +257,27 @@ window.onload = function () {
             }
 
         }
-        
+
         if (gaze_value > gaze_max) {
             gaze_value = gaze_max;
         }
         if (gaze_value < gaze_min) {
             gaze_value = gaze_min;
         }
-        
-        
-        console.log(gaze_value);
+
+        //prepare reset of gaze reset
+        if (!gaze_timeout) {
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        } else {
+            clearTimeout(gaze_timeout);
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        }
+
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
         });
         topic_gaze_direction.publish(gaze);
-        console.log("gaze direction published " + key);
+        console.log("gaze direction published " + gaze_value);
 
     };
 
@@ -305,13 +327,21 @@ window.onload = function () {
             ry = gaze_min;
         }
 
+        //prepare reset of gaze reset
+        if (!gaze_timeout) {
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        } else {
+            clearTimeout(gaze_timeout);
+            gaze_timeout = setTimeout(resetGazeDirection, periode_of_gaze_reset);
+        }
+
         //gaze_valueY not yet implemented
         gaze_value = Math.round(rx);
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
         });
         topic_gaze_direction.publish(gaze);
-        console.log("gaze direction published " + gaze_value);
+        console.log("gaze direction published " + Math.round(gaze_value));
 
     };
     var mouse_event_gaze = document.getElementById('div_cam3');
@@ -512,39 +542,70 @@ window.onload = function () {
 
     //-------------------------------------------------------------------------
     // Control with mouse motion
-    
-    //allow/disable mouse control by clic on mouse pad
+
+    //allow/disable mouse control by clicdown on mouse pad
     var mouse_event_enter = false;
     // bind mouse
     var mouse_event = document.getElementById('remote-controls-mouse');
-    mouse_event.onclick = function (e) {
+    mouse_event.onmousedown = function (e) {
         e = e || window.event;
         if (mouse_event_enter === false) {
             mouse_event_enter = true;
-            $("#remote-controls-mouse").css('background-color',green_ok);
+            $("#remote-controls-mouse").css('background-color', green_ok);
             mouseMotionCtrl(e);
         } else {
-            $("#remote-controls-mouse").css('background-color',yellow_ok);
-            mouse_event_enter = false;
+            exitMouseCtrl();
+
         }
     };
-    
-    var mouseMotionCtrl = function mouseMotionCtrl(event) {
+
+    //stop the robot and disable mouse control when click is up or pointer exit area
+    var exitMouseCtrl = function () {
+        $("#remote-controls-mouse").css('background-color', yellow_ok);
+        mouse_event_enter = false;
+        var speed1 = speed_stop;
+        var speed2 = speed_stop;
+        var msg = new ROSLIB.Message({
+            speed1: Math.round(speed1),
+            speed2: Math.round(speed2)
+        });
+        //Publish on Topic
+        topic_cmd.publish(msg);
+        console.log("published " + speed1 + " " + speed2);
+    };
+
+    //fonction which calculate robot movement with mouse control
+    var mouseMotionCtrl = function mouseMotionCtrl() {
 
         // distance of the window 
         var normX = $("#remote-controls-mouse").css('width');
         var normY = $("#remote-controls-mouse").css('height');
-        var window_elem = $("#remote-controls-mouse").offset();
+        var window_elem = $("#remote-controls-mouse").position();
         //erase 'px' from norm
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
 
-        var kx = 2*speed_max / normX;
-        var ky = 2*speed_max / normY;
+        var kx = 2 * speed_max / normX;
+        var ky = 2 * speed_max / normY;
 
         var x0 = normX / 2 + window_elem.left;
         var y0 = normY / 2 + window_elem.top;
 
+        //stop mouse control if pointer exit the area
+        mouse_event.onmouseout = function () {
+            if (mouse_event_enter === true) {
+                exitMouseCtrl();
+            }
+        };
+
+        //stop mouse control left button is up
+        mouse_event.onmouseup = function () {
+            if (mouse_event_enter === true) {
+                exitMouseCtrl();
+            }
+        };
+
+        //allow mouse control on area
         mouse_event.onmousemove = function (event) {
             if (mouse_event_enter === true) {
 
@@ -656,7 +717,7 @@ window.onload = function () {
 
     };
 
-    
+
     //-------------------------------------------------------------------------
     //===================================================
     //================Subscriber=====================
@@ -666,7 +727,7 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     // Collision event control
 
-    var collision_periode=false;
+    var collision_periode = false;
     topic_collision.subscribe(function (message) {
         console.log('Received message on ' + topic_collision.name + ': ' + message.collision);
         //get indication_board div and append the message only if there is a collision
@@ -708,7 +769,7 @@ window.onload = function () {
             $('#indication_board').append("<p> Collision détectée </p>");
             //scroll le div à la fin 
             $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
-            
+
             if (!collision_periode) {
                 collision_periode = setInterval(clignotement, 500);
             }
@@ -735,7 +796,7 @@ window.onload = function () {
             turn_left = true;
             turn_right = true;
         }
-        
+
 
     });
 
@@ -744,7 +805,7 @@ window.onload = function () {
 
     var hug_periode = false;
     topic_hug_event.subscribe(function (message) {
-    console.log('Received message on ' + topic_hug_event.name);
+        console.log('Received message on ' + topic_hug_event.name);
         var clignotement = function () {
             if ($("#hug").css('color') === red_alert) {
                 $("#hug").css('color', black_ok);
@@ -789,7 +850,7 @@ window.onload = function () {
                 $("#circle").css('background', orange_warning);
             }
         };
-        
+
         var stop = function () {
             $("#circle").css('background', white_ok);
             $("#up_possibility").css('color', black_ok);
@@ -801,7 +862,7 @@ window.onload = function () {
             move_down = true;
             turn_left = true;
             turn_right = true;
-            
+
             panic_periode = false;
         }
 
@@ -833,15 +894,15 @@ window.onload = function () {
                 setTimeout(function () {
                     clearInterval(panic_periode);
                 }, periode_of_panic_buton);
-                setTimeout(stop, periode_of_panic_buton+1);
+                setTimeout(stop, periode_of_panic_buton + 1);
             }
         }
-        
+
     });
 
     //-------------------------------------------------------------------------
     // Proximity obstacle event control
-
+    var proximity_alert = false;
     topic_proximity_obstacles.subscribe(function (message) {
         console.log('Received message on' + topic_proximity_obstacles.name
                 + " " + message.x1
@@ -855,14 +916,6 @@ window.onload = function () {
 
         var data = [message.x1, message.x2, message.x3, message.x4, message.x5, message.x6, message.x7, message.x8];
 
-        $("#proximity").css('border-color', grey_p_ok);
-        $("#proximity_level2").css('border-color', grey_p_ok);
-        $("#proximity1").css('border-color', grey_p_ok);
-        $("#proximity1_level2").css('border-color', grey_p_ok);
-        $("#proximity2").css('border-color', grey_p_ok);
-        $("#proximity2_level2").css('border-color', grey_p_ok);
-        $("#proximity3").css('border-color', grey_p_ok);
-        $("#proximity3_level2").css('border-color', grey_p_ok);
         $("#proximity4").css('border-color', grey_p_ok);
         $("#proximity4_level2").css('border-color', grey_p_ok);
         $("#proximity5").css('border-color', grey_p_ok);
@@ -871,155 +924,168 @@ window.onload = function () {
         $("#proximity6_level2").css('border-color', grey_p_ok);
         $("#proximity7").css('border-color', grey_p_ok);
         $("#proximity7_level2").css('border-color', grey_p_ok);
+        $("#proximity").css('border-color', grey_p_ok);
+        $("#proximity_level2").css('border-color', grey_p_ok);
+        $("#proximity1").css('border-color', grey_p_ok);
+        $("#proximity1_level2").css('border-color', grey_p_ok);
+        $("#proximity2").css('border-color', grey_p_ok);
+        $("#proximity2_level2").css('border-color', grey_p_ok);
+        $("#proximity3").css('border-color', grey_p_ok);
+        $("#proximity3_level2").css('border-color', grey_p_ok);
         var find = false;
         for (var iter = 0; iter < 8; iter++) {
 
             if (data[iter] < proximity_level1) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', green_p_ok);
-                        break;
-                    case 1 :
-                        $("#proximity1").css('border-color', green_p_ok);
-                        break;
-                    case 2 :
-                        $("#proximity2").css('border-color', green_p_ok);
-                        break;
-                    case 3 :
-                        $("#proximity3").css('border-color', green_p_ok);
-                        break;
-                    case 4 :
                         $("#proximity4").css('border-color', green_p_ok);
                         break;
-                    case 5 :
+                    case 1 :
                         $("#proximity5").css('border-color', green_p_ok);
                         break;
-                    case 6 :
+                    case 2 :
                         $("#proximity6").css('border-color', green_p_ok);
                         break;
-                    default :
+                    case 3 :
                         $("#proximity7").css('border-color', green_p_ok);
+                        break;
+                    case 4 :
+                        $("#proximity").css('border-color', green_p_ok);
+                        break;
+                    case 5 :
+                        $("#proximity1").css('border-color', green_p_ok);
+                        break;
+                    case 6 :
+                        $("#proximity2").css('border-color', green_p_ok);
+                        break;
+                    default :
+                        $("#proximity3").css('border-color', green_p_ok);
                         break;
                 }
             }
             if (data[iter] < proximity_level2) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', orange_p_warning);
-                        $("#proximity_level2").css('border-color', green_p_ok);
-                        break;
-                    case 1 :
-                        $("#proximity1").css('border-color', orange_p_warning);
-                        $("#proximity1_level2").css('border-color', green_p_ok);
-                        break;
-                    case 2 :
-                        $("#proximity2").css('border-color', orange_p_warning);
-                        $("#proximity2_level2").css('border-color', green_p_ok);
-                        break;
-                    case 3 :
-                        $("#proximity3").css('border-color', orange_p_warning);
-                        $("#proximity3_level2").css('border-color', green_p_ok);
-                        break;
-                    case 4 :
                         $("#proximity4").css('border-color', orange_p_warning);
                         $("#proximity4_level2").css('border-color', green_p_ok);
                         break;
-                    case 5 :
+                    case 1 :
                         $("#proximity5").css('border-color', orange_p_warning);
                         $("#proximity5_level2").css('border-color', green_p_ok);
                         break;
-                    case 6 :
+                    case 2 :
                         $("#proximity6").css('border-color', orange_p_warning);
                         $("#proximity6_level2").css('border-color', green_p_ok);
                         break;
-                    default :
+                    case 3 :
                         $("#proximity7").css('border-color', orange_p_warning);
                         $("#proximity7_level2").css('border-color', green_p_ok);
+                        break;
+                    case 4 :
+                        $("#proximity").css('border-color', orange_p_warning);
+                        $("#proximity_level2").css('border-color', green_p_ok);
+                        break;
+                    case 5 :
+                        $("#proximity1").css('border-color', orange_p_warning);
+                        $("#proximity1_level2").css('border-color', green_p_ok);
+                        break;
+                    case 6 :
+                        $("#proximity2").css('border-color', orange_p_warning);
+                        $("#proximity2_level2").css('border-color', green_p_ok);
+                        break;
+                    default :
+                        $("#proximity3").css('border-color', orange_p_warning);
+                        $("#proximity3_level2").css('border-color', green_p_ok);
                         break;
                 }
             }
             if (data[iter] < proximity_level3) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', red_alert);
-                        $("#proximity_level2").css('border-color', orange_p_warning);
-                        break;
-                    case 1 :
-                        $("#proximity1").css('border-color', red_p_alert);
-                        $("#proximity1_level2").css('border-color', orange_p_warning);
-                        break;
-                    case 2 :
-                        $("#proximity2").css('border-color', red_p_alert);
-                        $("#proximity2_level2").css('border-color', orange_p_warning);
-                        break;
-                    case 3 :
-                        $("#proximity3").css('border-color', red_p_alert);
-                        $("#proximity3_level2").css('border-color', orange_p_warning);
-                        break;
-                    case 4 :
-                        $("#proximity4").css('border-color', red_p_alert);
+                        $("#proximity4").css('border-color', red_alert);
                         $("#proximity4_level2").css('border-color', orange_p_warning);
                         break;
-                    case 5 :
+                    case 1 :
                         $("#proximity5").css('border-color', red_p_alert);
                         $("#proximity5_level2").css('border-color', orange_p_warning);
                         break;
-                    case 6 :
+                    case 2 :
                         $("#proximity6").css('border-color', red_p_alert);
                         $("#proximity6_level2").css('border-color', orange_p_warning);
                         break;
-                    default :
+                    case 3 :
                         $("#proximity7").css('border-color', red_p_alert);
                         $("#proximity7_level2").css('border-color', orange_p_warning);
+                        break;
+                    case 4 :
+                        $("#proximity").css('border-color', red_p_alert);
+                        $("#proximity_level2").css('border-color', orange_p_warning);
+                        break;
+                    case 5 :
+                        $("#proximity1").css('border-color', red_p_alert);
+                        $("#proximity1_level2").css('border-color', orange_p_warning);
+                        break;
+                    case 6 :
+                        $("#proximity2").css('border-color', red_p_alert);
+                        $("#proximity2_level2").css('border-color', orange_p_warning);
+                        break;
+                    default :
+                        $("#proximity3").css('border-color', red_p_alert);
+                        $("#proximity3_level2").css('border-color', orange_p_warning);
                         break;
                 }
             }
             if (data[iter] < proximity_level4) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity").css('border-color', red_p_alert);
-                        $("#proximity_level2").css('border-color', red_p_alert);
-                        break;
-                    case 1 :
-                        $("#proximity1").css('border-color', red_p_alert);
-                        $("#proximity1_level2").css('border-color', red_p_alert);
-                        break;
-                    case 2 :
-                        $("#proximity2").css('border-color', red_p_alert);
-                        $("#proximity2_level2").css('border-color', red_p_alert);
-                        break;
-                    case 3 :
-                        $("#proximity3").css('border-color', red_p_alert);
-                        $("#proximity3_level2").css('border-color', red_p_alert);
-                        break;
-                    case 4 :
                         $("#proximity4").css('border-color', red_p_alert);
                         $("#proximity4_level2").css('border-color', red_p_alert);
                         break;
-                    case 5 :
+                    case 1 :
                         $("#proximity5").css('border-color', red_p_alert);
                         $("#proximity5_level2").css('border-color', red_p_alert);
                         break;
-                    case 6 :
+                    case 2 :
                         $("#proximity6").css('border-color', red_p_alert);
                         $("#proximity6_level2").css('border-color', red_p_alert);
                         break;
-                    default :
+                    case 3 :
                         $("#proximity7").css('border-color', red_p_alert);
                         $("#proximity7_level2").css('border-color', red_p_alert);
+                        break;
+                    case 4 :
+                        $("#proximity").css('border-color', red_p_alert);
+                        $("#proximity_level2").css('border-color', red_p_alert);
+                        break;
+                    case 5 :
+                        $("#proximity1").css('border-color', red_p_alert);
+                        $("#proximity1_level2").css('border-color', red_p_alert);
+                        break;
+                    case 6 :
+                        $("#proximity2").css('border-color', red_p_alert);
+                        $("#proximity2_level2").css('border-color', red_p_alert);
+                        break;
+                    default :
+                        $("#proximity3").css('border-color', red_p_alert);
+                        $("#proximity3_level2").css('border-color', red_p_alert);
                         break;
                 }
                 find = true;
                 //allow movement with speed limit 
-                speed_limit = speed_reduction;
-                $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + data[iter] + "</p>");
-                //scroll le div à la fin 
-                $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+                if (!proximity_alert) {
+                    speed_limit = speed_reduction;
+                    $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + data[iter] + "</p>");
+                    //scroll le div à la fin 
+                    $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+                    proximity_alert = true;
+                }
+
             }
         }
         if (!find) {
             //allow movement with full speed (ie 100%)
             speed_limit = 0;
+            proximity_alert = false;
         }
     });
 
@@ -1083,8 +1149,7 @@ window.onload = function () {
         console.log('Battery value ' + message.data);
 
         //Update the battery view in room_user.html
-        var battery = $('battery');
-        var level = parseInt(message.data) / 255 * 100;
+        var level = parseInt(message.data) / battery_max * 100;
         var batteryLevel = $('#battery-level');
         batteryLevel.css('width', level + '%');
         if (level > battery_level2) {
