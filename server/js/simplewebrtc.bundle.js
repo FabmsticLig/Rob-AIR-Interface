@@ -24,7 +24,7 @@ function SimpleWebRTC(opts) {
             adjustPeerVolume: true,
             peerVolumeWhenSpeaking: 0.25,
             media: {
-                video: true,
+                video: {mandatory:{maxFrameRate : 30, maxWidth: 1280, maxHeight: 720 } },
                 audio: true
             },
             localVideo: {

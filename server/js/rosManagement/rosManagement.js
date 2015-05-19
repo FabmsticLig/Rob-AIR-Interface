@@ -189,7 +189,7 @@ window.onload = function () {
     var topic_proximity_obstacles = new ROSLIB.Topic({
         ros: ros,
         name: '/proximity_obstacles',
-        messageType: 'm49test/Sonars'
+        messageType: 'md49test/Sonars'
     });
 
     //Topic for end_line_obstacles (not yet implemented)
