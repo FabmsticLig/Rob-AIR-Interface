@@ -4,7 +4,26 @@
 var room = location.href && location.href.split('room/')[1];
 console.log("room name : " + room);
 console.log("location.href = " + location.href);
+
+/*MediaStreamTrack.getSources(function (deviceOptions){
+        if (deviceOptions){
+            var camNum = 1; //count the number of cameras for id if device label is unavailable
+            for (var x=0; x<deviceOptions.length; x++){
+                if (deviceOptions[x].kind == 'video') {
+		    console.log("camera found : ");
+		    console.log("   label: " + deviceOptions[x].label);
+		    console.log("   id : " + deviceOptions[x].id);
+               }
+            }
+        }
+        else {
+            console.log("No device sources found");
+        }
+    });
+*/
+
 // create our webrtc connection
+//head
 var webrtc = new SimpleWebRTC({
     // the id/element dom element that will hold "our" video
     localVideoEl: 'localVideo',
@@ -12,17 +31,24 @@ var webrtc = new SimpleWebRTC({
     remoteVideosEl: 'principal',
     // immediately ask for camera access
     autoRequestMedia: true,
-    debug: true,
+    debug: false,
     detectSpeakingEvents: true,
     autoAdjustMic: false,
     media :{
-        audio:true,
+	audio:true,
+        //audio:{
+	//	stereo:true,
+	//	echoCancellation:false
+	//},
         video:{
                 mandatory:
                     {
-                        //maxWidth:320,
-                        //maxHeight:100,
-                        maxFrameRate:60
+			//sourceId: 'ca2b61bc934d47ef9cd9fcc6f8fc567fa7f20d400fb6ff5841f7c2b6f4760694',
+                        maxWidth:640,
+                        maxHeight:480,
+			minWidth:640,
+			minHeight:480,
+                        //maxFrameRate:10
                     }
               }
     }
@@ -33,6 +59,8 @@ webrtc.on('readyToCall', function () {
    // you can name it anything
    if (room) webrtc.joinRoom(room);
 });
+
+
 
 // Since we use this twice we put it here
 function setRoom(name) {

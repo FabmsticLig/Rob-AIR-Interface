@@ -15,18 +15,18 @@ function SimpleWebRTC(opts) {
             //url: 'http://localhost:8088',
 			url: 'http://192.168.1.2:8088',
             socketio: {/* 'force new connection':true*/},
-            debug: false,
-            localVideoEl: '',
-            remoteVideosEl: '',
-            enableDataChannels: true,
-            autoRequestMedia: false,
-            autoRemoveVideos: true,
-            adjustPeerVolume: true,
-            peerVolumeWhenSpeaking: 0.25,
-            media: {
-                video: {mandatory:{maxFrameRate : 30, maxWidth: 1280, maxHeight: 720 } },
-                audio: true
-            },
+            //debug: true,
+            //localVideoEl: '',
+            //remoteVideosEl: '',
+            //enableDataChannels: true,
+            autoRequestMedia: true,
+            //autoRemoveVideos: true,
+            //adjustPeerVolume: true,
+            //peerVolumeWhenSpeaking: 0.25,
+            //media: {
+            //    video: {mandatory:{maxFrameRate : 30, maxWidth: 640, maxHeight: 480 } },
+            //    audio: true
+            //},
             localVideo: {
                 autoplay: true,
                 mirror: true,
@@ -34,7 +34,7 @@ function SimpleWebRTC(opts) {
             }
         };
     var item, connection;
-
+    
     // We also allow a 'logger' option. It can be any object that implements
     // log, warn, and error methods.
     // We log nothing by default, following "the rule of silence":
@@ -228,6 +228,7 @@ function SimpleWebRTC(opts) {
     });
 
     if (this.config.autoRequestMedia) this.startLocalVideo();
+
 }
 
 
@@ -350,6 +351,8 @@ SimpleWebRTC.prototype.getEl = function (idOrEl) {
 
 SimpleWebRTC.prototype.startLocalVideo = function () {
     var self = this;
+    //this.logger.log('startLocalVideo');
+    //this.logger.log('maxVideoWidth '+ this.config.media.video.mandatory.maxWidth);
     this.webrtc.startLocalMedia(this.config.media, function (err, stream) {
         if (err) {
             self.emit('localMediaError', err);

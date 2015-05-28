@@ -158,6 +158,12 @@ img {
     overflow-y:auto; 
 }
 
+#indication_board2 {
+    height: 50pt;
+    overflow-y:auto; 
+}
+
+
 /*hug statement*/
 #hug {
     color : rgb(0,0,0);
