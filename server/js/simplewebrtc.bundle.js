@@ -13,7 +13,7 @@ function SimpleWebRTC(opts) {
     var options = opts || {};
     var config = this.config = {
             //url: 'http://localhost:8088',
-			url: 'http://192.168.1.2:8088',
+			url: 'http://192.168.0.51:8088',
             socketio: {/* 'force new connection':true*/},
             //debug: true,
             //localVideoEl: '',

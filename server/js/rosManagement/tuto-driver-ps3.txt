@@ -1,0 +1,8 @@
+sudo apt-get install xboxdrv
+sudo xboxdrv --detach-kernel-driver //pour vérifier que ça marche bien
+sudo apt-get install jstest-gtk
+jstest-gtk                          //pour calibrer la mannete
+
+rosmanagement.js
+simpleWebrtc.bundle.js
+

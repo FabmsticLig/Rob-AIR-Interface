@@ -10,6 +10,8 @@ window.onload = function () {
     //see ../control.js
     init();
 
+//    var audio = new Audio('728.wav');
+//    audio.play();
     //-------------------------------------------------------------------------
     //=======================================
     //====== Connecting to ROS======
@@ -17,7 +19,7 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     var ros = new ROSLIB.Ros({
         //url : 'ws://localhost:9090'
-        url: 'ws://192.168.1.2:9090'
+        url: 'ws://192.168.0.51:9090'
     });
 
 
@@ -46,9 +48,11 @@ window.onload = function () {
     var turn_right = true;
 
     //interval of speed
-    var speed_max = 60;
+    var speed_max = 127;
     var speed_stop = 0;
-    var speed_min = -60;
+    var speed_min = -127;
+    var current_speed_max = speed_max;
+    var current_speed_min = speed_min;
 
     //current speed
     var current_speed1 = speed_stop;
@@ -56,24 +60,26 @@ window.onload = function () {
     //limit of speed in case proximity (ie 100% = 0)
     var speed_limit = 0;
     //max speed - speed reduction = speed limit
-    var speed_reduction = 40;
+    var speed_reduction = 50;
 
     //Default keyboard control
-    var key_stop = 83; //'s' 
-    var key_forward = 38; // arrow up
-    var key_backward = 40; // arrow down
-    var key_turn_left = 37; // arrow left
+    var key_stop = 83;       //'s' 
+    var key_forward = 38;    // arrow up
+    var key_backward = 40;   // arrow down
+    var key_turn_left = 37;  // arrow left
     var key_turn_right = 39; // arrow right
-    var key_gaze_left = 81; //'q'
+    var key_gaze_left = 81;  //'q'
     var key_gaze_right = 68; //'d'
-    var key_head_left = 65; //'a'
+    var key_head_left = 65;  //'a'
     var key_head_right = 69; //'e'
+    var key_speed_up = 107;   //+
+    var key_speed_down = 109; //-
 
     //initial Gaze_direction [0,255]
-    var gaze_max = 255;
+    var gaze_max = 256;
     var gaze_min = 0;
     //in this case 127
-    var gaze_front_value = 127;
+    var gaze_front_value = 128;
     var gaze_value = gaze_front_value;
     //In this case 8 possibility whith 64 degres by increments or decrements
     var gaze_increment = 32;
@@ -89,10 +95,10 @@ window.onload = function () {
     var head_increment = 5;
 
     //proximity level in centimeter in [0,255]
-    var proximity_level1 = 80;
-    var proximity_level2 = 70;
-    var proximity_level3 = 60;
-    var proximity_level4 = 40;
+    var proximity_level1 = 40;
+    var proximity_level2 = 30;
+    var proximity_level3 = 20;
+    var proximity_level4 = 10;
 
     //max battery level
     var battery_max = 24;
@@ -127,8 +133,6 @@ window.onload = function () {
     var orange_p_warning = 'transparent transparent transparent rgb(218, 97, 0)';
     var red_alert = 'rgb(255, 0, 0)';
     var red_p_alert = 'transparent transparent transparent rgb(255, 0, 0)';
-    $('#indication_board2').append("<p>" + Math.round(speed_max) + " " + Math.round(speed_max) + "</p>");
-    $('#indication_board2').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
 
     //-------------------------------------------------------------------------
     //============================================================
@@ -222,12 +226,18 @@ window.onload = function () {
     //-------------------------------------------------------------------------
     //Gaze_direction
 
+    var gaze_default_position = 6;
+    var gaze_current_position = 0;
     //function called after 30s of setting gaze direction
     var resetGazeDirection = function () {
         gaze_value = gaze_front_value;
         var gaze = new ROSLIB.Message({
             data: Math.round(gaze_value)
         });
+        gaze_current_position += 2;
+        $('#gaze-dir').css('margin-left', gaze_default_position);
+        $('#gaze-dir').css('background', black_ok);
+        $('#gaze').css('border-color', black_ok);
         console.log("gaze direction published 127");
         topic_gaze_direction.publish(gaze);
         gaze_timeout = false;
@@ -241,9 +251,13 @@ window.onload = function () {
         //d 68
         if (key === key_gaze_left)
         {
-            if (gaze_value > gaze_min - gaze_increment) {
+            if (gaze_value - gaze_increment >= gaze_min ) {
                 gaze_value -= gaze_increment;
-                console.log("Turn sight to Left");
+                gaze_current_position -= 2;
+                $('#gaze-dir').css('margin-left', gaze_default_position + gaze_current_position);
+                $('#gaze-dir').css('background', green_ok);
+                $('#gaze').css('border-color', green_ok);
+                console.log("Turn sight to Left ");
             }
             else {
                 console.log("Max left position reached");
@@ -251,8 +265,12 @@ window.onload = function () {
             }
 
         } else if (key === key_gaze_right) {
-            if (gaze_value < gaze_max + gaze_increment) {
+            if (gaze_value + gaze_increment <= gaze_max -1) {
                 gaze_value += gaze_increment;
+                gaze_current_position += 2;
+                $('#gaze-dir').css('margin-left', gaze_default_position + gaze_current_position);
+                $('#gaze-dir').css('background', green_ok);
+                $('#gaze').css('border-color', green_ok);
                 console.log("Turn sight to Right");
             }
             else {
@@ -262,8 +280,8 @@ window.onload = function () {
 
         }
 
-        if (gaze_value > gaze_max) {
-            gaze_value = gaze_max;
+        if (gaze_value > gaze_max-1) {
+            gaze_value = gaze_max-1;
         }
         if (gaze_value < gaze_min) {
             gaze_value = gaze_min;
@@ -382,7 +400,6 @@ window.onload = function () {
             else {
                 console.log("Max left position reached");
                 head_direction = head_max;
-                $('#indication_board').append("<p> Limite de rotation de la tete a gauche atteinte </p>");
             }
 
         } else if (key === key_head_right) {
@@ -393,7 +410,6 @@ window.onload = function () {
             else {
                 console.log("Max right position reached");
                 head_direction = head_min;
-                $('#indication_board').append("<p> Limite de rotation de la tete a droite atteinte </p>");
             }
 
         }
@@ -471,23 +487,23 @@ window.onload = function () {
             if (key === key_forward && move_up) {
                 // up arrow
                 console.log("up Arrow");
-                speed1 = speed_max - speed_limit;
-                speed2 = speed_max - speed_limit;
+                speed1 = current_speed_max - speed_limit;
+                speed2 = current_speed_max - speed_limit;
             } else if (key === key_backward && move_down) {
                 // down arrow
                 console.log("down Arrow");
-                speed1 = speed_min + speed_limit;
-                speed2 = speed_min + speed_limit;
+                speed1 = current_speed_min + speed_limit;
+                speed2 = current_speed_min + speed_limit;
             } else if (key === key_turn_left && turn_left) {
                 // left arrow
                 console.log("left Arrow");
-                speed1 = speed_max - speed_limit;
-                speed2 = speed_min + speed_limit;
+                speed1 = current_speed_max - speed_limit;
+                speed2 = current_speed_min + speed_limit;
             } else if (key === key_turn_right && turn_right) {
                 // right arrow
                 console.log("right Arrow");
-                speed1 = speed_min + speed_limit;
-                speed2 = speed_max - speed_limit;
+                speed1 = current_speed_min + speed_limit;
+                speed2 = current_speed_max - speed_limit;
             } else if (key === key_stop
                     || !move_up
                     || !move_down
@@ -516,6 +532,7 @@ window.onload = function () {
     //                   - 's' for STOP
     //                   - 'q' and 'd' for gaze direction
     //                   - 'a' and 'e' for head direction
+    //                   - '+' and '-' for speed limitation
     document.addEventListener('keydown', function (e) {
         e = e || window.event;
 
@@ -534,6 +551,10 @@ window.onload = function () {
         } else if (keyCode === key_head_left || keyCode === key_head_right) {
             e.preventDefault();
             setHeadDirection(e.keyCode);
+            //speed configuration
+        } else if (keyCode === key_speed_up || keyCode === key_speed_down) {
+            e.preventDefault();
+            setSpeedLimit(e.keyCode);
         }
     }, false);
 
@@ -546,10 +567,31 @@ window.onload = function () {
     this.remote.head_l.click(clickButton.bind(null, key_head_left));
     this.remote.head_r.click(clickButton.bind(null, key_head_right));
 
+
+    var setSpeedLimit = function (key) {
+        if (key === key_speed_up) {
+            if (current_speed_max + 8 <= speed_max) {
+                current_speed_max += 8;
+                current_speed_min -= 8;
+                var level = current_speed_max / speed_max * 100;
+                $('#speed-level').css('width', level + '%');
+                console.log("speed up");
+            }
+        } else {
+            if (current_speed_max - 8 >= speed_stop) {
+                current_speed_max -= 8;
+                current_speed_min += 8;
+                var level = current_speed_max / speed_max * 100;
+                $('#speed-level').css('width', level + '%');
+                console.log("speed down");
+            }
+        }
+    };
+
     //-------------------------------------------------------------------------
     // Control with mouse motion
 
-    
+
     //allow/disable mouse control by clicdown on mouse pad
     var mouse_event_enter = false;
     // bind mouse
@@ -593,8 +635,8 @@ window.onload = function () {
         normX = normX.substring(normX.length - 2, 0);
         normY = normY.substring(normY.length - 2, 0);
 
-        var kx = 2 * speed_max / normX;
-        var ky = 2 * speed_max / normY;
+        var kx = 2 * current_speed_max / normX;
+        var ky = 2 * current_speed_max / normY;
 
         var x0 = normX / 2 + window_elem.left;
         var y0 = normY / 2 + window_elem.top;
@@ -697,20 +739,20 @@ window.onload = function () {
                 speed1 += speed_stop;
                 speed2 += speed_stop;
 
-                if (speed1 >= speed_max - speed_limit) {
-                    speed1 = speed_max - speed_limit;
+                if (speed1 >= current_speed_max - speed_limit) {
+                    speed1 = current_speed_max - speed_limit;
                 }
 
-                if (speed1 <= speed_min + speed_limit) {
-                    speed1 = speed_min + speed_limit;
+                if (speed1 <= current_speed_min + speed_limit) {
+                    speed1 = current_speed_min + speed_limit;
                 }
 
-                if (speed2 >= speed_max - speed_limit) {
-                    speed2 = speed_max - speed_limit;
+                if (speed2 >= current_speed_max - speed_limit) {
+                    speed2 = current_speed_max - speed_limit;
                 }
 
-                if (speed2 <= speed_min + speed_limit) {
-                    speed2 = speed_min + speed_limit;
+                if (speed2 <= current_speed_min + speed_limit) {
+                    speed2 = current_speed_min + speed_limit;
                 }
 
                 var msg = new ROSLIB.Message({
@@ -738,12 +780,14 @@ window.onload = function () {
     // Collision event control
 
     var collision_periode = false;
+    var wait_after_collision = 0;
     topic_collision.subscribe(function (message) {
         console.log('Received message on ' + topic_collision.name + ': ' + message.data);
         //get indication_board div and append the message only if there is a collision
 
         var boolClign = 1;
         var clignotement = function () {
+            wait_after_collision++;
             if (boolClign === 0) {
                 boolClign = 1;
                 $("#circle").css('color', red_alert);
@@ -762,13 +806,13 @@ window.onload = function () {
 
         if (message.data) {
             //movement are prohibited and robot stop
-        console.log('COLLISION');
+            console.log('COLLISION');
             move_up = false;
             move_down = false;
             turn_left = false;
             turn_right = false;
-	    var speed1 = 0;
-	    var speed2 = 0;
+            var speed1 = 0;
+            var speed2 = 0;
             var msg = new ROSLIB.Message({
                 speed1: speed_stop,
                 speed2: speed_stop
@@ -778,11 +822,6 @@ window.onload = function () {
             current_speed2 = speed2;
             topic_cmd.publish(msg);
             console.log("published : Emergency Stop");
-
-            //display error
-            $('#indication_board').append("<p> Collision détectée </p>");
-            //scroll le div à la fin 
-            $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
 
             if (!collision_periode) {
                 collision_periode = setInterval(clignotement, 500);
@@ -795,11 +834,16 @@ window.onload = function () {
 
         } else {
             if (collision_periode) {
+                if (wait_after_collision < 5) {
+                    sleep(3000);
+                }
                 clearInterval(collision_periode);
                 collision_periode = false;
             }
+            wait_after_collision = 0;
             $("#circle").css('color', green_ok);
             $("#circle").css('background', white_ok);
+            $("#circle").css('border-color', white_ok);
             $("#up_possibility").css('color', black_ok);
             $("#down_possibility").css('color', black_ok);
             $("#left_possibility").css('color', black_ok);
@@ -901,10 +945,6 @@ window.onload = function () {
             turn_left = false;
             turn_right = false;
 
-            //display error
-            $('#indication_board').append("<p> \"Panic button\" activé </p>");
-            //scroll le div à la fin 
-            $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
             if (!panic_periode) {
                 panic_periode = setInterval(clignotement, 700);
                 setTimeout(function () {
@@ -931,33 +971,33 @@ window.onload = function () {
                 + " " + message.x8);
 
         var data = [message.x1, message.x2, message.x3, message.x4, message.x5, message.x6, message.x7, message.x8];
-	//in case of sonar trouble
-      	if (message.x1 === 0){
+        //in case of sonar trouble
+        if (message.x1 === 0) {
             data[0] = 255;
         }
-        if (message.x2 === 0){
+        if (message.x2 === 0) {
             data[1] = 255;
         }
-        if (message.x3 === 0){
+        if (message.x3 === 0) {
             data[2] = 255;
         }
-        if (message.x4 === 0){
+        if (message.x4 === 0) {
             data[3] = 255;
         }
-        if (message.x5 === 0){
+        if (message.x5 === 0) {
             data[4] = 255;
         }
-        if (message.x6 === 0){
+        if (message.x6 === 0) {
             data[5] = 255;
         }
-        if (message.x7 === 0){
+        if (message.x7 === 0) {
             data[6] = 255;
         }
-        if (message.x8 === 0){
+        if (message.x8 === 0) {
             data[7] = 255;
         }
-	//from top left in horloge cycle
-	$("#proximity7").css('border-color', grey_p_ok);
+        //from top left in horloge cycle
+        $("#proximity7").css('border-color', grey_p_ok);
         $("#proximity7_level2").css('border-color', grey_p_ok);
         $("#proximity5").css('border-color', grey_p_ok);
         $("#proximity5_level2").css('border-color', grey_p_ok);
@@ -979,28 +1019,28 @@ window.onload = function () {
             if (data[iter] < proximity_level1) {
                 switch (iter) {
                     case 0 :
-                        $("#proximity7").css('border-color', green_p_ok);
+                        $("#proximity7").css('border-color', green_p_ok); //7
                         break;
                     case 1 :
-                        $("#proximity5").css('border-color', green_p_ok);
+                        $("#proximity6").css('border-color', green_p_ok); //5
                         break;
                     case 2 :
-                        $("#proximity4").css('border-color', green_p_ok);
+                        $("#proximity5").css('border-color', green_p_ok); //4
                         break;
                     case 3 :
-                        $("#proximity6").css('border-color', green_p_ok);
+                        $("#proximity4").css('border-color', green_p_ok); //6
                         break;
                     case 4 :
-                        $("#proximity3").css('border-color', green_p_ok);
+                        $("#proximity2").css('border-color', green_p_ok); //3
                         break;
                     case 5 :
-                        $("#proximity2").css('border-color', green_p_ok);
+                        $("#proximity1").css('border-color', green_p_ok); //2
                         break;
                     case 6 :
-                        $("#proximity1").css('border-color', green_p_ok);
+                        $("#proximity3").css('border-color', green_p_ok); //1
                         break;
                     default :
-                        $("#proximity0").css('border-color', green_p_ok);
+                        $("#proximity0").css('border-color', green_p_ok);  //0
                         break;
                 }
             }
@@ -1011,31 +1051,31 @@ window.onload = function () {
                         $("#proximity7_level2").css('border-color', green_p_ok);
                         break;
                     case 1 :
-                        $("#proximity5").css('border-color', orange_p_warning);
-                        $("#proximity5_level2").css('border-color', green_p_ok);
-                        break;
-                    case 2 :
-                        $("#proximity4").css('border-color', orange_p_warning);
-                        $("#proximity4_level2").css('border-color', green_p_ok);
-                        break;
-                    case 3 :
-                        $("#proximity6").css('border-color', orange_p_warning);
+                        $("#proximity6").css('border-color', orange_p_warning);  //3
                         $("#proximity6_level2").css('border-color', green_p_ok);
                         break;
-                    case 4 :
-                        $("#proximity3").css('border-color', orange_p_warning);
-                        $("#proximity3_level2").css('border-color', green_p_ok);
+                    case 2 :
+                        $("#proximity5").css('border-color', orange_p_warning);  //5
+                        $("#proximity5_level2").css('border-color', green_p_ok);
                         break;
-                    case 5 :
-                        $("#proximity2").css('border-color', orange_p_warning);
+                    case 3 :
+                        $("#proximity4").css('border-color', orange_p_warning);  //4
+                        $("#proximity4_level2").css('border-color', green_p_ok);
+                        break;
+                    case 4 :
+                        $("#proximity2").css('border-color', orange_p_warning);  //2
                         $("#proximity2_level2").css('border-color', green_p_ok);
                         break;
-                    case 6 :
-                        $("#proximity1").css('border-color', orange_p_warning);
+                    case 5 :
+                        $("#proximity1").css('border-color', orange_p_warning);   //0
                         $("#proximity1_level2").css('border-color', green_p_ok);
                         break;
+                    case 6 :
+                        $("#proximity3").css('border-color', orange_p_warning);  //1
+                        $("#proximity3_level2").css('border-color', green_p_ok);
+                        break;
                     default :
-                        $("#proximity").css('border-color', orange_p_warning);
+                        $("#proximity").css('border-color', orange_p_warning);   //6
                         $("#proximity_level2").css('border-color', green_p_ok);
                         break;
                 }
@@ -1047,28 +1087,28 @@ window.onload = function () {
                         $("#proximity7_level2").css('border-color', orange_p_warning);
                         break;
                     case 1 :
-                        $("#proximity5").css('border-color', red_p_alert);
-                        $("#proximity5_level2").css('border-color', orange_p_warning);
-                        break;
-                    case 2 :
-                        $("#proximity4").css('border-color', red_p_alert);
-                        $("#proximity4_level2").css('border-color', orange_p_warning);
-                        break;
-                    case 3 :
                         $("#proximity6").css('border-color', red_p_alert);
                         $("#proximity6_level2").css('border-color', orange_p_warning);
                         break;
-                    case 4 :
-                        $("#proximity3").css('border-color', red_p_alert);
-                        $("#proximity3_level2").css('border-color', orange_p_warning);
+                    case 2 :
+                        $("#proximity5").css('border-color', red_p_alert);
+                        $("#proximity5_level2").css('border-color', orange_p_warning);
                         break;
-                    case 5 :
+                    case 3 :
+                        $("#proximity4").css('border-color', red_p_alert);
+                        $("#proximity4_level2").css('border-color', orange_p_warning);
+                        break;
+                    case 4 :
                         $("#proximity2").css('border-color', red_p_alert);
                         $("#proximity2_level2").css('border-color', orange_p_warning);
                         break;
-                    case 6 :
+                    case 5 :
                         $("#proximity1").css('border-color', red_p_alert);
                         $("#proximity1_level2").css('border-color', orange_p_warning);
+                        break;
+                    case 6 :
+                        $("#proximity3").css('border-color', red_p_alert);
+                        $("#proximity3_level2").css('border-color', orange_p_warning);
                         break;
                     default :
                         $("#proximity").css('border-color', red_p_alert);
@@ -1083,28 +1123,28 @@ window.onload = function () {
                         $("#proximity7_level2").css('border-color', red_p_alert);
                         break;
                     case 1 :
-                        $("#proximity5").css('border-color', red_p_alert);
-                        $("#proximity5_level2").css('border-color', red_p_alert);
-                        break;
-                    case 2 :
-                        $("#proximity4").css('border-color', red_p_alert);
-                        $("#proximity4_level2").css('border-color', red_p_alert);
-                        break;
-                    case 3 :
                         $("#proximity6").css('border-color', red_p_alert);
                         $("#proximity6_level2").css('border-color', red_p_alert);
                         break;
-                    case 4 :
-                        $("#proximity3").css('border-color', red_p_alert);
-                        $("#proximity3_level2").css('border-color', red_p_alert);
+                    case 2 :
+                        $("#proximity5").css('border-color', red_p_alert);
+                        $("#proximity5_level2").css('border-color', red_p_alert);
                         break;
-                    case 5 :
+                    case 3 :
+                        $("#proximity4").css('border-color', red_p_alert);
+                        $("#proximity4_level2").css('border-color', red_p_alert);
+                        break;
+                    case 4 :
                         $("#proximity2").css('border-color', red_p_alert);
                         $("#proximity2_level2").css('border-color', red_p_alert);
                         break;
-                    case 6 :
+                    case 5 :
                         $("#proximity1").css('border-color', red_p_alert);
                         $("#proximity1_level2").css('border-color', red_p_alert);
+                        break;
+                    case 6 :
+                        $("#proximity3").css('border-color', red_p_alert);
+                        $("#proximity3_level2").css('border-color', red_p_alert);
                         break;
                     default :
                         $("#proximity").css('border-color', red_p_alert);
@@ -1114,10 +1154,8 @@ window.onload = function () {
                 find = true;
                 //allow movement with speed limit 
                 if (!proximity_alert) {
-                    speed_limit = speed_reduction;
-                    $('#indication_board').append("<p> Obstacle détecté à la position " + iter + " à la distance " + data[iter] + "</p>");
-                    //scroll le div à la fin 
-                    $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+                    speed_limit = Math.round(speed_reduction * speed_max / current_speed_max);
+
                     proximity_alert = true;
                     var speed1 = speed_stop;
                     var speed2 = speed_stop;
@@ -1131,8 +1169,14 @@ window.onload = function () {
                     } else if (current_speed1 < speed_stop) {
                         speed2 = current_speed2 + speed_limit;
                     }
-		    $('#indication_board2').append("<p style=\"color:red\">" + Math.round(speed1) + " " + Math.round(speed2) + "</p>");
-                    $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+                    $("#circle").css('background', orange_warning);
+                    $("#up_possibility").css('color', orange_warning);
+                    $("#down_possibility").css('color', orange_warning);
+                    $("#left_possibility").css('color', orange_warning);
+                    $("#right_possibility").css('color', orange_warning);
+                    current_speed2 = speed2;
+                    current_speed1 = speed1;
+
                     var msg = new ROSLIB.Message({
                         speed1: speed1,
                         speed2: speed2
@@ -1144,10 +1188,14 @@ window.onload = function () {
         }
         if (!find) {
             //allow movement with full speed (ie 100%)
+            $("#circle").css('color', white_ok);
+            $("#up_possibility").css('color', black_ok);
+            $("#down_possibility").css('color', black_ok);
+            $("#left_possibility").css('color', black_ok);
+            $("#right_possibility").css('color', black_ok);
             speed_limit = 0;
             proximity_alert = false;
-	    $('#indication_board2').append("<p>" + Math.round(speed_max) + " " + Math.round(speed_max) + "</p>");
-	    $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
+
         }
     });
 
@@ -1262,9 +1310,6 @@ window.onload = function () {
 //                });
 //                topic_cmd.publish(msg);
 //                console.log("published : End line obstacles");
-//                $('#indication_board').append("<p> Obstacle au sol détecté à la position " + iter + "</p>");
-//                //scroll le div à la fin 
-//                $('#indication_board').animate({scrollTop: $('#indication_board')[0].scrollHeight}, 1000);
 //                periode = setInterval(clignotement, 500);
 //                switch (iter) {
 //                    case 0 :
@@ -1350,76 +1395,219 @@ window.onload = function () {
 //=====================================================================
 //===================GAMEPAD CONTROL=========================
 //=====================================================================
+    var gamePeriode;
+    var checkOk;
+    var movement = false;
 
-// /!\ not yet implemented and tested
-//Tested with a xbox pad 
-//    var start;
-//    var rAF = window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
-//            window.requestAnimationFrame;
-//
-//    var rAFStop = window.mozCancelRequestAnimationFrame || window.webkitCancelRequestAnimationFrame ||
-//            window.cancelRequestAnimationFrame;
-//
-//    window.addEventListener("gamepadconnected", function () {
-//        var gp = navigator.getGamepads()[0];
-//        console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
-//        gameLoop();
-//    });
-//
-//    window.addEventListener("gamepaddisconnected", function () {
-//        console.log("Waiting for gamepad.");
-//        rAFStop(start);
-//    });
-//
-//    if (!('GamepadEvent' in window)) {
-//        // No gamepad events available, poll instead.
-//        var interval = setInterval(pollGamepads, 500);
-//    }
-//
-//    function pollGamepads() {
-//        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-//        for (var i = 0; i < gamepads.length; i++) {
-//            var gp = gamepads[i];
-//            if (gp) {
-//                console.log("Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.");
-//                gameLoop();
-//                clearInterval(interval);
-//            }
+    $(window).on("gamepaddisconnected", function () {
+        console.log("disconnection event");
+        $(".img-game").css('background-color', black_ok);
+        $("#up_possibility").css('color', black_ok);
+        $("#down_possibility").css('color', black_ok);
+        $("#left_possibility").css('color', black_ok);
+        $("#right_possibility").css('color', black_ok);
+        movement = false;
+        clearInterval(gamePeriode);
+        clearInterval(checkOk);
+    });
+
+    $(window).on("gamepadconnected", function () {
+        console.log("connection event");
+        $(".img-game").css('background-color', orange_warning);
+        checkOk = setInterval(canGame, 100);
+    });
+
+    function canGame() {
+        var gp = navigator.getGamepads()[0];
+        if (gp.buttons[16].pressed) {
+            $(".img-game").css('background-color', green_warning);
+            gamePeriode = setInterval(gameLoop, 100);
+            $("#up_possibility").css('color', orange_warning);
+            $("#down_possibility").css('color', orange_warning);
+            $("#left_possibility").css('color', orange_warning);
+            $("#right_possibility").css('color', orange_warning);
+            clearInterval(checkOk);
+        }
+    };
+
+    function gameLoop() {
+        var gp = navigator.getGamepads()[0];
+
+
+        if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) > 5 || gp.buttons[1].pressed) {
+            setHeadDirection(key_head_right);
+        }
+
+        if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) < -5 || gp.buttons[2].pressed) {
+            setHeadDirection(key_head_left);
+        }
+        //debug
+//        for(var i=0;i<gp.buttons.length;i++) {
+//            if(gp.buttons[i].pressed) console.log("pressed " + i);
 //        }
-//    }
-//
-//
-//    function gameLoop() {
-//        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
-//        if (!gamepads)
-//            return;
-//        var gp = gamepads[0];
-//        var x = gp.axes[0];
-//        var speed = gp.buttons[0].value;
-//        var isPressed = gp.buttons[0].pressed;
-//        if (!isPressed) {
-//            var start = rAF(gameLoop);
-//            return;
-//        }
-//
-//        var angular_val = -x;
-//        var msg = new ROSLIB.Message({
-//            linear: {
-//                x: speed,
-//                y: 0.0,
-//                z: 0.0
-//            },
-//            angular: {
-//                x: 0.0,
-//                y: 0.0,
-//                z: angular_val
-//            }
-//        });
-//
-//        //Publish on Topic
-//        topic_cmd.publish(msg);
-//
-//        var start = rAF(gameLoop);
-//    };
+
+        if (gp.buttons[9].pressed) {
+            setSpeedLimit(key_speed_up);
+        }
+
+        if (gp.buttons[8].pressed) {
+            setSpeedLimit(key_speed_down);
+        }
+
+        if (gp.buttons[7].pressed) {
+            setGazeDirection(key_gaze_right);
+        }
+        if (gp.buttons[6].pressed) {
+            setGazeDirection(key_gaze_left);
+        }
+
+        if (gp.buttons[4].pressed || gp.buttons[5].pressed) {
+            movement = true;
+            $("#up_possibility").css('color', green_warning);
+            $("#down_possibility").css('color', green_warning);
+            $("#left_possibility").css('color', green_warning);
+            $("#right_possibility").css('color', green_warning);
+
+            if (Math.round((Math.round(gp.axes[1] * 100) / 100) * 256 / 2) > 5 ||
+                    Math.round((Math.round(gp.axes[1] * 100) / 100) * 256 / 2) < -5) {
+                analogGamepad(Math.round((Math.round(gp.axes[0] * 100) / 100) * 256 / 2),
+                        Math.round((Math.round(gp.axes[1] * 100) / 100) * 256 / 2));
+            }
+
+            if (Math.round((Math.round(gp.axes[0] * 100) / 100) * 256 / 2) > 5 ||
+                    Math.round((Math.round(gp.axes[0] * 100) / 100) * 256 / 2) < -5) {
+                analogGamepad(Math.round((Math.round(gp.axes[0] * 100) / 100) * 256 / 2),
+                        Math.round((Math.round(gp.axes[1] * 100) / 100) * 256 / 2));
+            }
+
+            if (gp.buttons[12].pressed) {
+                clickButton(key_forward);
+            }
+            if (gp.buttons[13].pressed) {
+                clickButton(key_backward);
+            }
+            if (gp.buttons[14].pressed) {
+                clickButton(key_turn_left);
+            }
+            if (gp.buttons[15].pressed) {
+                clickButton(key_turn_right);
+            }
+            if (gp.buttons[3].pressed || gp.buttons[0].pressed) {
+                clickButton(key_stop);
+            }
+
+        } else if (movement) {
+            clickButton(key_stop);
+            movement = false;
+            $("#up_possibility").css('color', orange_warning);
+            $("#down_possibility").css('color', orange_warning);
+            $("#left_possibility").css('color', orange_warning);
+            $("#right_possibility").css('color', orange_warning);
+        }
+
+    }
+    ;
+
+
+    function analogGamepad(dx, dy) {
+
+        var kx = 1;
+        var ky = 1;
+
+        var theta = Math.atan(dy / dx); // En radian
+        if (dx <= 0 && dy >= 0) {
+            theta = theta + Math.PI;
+        } else if (dx <= 0 && dy <= 0) {
+            theta = theta + Math.PI;
+        } else if (dx >= 0 && dy <= 0) {
+            theta = theta + 2 * Math.PI;
+        }
+
+        var v, speed1, speed2;
+
+        if (theta >= 0 && theta <= Math.PI / 2) { // 1er cadran
+            if (theta <= Math.PI / 4) { // 1ère moitié du 1er cadran
+                v = dx * kx;
+                speed1 = v;
+                speed2 = v * Math.sin(theta);
+            } else {
+                v = dy * ky;
+                speed1 = v;
+                speed2 = v * Math.sin(theta);
+            }
+
+        } else if (theta > Math.PI / 2 && theta <= Math.PI) { // 2ème cadran
+            if (theta <= 3 * Math.PI / 4) { // 1ère moitié du 2ème cadran
+                v = dy * ky;
+                speed1 = v * Math.sin(theta);
+                speed2 = v;
+            } else {
+                v = -dx * kx;
+                speed1 = v * Math.sin(theta);
+                speed2 = v;
+            }
+
+        } else if (theta > Math.PI && theta <= 3 * Math.PI / 2) { // 3ème cadran
+            if (theta <= 5 * Math.PI / 4) { // 1ère moitié du 3ème cadran
+                v = dx * kx;
+                speed1 = -v * Math.sin(theta);
+                speed2 = v;
+            } else {
+                v = dy * ky;
+                speed1 = -v * Math.sin(theta);
+                speed2 = v;
+            }
+
+        } else { // 4ème cadran
+            if (theta <= 7 * Math.PI / 4) { // 1ère moitié du 4ème cadran
+                v = dy * ky;
+                speed1 = v;
+                speed2 = -v * Math.sin(theta);
+            } else {
+                v = -dx * kx;
+                speed1 = v;
+                speed2 = -v * Math.sin(theta);
+            }
+
+        }
+
+
+        speed1 += speed_stop;
+        speed2 += speed_stop;
+
+        speed1 = -speed1;
+        speed2 = -speed2;
+
+        speed1 = speed1 * Math.pow(2, Math.abs(speed1) / 32) / 16;
+        speed2 = speed2 * Math.pow(2, Math.abs(speed2) / 32) / 16;
+
+        if (speed1 >= current_speed_max - speed_limit) {
+            speed1 = current_speed_max - speed_limit;
+        }
+
+        if (speed1 <= current_speed_min + speed_limit) {
+            speed1 = current_speed_min + speed_limit;
+        }
+
+        if (speed2 >= current_speed_max - speed_limit) {
+            speed2 = current_speed_max - speed_limit;
+        }
+
+        if (speed2 <= current_speed_min + speed_limit) {
+            speed2 = current_speed_min + speed_limit;
+        }
+
+        var msg = new ROSLIB.Message({
+            speed1: Math.round(speed1),
+            speed2: Math.round(speed2)
+        });
+        //Publish on Topic
+        current_speed1 = Math.round(speed1);
+        current_speed2 = Math.round(speed2);
+        topic_cmd.publish(msg);
+        console.log("published " + Math.round(speed1) + " " + Math.round(speed2));
+
+    }
+    ;
 
 };

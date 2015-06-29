@@ -65,9 +65,35 @@ h3 {
     margin: 5px;
 }
 
-img {
-    height: 100%;
-    width: 100%;
+.img-game {
+    background-color: black;
+    margin-top:-25px;
+    height: 5%;
+    width: 15%;
+
+}
+
+#gaze {
+    position:relative;
+    background-color: #666;
+    border-radius:50%;
+    width:40px;
+    height:20px;
+    border:3px solid black;
+    margin-top : -105px;
+    margin-right: 10px;
+
+
+}
+
+#gaze-dir {
+    position:relative;
+    background: black;
+    border-radius:50%;
+    width:12px;
+    height:12px;
+    margin-left: 6px;
+    margin-top: -4px;
 }
 
 
@@ -477,7 +503,7 @@ ul#tabs li {
 
 ul#tabs li a { 
     color: #42454a; 
-	background-color: #dedbde; 
+    background-color: #dedbde; 
     border: 1px solid #c9c3ba; 
     border-bottom: none; 
     padding: 0.3em; 
@@ -490,8 +516,8 @@ ul#tabs li a:hover {
 
 ul#tabs li a.selected { 
     color: #000; 
-	background-color: #f1f0ee; 
-	font-weight: bold; 
+    background-color: #f1f0ee; 
+    font-weight: bold; 
     padding: 0.7em 0.3em 0.38em 0.3em;
 }
 
@@ -509,6 +535,7 @@ div.tabContent.hide {
 #triangle-up {
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     width: 22px;
     height: 28px;
     background: #3ba3a4;
@@ -529,4 +556,23 @@ div.tabContent.hide {
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
     border-bottom: 12px solid #3ba3a4;
+}
+
+
+#speed-indication {
+    background-color: #fff;
+    border: 2px solid #000;
+    height: 16px;
+    margin-right: 10px;
+    margin-top: -25px;
+    position: relative;
+    transform: rotate(-90deg);
+    width: 50px;
+    padding:0;
+}
+#speed-level {
+    background-color: green;
+    height: 100%;
+    padding:0;
+
 }
