@@ -95,10 +95,10 @@ window.onload = function () {
     var head_increment = 5;
 
     //proximity level in centimeter in [0,255]
-    var proximity_level1 = 40;
-    var proximity_level2 = 30;
-    var proximity_level3 = 20;
-    var proximity_level4 = 10;
+    var proximity_level1 = 90;
+    var proximity_level2 = 80;
+    var proximity_level3 = 70;
+    var proximity_level4 = 60;
 
     //max battery level
     var battery_max = 24;
@@ -245,6 +245,7 @@ window.onload = function () {
 
     var gaze_timeout = false;
     var setGazeDirection = function (key) {
+
 
         //Key code
         //q 81
@@ -834,9 +835,9 @@ window.onload = function () {
 
         } else {
             if (collision_periode) {
-                if (wait_after_collision < 5) {
-                    sleep(3000);
-                }
+                //if (wait_after_collision < 5) {
+                //    sleep(3000);
+                //}
                 clearInterval(collision_periode);
                 collision_periode = false;
             }
@@ -1154,7 +1155,7 @@ window.onload = function () {
                 find = true;
                 //allow movement with speed limit 
                 if (!proximity_alert) {
-                    speed_limit = Math.round(speed_reduction * speed_max / current_speed_max);
+                    speed_limit = Math.round(speed_reduction * current_speed_max /speed_max );
 
                     proximity_alert = true;
                     var speed1 = speed_stop;
@@ -1188,11 +1189,18 @@ window.onload = function () {
         }
         if (!find) {
             //allow movement with full speed (ie 100%)
-            $("#circle").css('color', white_ok);
-            $("#up_possibility").css('color', black_ok);
-            $("#down_possibility").css('color', black_ok);
-            $("#left_possibility").css('color', black_ok);
-            $("#right_possibility").css('color', black_ok);
+            $("#circle").css('background', white_ok);
+	    if (!gamePad) { 
+                    $("#up_possibility").css('color', black_ok);
+                    $("#down_possibility").css('color', black_ok);
+                    $("#left_possibility").css('color', black_ok);
+                    $("#right_possibility").css('color', black_ok);
+            } else {
+                    $("#up_possibility").css('color', orange_warning);
+                    $("#down_possibility").css('color', orange_warning);
+                    $("#left_possibility").css('color', orange_warning);
+                    $("#right_possibility").css('color', orange_warning);
+            }
             speed_limit = 0;
             proximity_alert = false;
 
@@ -1398,6 +1406,7 @@ window.onload = function () {
     var gamePeriode;
     var checkOk;
     var movement = false;
+    var gamePad = false;
 
     $(window).on("gamepaddisconnected", function () {
         console.log("disconnection event");
@@ -1407,6 +1416,7 @@ window.onload = function () {
         $("#left_possibility").css('color', black_ok);
         $("#right_possibility").css('color', black_ok);
         movement = false;
+        gamePad = false ;
         clearInterval(gamePeriode);
         clearInterval(checkOk);
     });
@@ -1419,6 +1429,7 @@ window.onload = function () {
 
     function canGame() {
         var gp = navigator.getGamepads()[0];
+
         if (gp.buttons[16].pressed) {
             $(".img-game").css('background-color', green_warning);
             gamePeriode = setInterval(gameLoop, 100);
@@ -1432,7 +1443,7 @@ window.onload = function () {
 
     function gameLoop() {
         var gp = navigator.getGamepads()[0];
-
+        var gamePad = true;
 
         if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) > 5 || gp.buttons[1].pressed) {
             setHeadDirection(key_head_right);
@@ -1446,22 +1457,22 @@ window.onload = function () {
 //            if(gp.buttons[i].pressed) console.log("pressed " + i);
 //        }
 
-        if (gp.buttons[9].pressed) {
+        if (gp.buttons[3].pressed) {
             setSpeedLimit(key_speed_up);
         }
 
-        if (gp.buttons[8].pressed) {
+        if (gp.buttons[0].pressed) {
             setSpeedLimit(key_speed_down);
         }
 
-        if (gp.buttons[7].pressed) {
+        if (gp.buttons[8].pressed) {
             setGazeDirection(key_gaze_right);
         }
-        if (gp.buttons[6].pressed) {
+        if (gp.buttons[9].pressed) {
             setGazeDirection(key_gaze_left);
         }
 
-        if (gp.buttons[4].pressed || gp.buttons[5].pressed) {
+        if (gp.buttons[11].pressed || gp.buttons[10].pressed) {
             movement = true;
             $("#up_possibility").css('color', green_warning);
             $("#down_possibility").css('color', green_warning);
@@ -1480,19 +1491,19 @@ window.onload = function () {
                         Math.round((Math.round(gp.axes[1] * 100) / 100) * 256 / 2));
             }
 
-            if (gp.buttons[12].pressed) {
+            if (gp.buttons[4].pressed) {
                 clickButton(key_forward);
             }
-            if (gp.buttons[13].pressed) {
+            if (gp.buttons[6].pressed) {
                 clickButton(key_backward);
             }
-            if (gp.buttons[14].pressed) {
+            if (gp.buttons[7].pressed) {
                 clickButton(key_turn_left);
             }
-            if (gp.buttons[15].pressed) {
+            if (gp.buttons[5].pressed) {
                 clickButton(key_turn_right);
             }
-            if (gp.buttons[3].pressed || gp.buttons[0].pressed) {
+            if (gp.buttons[12].pressed || gp.buttons[13].pressed) {
                 clickButton(key_stop);
             }
 
