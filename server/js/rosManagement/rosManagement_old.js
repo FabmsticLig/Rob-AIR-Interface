@@ -111,8 +111,8 @@ window.onload = function () {
         //Command motor
         topic_cmd = new ROSLIB.Topic({
             ros: ros,
-            name: '/cmdProxy',//'/cmdmotors',
-            messageType:'obstacle_avoidance/CommandesProxy' //'md49test/MotorCmd'
+            name: '/cmdmotors',
+            messageType: 'md49test/MotorCmd'
         });
 
         //Head position
@@ -121,12 +121,6 @@ window.onload = function () {
             name: '/angle_position',
             messageType: 'std_msgs/UInt8'
         });
-	
-	topic_suivi_start = new ROSLIB.Topic({
-            ros: ros,
-            name: '/start_suivi',
-            messageType: 'std_msgs/Bool'
-        }); 
 
         //-------------------------------------------------------------------------
         // Subscribers
@@ -205,21 +199,6 @@ window.onload = function () {
                 }
             };
 
-	    var stop = function () {
-                collision_periode = false;
-                $("#circle").css('color', green_ok);
-                $("#circle").css('background', white_ok);
-                $("#circle").css('border-color', white_ok);
-                $("#up_possibility").css('color', black_ok);
-                $("#down_possibility").css('color', black_ok);
-                $("#left_possibility").css('color', black_ok);
-                $("#right_possibility").css('color', black_ok);
-                //allow movement
-                move_up = true;
-                move_down = true;
-                turn_left = true;
-                turn_right = true;
-            };
             if (message.data) {
                 //movement are prohibited and robot stop
                 console.log('COLLISION');
@@ -242,17 +221,33 @@ window.onload = function () {
                 if (!collision_periode) {
                     collision_periode = setInterval(clignotement, 500);
                 }
-		setTimeout(function () {
-                        clearInterval(collision_periode);
-                    }, 5000);
-                    setTimeout(stop, 5001);
 
                 $("#up_possibility").css('color', red_alert);
                 $("#down_possibility").css('color', red_alert);
                 $("#left_possibility").css('color', red_alert);
                 $("#right_possibility").css('color', red_alert);
 
-            
+            } else {
+                if (collision_periode) {
+                    //if (wait_after_collision < 5) {
+                    //    sleep(3000);
+                    //}
+                    clearInterval(collision_periode);
+                    collision_periode = false;
+                }
+                wait_after_collision = 0;
+                $("#circle").css('color', green_ok);
+                $("#circle").css('background', white_ok);
+                $("#circle").css('border-color', white_ok);
+                $("#up_possibility").css('color', black_ok);
+                $("#down_possibility").css('color', black_ok);
+                $("#left_possibility").css('color', black_ok);
+                $("#right_possibility").css('color', black_ok);
+                //allow movement
+                move_up = true;
+                move_down = true;
+                turn_left = true;
+                turn_right = true;
             }
 
 
@@ -340,10 +335,10 @@ window.onload = function () {
                 $("#down_possibility").css('color', red_alert);
                 $("#left_possibility").css('color', red_alert);
                 $("#right_possibility").css('color', red_alert);
-                move_up = true;
-                move_down = true;
-                turn_left = true;
-                turn_right = true;
+                move_up = false;
+                move_down = false;
+                turn_left = false;
+                turn_right = false;
 
                 if (!panic_periode) {
                     panic_periode = setInterval(clignotement, 700);
@@ -813,9 +808,9 @@ window.onload = function () {
     var turn_right = true;
 
     //interval of speed
-    var speed_max = 100;
+    var speed_max = 127;
     var speed_stop = 0;
-    var speed_min = -100;
+    var speed_min = -127;
     var current_speed_max = speed_max;
     var current_speed_min = speed_min;
     var current_angle = Math.PI/2;
@@ -921,29 +916,7 @@ window.onload = function () {
     //==================Publisher============================
     //============================================================
 
-	document.getElementById('tracker-dufour-start').onclick = function (event) {
-        console.log("start_suivi");
-         $(this).toggle();
-        $('#tracker-dufour-stop').toggle();
-         var start_suivi = new ROSLIB.Message({
-             data :true
-         });
-         topic_suivi_start.publish(start_suivi);
-        console.log("start suivi  published ");
-    };
- 
-    document.getElementById('tracker-dufour-stop').onclick = function (event) {
-        console.log("stop_suivi");
-        $(this).toggle();
-        $('#tracker-dufour-start').toggle();
-        var stop_suivi = new ROSLIB.Message({
-            data :false
-    });
-        topic_suivi_start.publish(stop_suivi);
-        console.log("stop suivi  published ");
-    }; 
-   
- var setLine = function () {
+    var setLine = function () {
         if (!hud_activated) {
             var normCamW = $("#div_cam3").css('width');
             var normCamH = $("#div_cam3").css('height');
@@ -1365,12 +1338,11 @@ window.onload = function () {
             }
 
             if (speed1 === speed_stop && speed2 === speed_stop) {
-		sendStop();
-                ///stop_periode = setInterval(sendStop, speed_stop_delay);
-                ///setTimeout(function () {
-                ///    clearInterval(stop_periode);
-                ///    stop_periode = false;
-                ///}, speed_stop_delay * 3 + 1);
+                stop_periode = setInterval(sendStop, speed_stop_delay);
+                setTimeout(function () {
+                    clearInterval(stop_periode);
+                    stop_periode = false;
+                }, speed_stop_delay * 3 + 1);
             } else {
                 var msg = new ROSLIB.Message({
                     speed1: speed1,
@@ -1393,18 +1365,6 @@ window.onload = function () {
     //                   - 'q' and 'd' for gaze direction
     //                   - 'a' and 'e' for head direction
     //                   - '+' and '-' for speed limitation
-
-
-    document.addEventListener('keyup', function (e) {
-
-        e = e || window.event;
-        var keyCode = e.keyCode;
-        e.preventDefault();
-        keyCode = key_stop;
-        clickButton(keyCode);
-        
-    }, false);
-
     document.addEventListener('keydown', function (e) {
 
         e = e || window.event;
@@ -1491,12 +1451,11 @@ window.onload = function () {
         mouse_event_enter = false;
         clearInterval(movement);
         movement = false;
-	//sendstop();
         stop_periode = setInterval(sendStop, speed_stop_delay);
         setTimeout(function () {
-        clearInterval(stop_periode);
-        stop_periode = false;
-       }, speed_stop_delay * 3 + 1);
+            clearInterval(stop_periode);
+            stop_periode = false;
+        }, speed_stop_delay * 3 + 1);
 
 
     };
@@ -1688,9 +1647,6 @@ window.onload = function () {
 
     function canGame() {
         var gp = navigator.getGamepads()[0];
-        for(var i=0;i<gp.buttons.length;i++) {
-            if(gp.buttons[i].pressed) console.log("pressed " + i);
-        }
 
         if (gp.buttons[16].pressed) {
             $(".img-game").css('background-color', green_warning);
@@ -1708,11 +1664,11 @@ window.onload = function () {
         var gp = navigator.getGamepads()[0];
         gamePad = true;
 
-        if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) > 5 || gp.buttons[9].pressed) {
+        if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) > 5 || gp.buttons[1].pressed) {
             setHeadDirection(key_head_right);
         }
 
-        if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) < -5 || gp.buttons[8].pressed) {
+        if (Math.round((Math.round(gp.axes[2] * 100) / 100) * 256 / 2) < -5 || gp.buttons[2].pressed) {
             setHeadDirection(key_head_left);
         }
         //debug
@@ -1720,18 +1676,18 @@ window.onload = function () {
 //            if(gp.buttons[i].pressed) console.log("pressed " + i);
 //        }
 
-        if (gp.buttons[0].pressed) {
+        if (gp.buttons[3].pressed) {
             setSpeedLimit(key_speed_up);
         }
 
-        if (gp.buttons[3].pressed) {
+        if (gp.buttons[0].pressed) {
             setSpeedLimit(key_speed_down);
         }
 
-        if (gp.buttons[13].pressed) {
+        if (gp.buttons[8].pressed) {
             setGazeDirection(key_gaze_right);
         }
-        if (gp.buttons[15].pressed) {
+        if (gp.buttons[9].pressed) {
             setGazeDirection(key_gaze_left);
         }
 
@@ -1768,8 +1724,7 @@ window.onload = function () {
             if (gp.buttons[5].pressed) {
                 clickButton(key_turn_right);
             }
-            if (gp.buttons[12].pressed || gp.buttons[14].pressed) {
-		//sendstop();
+            if (gp.buttons[12].pressed || gp.buttons[13].pressed) {
                 stop_periode = setInterval(sendStop, speed_stop_delay);
                 setTimeout(function () {
                     clearInterval(stop_periode);
@@ -1778,11 +1733,10 @@ window.onload = function () {
             }
 
         } else if (movement && !mouse_event_enter) {
-		//sendstop();
             stop_periode = setInterval(sendStop, speed_stop_delay);
             setTimeout(function () {
-                 clearInterval(stop_periode);
-                 stop_periode = false;
+                clearInterval(stop_periode);
+                stop_periode = false;
             }, speed_stop_delay * 3 + 1);
             clearInterval(movement);
             movement = false;

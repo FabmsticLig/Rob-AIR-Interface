@@ -7,35 +7,6 @@ var mysql = require('mysql');
 var cookieParser = require('cookie-parser'),
     session = require('express-session');
 
-var os = require('os');
-var ifaces = os.networkInterfaces();
-var ipwlan = "127.0.0.1";
-
-Object.keys(ifaces).forEach(function (ifname) {
-    var alias = 0
-            ;
-
-    ifaces[ifname].forEach(function (iface) {
-        if ('IPv4' !== iface.family || iface.internal !== false) {
-            // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-            return;
-        }
-
-        if (alias >= 1) {
-            // this single interface has multiple ipv4 addresses
-            console.log(ifname + ':' + alias, iface.address);
-        } else {
-            if (ifname.indexOf("wlan") !== -1){
-                ipwlan = iface.address;
-            }
-            // this interface has only one ipv4 adress
-            console.log(ifname, iface.address);
-        }
-    });
-});
-
-
-
 var hskey = fs.readFileSync('hacksparrow-key.pem');
 var hscert = fs.readFileSync('hacksparrow-cert.pem');
 
@@ -49,11 +20,6 @@ var port = '8087';
 
 var data = fs.readFileSync("config.json");
 var json = JSON.parse(data);
-
-json.IP_Locale = ipwlan ;
-json.signal.webrtc = "http://" + json.IP_Public + ":8088";
-json.signal.ros = "ws://" + json.IP_Public + ":9090";
-fs.writeFile("config.json", JSON.stringify(json));
 
 var isConnected = {}; //mapping each user to a boolean (connected/not connected)
 var roomToUsers = {}; //mapping each room to its authenticated users
@@ -191,32 +157,12 @@ console.log('XXXXXXXXXXXXX');
 app.get('/', function (req, res) {
     if (req.session.isLogged) {
         console.log('Connecte');
-        var user_type = req.session.userType;
-        if (user_type === 'user') {
-            printPageWithLayout(req, res, 'index.html');
-        } else if (user_type === 'robot') {
-            var conf = {};
-            var data = fs.readFileSync("config.json");
-            conf = JSON.parse(data);
-            printPageWithLayout(req, res, 'index_robot.html', conf);
-
-        }
+	printPageWithLayout(req, res, 'index.html');
     } else {
         console.log('Pas connecte');
 	printPageWithLayout(req, res, 'login.html');
     };
     
-});
-
-app.post('/rob', function (req, res) {
-    var conf = {};
-    var data = fs.readFileSync("config.json");
-    conf = JSON.parse(data);
-    conf.IP_Public = req.body.IP_Public ;
-    conf.signal.webrtc = "http://" + req.body.IP_Public + ":8088";
-    conf.signal.ros = "ws://" + req.body.IP_Public + ":9090";
-    fs.writeFile("config.json", JSON.stringify(conf));
-    res.redirect('/');
 });
 
 

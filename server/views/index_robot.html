@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <h1>Accueil Robair</h1>
+            <h1></h1>
+            <label>Adresse IP local : <%= IP_Locale %> </label>
+            <label>Adresse IP public http:\\<%= IP_Public %>:8087 </label>
+            <label></label>
+            <h1></h1>
+            <div>
+                <label>Changer l'adresse IP public : </label>
+                <input type="text" size="15" id="ip_public" />
+            </div>
+            <button style="background-color:lightblue" onclick="send()">Changer</button>
+        </div>        
+    </div>
+</div>
+<script>
+
+    document.getElementById("ip_public").setAttribute("value", "<%= IP_Public %>");
+
+    function send() {
+        var http = new XMLHttpRequest();
+        var x = document.getElementById("ip_public").value;
+        var params = "IP_Public=" + x;
+        var url = "/rob";
+        http.open("POST", url, true);
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.setRequestHeader("Content-length", params.length);
+        http.setRequestHeader("Connection", "close");
+
+        http.onreadystatechange = function () {//Call a function when the state changes.
+            if (http.readyState === 4 && http.status === 200) {
+                document.location.href = "/";
+            }
+        };
+        http.send(params);
+
+    }
+
+</script>

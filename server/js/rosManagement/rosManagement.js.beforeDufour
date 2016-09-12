@@ -111,8 +111,8 @@ window.onload = function () {
         //Command motor
         topic_cmd = new ROSLIB.Topic({
             ros: ros,
-            name: '/cmdProxy',//'/cmdmotors',
-            messageType:'obstacle_avoidance/CommandesProxy' //'md49test/MotorCmd'
+            name: '/cmdmotors',
+            messageType: 'md49test/MotorCmd'
         });
 
         //Head position
@@ -121,12 +121,6 @@ window.onload = function () {
             name: '/angle_position',
             messageType: 'std_msgs/UInt8'
         });
-	
-	topic_suivi_start = new ROSLIB.Topic({
-            ros: ros,
-            name: '/start_suivi',
-            messageType: 'std_msgs/Bool'
-        }); 
 
         //-------------------------------------------------------------------------
         // Subscribers
@@ -921,29 +915,7 @@ window.onload = function () {
     //==================Publisher============================
     //============================================================
 
-	document.getElementById('tracker-dufour-start').onclick = function (event) {
-        console.log("start_suivi");
-         $(this).toggle();
-        $('#tracker-dufour-stop').toggle();
-         var start_suivi = new ROSLIB.Message({
-             data :true
-         });
-         topic_suivi_start.publish(start_suivi);
-        console.log("start suivi  published ");
-    };
- 
-    document.getElementById('tracker-dufour-stop').onclick = function (event) {
-        console.log("stop_suivi");
-        $(this).toggle();
-        $('#tracker-dufour-start').toggle();
-        var stop_suivi = new ROSLIB.Message({
-            data :false
-    });
-        topic_suivi_start.publish(stop_suivi);
-        console.log("stop suivi  published ");
-    }; 
-   
- var setLine = function () {
+    var setLine = function () {
         if (!hud_activated) {
             var normCamW = $("#div_cam3").css('width');
             var normCamH = $("#div_cam3").css('height');

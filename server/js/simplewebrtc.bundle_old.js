@@ -7,17 +7,6 @@ var attachMediaStream = require('attachmediastream');
 var mockconsole = require('mockconsole');
 var io = require('socket.io-client');
 
-var confighttp;
-var xmlhttpros = new XMLHttpRequest();
-xmlhttpros.onreadystatechange = function () {
-	if (xmlhttpros.readyState === 4 && xmlhttpros.status === 200) {
-	        confighttp = JSON.parse(xmlhttpros.responseText);
-
-         }
-};
-xmlhttpros.open("GET", "../config.json", true);
-xmlhttpros.send(null);
-
 
 function SimpleWebRTC(opts) {
     var self = this;
@@ -25,7 +14,7 @@ function SimpleWebRTC(opts) {
     var config = this.config = {
             //url: 'http://localhost:8088',
 	//url: 'http://192.168.43.208:8088',
-	url: confighttp.signal.webrtc,
+	url: 'http://192.168.1.151:8088',
             socketio: {/* 'force new connection':true*/},
             //debug: true,
             //localVideoEl: '',

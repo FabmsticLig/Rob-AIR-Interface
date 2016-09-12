@@ -19,7 +19,9 @@ a:hover {
   border: 1px solid #fff;
 }
 
-
+video {
+  width:800px;
+}
 /*
  * Base structure
  */

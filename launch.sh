@@ -7,7 +7,7 @@ sleep 3
 nodejs ../signalingserver/server.js &
 
 echo -e "Serveur lancé"
-namevariable=$(uname)
+#namevariable=$(uname)
 
-echo "$namevariable"
+#echo "$namevariable"
 echo -e "Fin du programme"

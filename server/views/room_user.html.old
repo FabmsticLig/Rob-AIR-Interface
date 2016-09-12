@@ -45,16 +45,8 @@
                     </div>
                 </div>
             </div>
-		<div class="row">Pour activer le suivi, placez-vous à 1m50 du robot, vérifiez que vous êtes au centre de la caméra, puis cliquez sur le bouton "Lancer le suivi".
-			<button type="button" id="tracker-dufour-start" class="btn btn-block btn-primary btn-lg">
-                            <span class="glyphicon glyphicon-road"></span> Lancer le suivi
-                        </button>
-			<button type="button" id="tracker-dufour-stop" class="btn btn-block btn-warning btn-lg" style="display:none;">
-                            <span class="glyphicon glyphicon-stop"></span> Arrêter le suivi
-                        </button>
-		</div>
-        </div>
 
+        </div>
         <div class="col-sm-4">
             <div class="row">
                 <div class="row">

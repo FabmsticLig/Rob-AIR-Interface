@@ -44,10 +44,10 @@ var webrtc = new SimpleWebRTC({
                 mandatory:
                     {
 			//sourceId: 'ca2b61bc934d47ef9cd9fcc6f8fc567fa7f20d400fb6ff5841f7c2b6f4760694',
-                        maxWidth:640,
-                        maxHeight:480,
-			minWidth:640,
-			minHeight:480,
+                        maxWidth:1024,
+                        maxHeight:768,
+			minWidth:1024,
+			minHeight:768,
                         //maxFrameRate:10
                     }
               }

@@ -6,17 +6,30 @@
     margin: auto;
 }
 
-.accelerometer {
-    position: absolute;
-    left: 10%;
-    width: 80%;
-    bottom: 5px;
-    height: 5px;
-    display: none;
+#cam {
+    position : absolute; 
+}
+
+#mouse {
+    width :214px;
+    height:214px;
+}
+
+#remote-controls-mouse {
+    padding: 2px 2px;
+    position : relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    width:220px;
+    height:220px;
+    border:2px solid red; 
+    
 }
 
 /* Video principale de video-conf */
 #div_cam3 video {
+    display:inline-block;
     width: 80%;
     height: 70%;
 }
