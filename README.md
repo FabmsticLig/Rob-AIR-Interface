@@ -45,4 +45,3 @@ You might also need a stunt server but we'll explain this in more detail later.
 
 How to locally launch the web page :
 * `$ chromium-browser http://localhost:8081/`
-
